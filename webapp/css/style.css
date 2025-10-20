@@ -1,0 +1,20 @@
+/* Enter your custom styles here */
+
+/* SAP UI5 标准布局：限制内容宽度，左右留白 */
+.sapUiBody .sapMShellAppWidthLimited .sapMShellCentralBox {
+    max-width: 1280px;
+    margin: 0 auto;
+}
+
+/* 为小屏幕设备设置响应式 */
+@media (max-width: 1024px) {
+    .sapUiBody .sapMShellAppWidthLimited .sapMShellCentralBox {
+        max-width: 100%;
+        padding: 0 1rem;
+    }
+}
+
+/* 优化面板间距 */
+.sapMPanel {
+    margin-bottom: 1rem;
+}
