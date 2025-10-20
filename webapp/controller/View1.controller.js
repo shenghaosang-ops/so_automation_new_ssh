@@ -7,11 +7,11 @@ sap.ui.define([
     "sap/ui/core/mvc/Controller",
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageToast",
-    "./FileHandler",
-    "./RuleManager",
-    "./BatchProcessor",
-    "./ResultsHandler",
-    "./TableManager"  
+    "../services/FileHandler",
+    "../services/RuleManager",
+    "../services/BatchProcessor",
+    "../services/ResultsHandler",
+    "../services/TableManager"  
 ], function(Controller, JSONModel, MessageToast, FileHandler, RuleManager, BatchProcessor, ResultsHandler, TableManager) {
     "use strict";
     return Controller.extend("yegeoaiso.controller.View1", {
