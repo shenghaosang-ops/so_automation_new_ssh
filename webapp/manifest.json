@@ -77,17 +77,61 @@
       },
       "routes": [
         {
+          "name": "Home",
+          "pattern": "",
+          "target": [
+            "TargetHome"
+          ]
+        },
+        {
+          "name": "DataAcquisition",
+          "pattern": "data-acquisition",
+          "target": [
+            "TargetDataAcquisition"
+          ]
+        },
+        {
           "name": "RouteView1",
-          "pattern": ":?query:",
+          "pattern": "so-automation",
           "target": [
             "TargetView1"
+          ]
+        },
+        {
+          "name": "SOUpload",
+          "pattern": "so-upload",
+          "target": [
+            "TargetSOUpload"
+          ]
+        },
+        {
+          "name": "EmailNotification",
+          "pattern": "email-notification",
+          "target": [
+            "TargetEmailNotification"
           ]
         }
       ],
       "targets": {
+        "TargetHome": {
+          "id": "Home",
+          "name": "Home"
+        },
+        "TargetDataAcquisition": {
+          "id": "DataAcquisition",
+          "name": "DataAcquisition"
+        },
         "TargetView1": {
           "id": "View1",
           "name": "View1"
+        },
+        "TargetSOUpload": {
+          "id": "SOUpload",
+          "name": "SOUpload"
+        },
+        "TargetEmailNotification": {
+          "id": "EmailNotification",
+          "name": "EmailNotification"
         }
       }
     },

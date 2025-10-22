@@ -1,0 +1,279 @@
+<mvc:View
+    controllerName="yegeoaiso.controller.EmailNotification"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:l="sap.ui.layout"
+    xmlns:form="sap.ui.layout.form">
+
+    <Page
+        id="emailNotificationPage"
+        title="Email Notification Configuration"
+        showNavButton="true"
+        navButtonPress="onNavBack"
+        backgroundDesign="Transparent">
+
+        <content>
+            <!-- Email Configuration -->
+            <Panel
+                expandable="true"
+                expanded="true"
+                headerText="Email Configuration"
+                width="auto"
+                class="sapUiNoContentPadding">
+                <headerToolbar>
+                    <Toolbar style="Clear">
+                        <Title text="Configure Email Settings"/>
+                        <ToolbarSpacer/>
+                        <core:Icon src="sap-icon://email" class="sapUiTinyMarginEnd"/>
+                    </Toolbar>
+                </headerToolbar>
+                <content>
+                    <form:SimpleForm
+                        editable="true"
+                        layout="ResponsiveGridLayout"
+                        labelSpanXL="3"
+                        labelSpanL="3"
+                        labelSpanM="3"
+                        labelSpanS="12"
+                        class="sapUiSmallMargin">
+                        <form:content>
+                            <!-- Result Type Selection -->
+                            <Label text="Upload Result Type" required="true"/>
+                            <SegmentedButton
+                                id="resultTypeSegmented"
+                                selectedKey="{email>/resultType}"
+                                selectionChange="onResultTypeChange">
+                                <items>
+                                    <SegmentedButtonItem key="success" icon="sap-icon://message-success" text="Success"/>
+                                    <SegmentedButtonItem key="failure" icon="sap-icon://message-error" text="Failure"/>
+                                    <SegmentedButtonItem key="both" icon="sap-icon://email" text="Both"/>
+                                </items>
+                            </SegmentedButton>
+
+                            <Label text=""/>
+                            <Text text=""/>
+
+                            <!-- Email Recipients -->
+                            <Label text="To (Recipients)" required="true"/>
+                            <Input
+                                value="{email>/recipients}"
+                                placeholder="email1@example.com; email2@example.com"
+                                width="100%"/>
+
+                            <Label text="CC"/>
+                            <Input
+                                value="{email>/cc}"
+                                placeholder="Optional: CC recipients"
+                                width="100%"/>
+
+                            <Label text="Email Subject" required="true"/>
+                            <Input
+                                value="{email>/subject}"
+                                placeholder="SO Upload Results - {date}"
+                                width="100%"/>
+
+                            <!-- Success Message Configuration -->
+                            <Label 
+                                text="Success Message Template"
+                                visible="{= ${email>/resultType} === 'success' || ${email>/resultType} === 'both'}"/>
+                            <TextArea
+                                value="{email>/successMessage}"
+                                placeholder="Enter success message template..."
+                                rows="5"
+                                width="100%"
+                                visible="{= ${email>/resultType} === 'success' || ${email>/resultType} === 'both'}"/>
+
+                            <!-- Failure Message Configuration -->
+                            <Label 
+                                text="Failure Message Template"
+                                visible="{= ${email>/resultType} === 'failure' || ${email>/resultType} === 'both'}"/>
+                            <TextArea
+                                value="{email>/failureMessage}"
+                                placeholder="Enter failure message template..."
+                                rows="5"
+                                width="100%"
+                                visible="{= ${email>/resultType} === 'failure' || ${email>/resultType} === 'both'}"/>
+
+                            <Label text="Attach Data"/>
+                            <CheckBox
+                                text="Attach detailed results as Excel file"
+                                selected="{email>/attachExcel}"/>
+                        </form:content>
+                    </form:SimpleForm>
+                </content>
+            </Panel>
+
+            <!-- Data Preview with Status Column -->
+            <Panel
+                expandable="true"
+                expanded="true"
+                headerText="Email Data Preview"
+                width="auto"
+                class="sapUiNoContentPadding">
+                <headerToolbar>
+                    <Toolbar style="Clear">
+                        <Title text="Data to be Sent in Email"/>
+                        <ToolbarSpacer/>
+                        <Text text="Total: {email>/totalCount} | Success: {email>/successCount} | Failed: {email>/failedCount}"/>
+                        <ToolbarSpacer width="1rem"/>
+                        <SearchField 
+                            width="15rem" 
+                            placeholder="Search..." 
+                            search="onSearchEmailData"/>
+                        <core:Icon src="sap-icon>/table-view" class="sapUiTinyMarginEnd"/>
+                    </Toolbar>
+                </headerToolbar>
+                <content>
+                    <VBox class="sapUiSmallMargin">
+                        <Table
+                            id="emailDataTable"
+                            items="{email>/emailData}"
+                            sticky="ColumnHeaders"
+                            growing="true"
+                            growingThreshold="50">
+                            <columns>
+                                <Column width="60px"><Text text="Row #"/></Column>
+                                <Column width="100px"><Text text="Status"/></Column>
+                                <Column><Text text="PO Number"/></Column>
+                                <Column><Text text="SO Number"/></Column>
+                                <Column><Text text="Customer Code"/></Column>
+                                <Column><Text text="Part No"/></Column>
+                                <Column><Text text="Quantity"/></Column>
+                                <Column><Text text="Request Date"/></Column>
+                                <Column width="200px"><Text text="Result Message"/></Column>
+                            </columns>
+                            <items>
+                                <ColumnListItem>
+                                    <cells>
+                                        <Text text="{email>rowIndex}"/>
+                                        <ObjectStatus
+                                            text="{email>status}"
+                                            state="{= ${email>status} === 'Success' ? 'Success' : 'Error'}"
+                                            icon="{= ${email>status} === 'Success' ? 'sap-icon://message-success' : 'sap-icon://message-error'}"/>
+                                        <Text text="{email>poNumber}"/>
+                                        <Text text="{email>soNumber}"/>
+                                        <Text text="{email>customerCode}"/>
+                                        <Text text="{email>partNo}"/>
+                                        <Text text="{email>quantity}"/>
+                                        <Text text="{email>requestDate}"/>
+                                        <Text text="{email>message}"/>
+                                    </cells>
+                                </ColumnListItem>
+                            </items>
+                        </Table>
+                    </VBox>
+                </content>
+            </Panel>
+
+            <!-- Email Preview -->
+            <Panel
+                id="emailPreviewPanel"
+                expandable="true"
+                expanded="false"
+                headerText="Email Preview"
+                width="auto"
+                class="sapUiNoContentPadding">
+                <headerToolbar>
+                    <Toolbar style="Clear">
+                        <Title text="Preview Email Content"/>
+                        <ToolbarSpacer/>
+                        <Button
+                            text="Refresh Preview"
+                            icon="sap-icon://refresh"
+                            press="onRefreshPreview"/>
+                        <core:Icon src="sap-icon://preview" class="sapUiTinyMarginEnd"/>
+                    </Toolbar>
+                </headerToolbar>
+                <content>
+                    <VBox class="sapUiSmallMargin">
+                        <form:SimpleForm editable="false" layout="ResponsiveGridLayout">
+                            <form:content>
+                                <Label text="To:"/>
+                                <Text text="{email>/recipients}"/>
+                                
+                                <Label text="CC:"/>
+                                <Text text="{email>/cc}"/>
+                                
+                                <Label text="Subject:"/>
+                                <Text text="{email>/subject}"/>
+                                
+                                <Label text="Message:"/>
+                                <TextArea
+                                    value="{email>/previewMessage}"
+                                    editable="false"
+                                    rows="10"
+                                    width="100%"/>
+                            </form:content>
+                        </form:SimpleForm>
+                    </VBox>
+                </content>
+            </Panel>
+
+            <!-- Send Actions -->
+            <Panel
+                expandable="false"
+                expanded="true"
+                headerText="Send Email"
+                width="auto"
+                class="sapUiNoContentPadding">
+                <content>
+                    <VBox class="sapUiSmallMargin">
+                        <HBox justifyContent="SpaceBetween">
+                            <VBox width="60%">
+                                <MessageStrip
+                                    text="Review the email configuration and data before sending."
+                                    type="Information"
+                                    showIcon="true"/>
+                            </VBox>
+                            <VBox width="35%">
+                                <Button
+                                    text="Send Email"
+                                    type="Emphasized"
+                                    icon="sap-icon://paper-plane"
+                                    press="onSendEmail"
+                                    width="100%"/>
+                            </VBox>
+                        </HBox>
+                        
+                        <!-- Send Progress -->
+                        <VBox 
+                            visible="{= ${email>/sendInProgress} === true}"
+                            class="sapUiSmallMarginTop">
+                            <Label text="Sending Email..." class="sapUiTinyMarginBottom"/>
+                            <ProgressIndicator
+                                percentValue="{email>/sendProgress}"
+                                displayValue="Processing..."
+                                showValue="true"
+                                state="Information"/>
+                        </VBox>
+
+                        <!-- Send Result -->
+                        <MessageStrip
+                            visible="{= ${email>/sendResult} !== ''}"
+                            text="{email>/sendResultMessage}"
+                            type="{email>/sendResultType}"
+                            showIcon="true"
+                            class="sapUiSmallMarginTop"/>
+                    </VBox>
+                </content>
+            </Panel>
+        </content>
+
+        <footer>
+            <Toolbar>
+                <ToolbarSpacer/>
+                <Button
+                    text="Back to Home"
+                    icon="sap-icon://home"
+                    press="onNavigateToHome"/>
+                <Button
+                    text="Complete Workflow"
+                    type="Success"
+                    icon="sap-icon://accept"
+                    press="onCompleteWorkflow"
+                    enabled="{= ${email>/sendResult} === 'success'}"/>
+            </Toolbar>
+        </footer>
+    </Page>
+</mvc:View>

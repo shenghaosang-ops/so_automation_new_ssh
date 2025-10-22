@@ -1,0 +1,95 @@
+<mvc:View
+    controllerName="yegeoaiso.controller.Home"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:l="sap.ui.layout"
+    xmlns:core="sap.ui.core">
+
+    <Page
+        id="homePage"
+        title="SO Automation Platform"
+        showNavButton="false"
+        backgroundDesign="Transparent">
+
+        <content>
+            <l:VerticalLayout width="100%" class="sapUiSmallMarginTop">
+                <!-- Welcome Section -->
+                <VBox alignItems="Center" class="sapUiSmallMarginBottom">
+                    <Title text="Welcome to SO Automation Suite" level="H2" class="sapUiTinyMarginBottom"/>
+                    <Text text="Complete end-to-end solution for sales order processing"/>
+                </VBox>
+
+                <!-- Process Flow Cards - 2x2 Grid Layout (Compact) -->
+                <VBox alignItems="Center">
+                    <!-- First Row -->
+                    <HBox justifyContent="Center" class="sapUiSmallMarginBottom">
+                        <!-- Data Acquisition -->
+                        <VBox alignItems="Center" width="280px" class="sapUiMediumMargin">
+                            <core:Icon src="sap-icon://database" size="3rem" color="#0854a0" 
+                                      class="sapUiSmallMarginBottom"/>
+                            <Title text="1. Data Acquisition" level="H4" 
+                                   class="sapUiTinyMarginBottom" textAlign="Center"/>
+                            <Text text="Extract data from web pages or PDF documents using OCR and AI" 
+                                  textAlign="Center" class="sapUiTinyMarginBottom"/>
+                            <Button text="Start Me..." type="Emphasized" 
+                                    press="onNavigateToDataAcquisition"/>
+                        </VBox>
+
+                        <!-- SO Automation -->
+                        <VBox alignItems="Center" width="280px" class="sapUiMediumMargin">
+                            <core:Icon src="sap-icon://flight" size="3rem" color="#0854a0" 
+                                      class="sapUiSmallMarginBottom"/>
+                            <Title text="2. SO Automation" level="H4" 
+                                   class="sapUiTinyMarginBottom" textAlign="Center"/>
+                            <Text text="Upload Excel data and process sales orders with AI-powered automation" 
+                                  textAlign="Center" class="sapUiTinyMarginBottom"/>
+                            <Button text="Start Me..." type="Emphasized" 
+                                    press="onNavigateToSOAutomation"/>
+                        </VBox>
+                    </HBox>
+
+                    <!-- Second Row -->
+                    <HBox justifyContent="Center" class="sapUiSmallMarginTop">
+                        <!-- SO Upload -->
+                        <VBox alignItems="Center" width="280px" class="sapUiMediumMargin">
+                            <core:Icon src="sap-icon://upload-to-cloud" size="3rem" color="#0854a0" 
+                                      class="sapUiSmallMarginBottom"/>
+                            <Title text="3. SO Upload" level="H4" 
+                                   class="sapUiTinyMarginBottom" textAlign="Center"/>
+                            <Text text="Validate and upload sales orders to ERP system with real-time status tracking" 
+                                  textAlign="Center" class="sapUiTinyMarginBottom"/>
+                            <Button text="Start Me..." type="Emphasized" 
+                                    press="onNavigateToSOUpload"/>
+                        </VBox>
+
+                        <!-- Email Configuration -->
+                        <VBox alignItems="Center" width="280px" class="sapUiMediumMargin">
+                            <core:Icon src="sap-icon://email" size="3rem" color="#0854a0" 
+                                      class="sapUiSmallMarginBottom"/>
+                            <Title text="4. Email Configuration" level="H4" 
+                                   class="sapUiTinyMarginBottom" textAlign="Center"/>
+                            <Text text="Configure and send automated email notifications with upload results" 
+                                  textAlign="Center" class="sapUiTinyMarginBottom"/>
+                            <Button text="Start Me..." type="Emphasized" 
+                                    press="onNavigateToEmailNotification"/>
+                        </VBox>
+                    </HBox>
+                </VBox>
+
+                <!-- Process Flow Indicator -->
+                <VBox alignItems="Center" class="sapUiMediumMarginTop">
+                    <Text text="Process Flow:" class="sapUiTinyMarginBottom" />
+                    <HBox alignItems="Center">
+                        <Text text="1. Data Acquisition" class="sapUiTinyMarginEnd"/>
+                        <core:Icon src="sap-icon://navigation-right-arrow" size="0.8rem" color="#0854a0" class="sapUiTinyMarginEnd"/>
+                        <Text text="2. SO Automation" class="sapUiTinyMarginEnd"/>
+                        <core:Icon src="sap-icon://navigation-right-arrow" size="0.8rem" color="#0854a0" class="sapUiTinyMarginEnd"/>
+                        <Text text="3. SO Upload" class="sapUiTinyMarginEnd"/>
+                        <core:Icon src="sap-icon://navigation-right-arrow" size="0.8rem" color="#0854a0" class="sapUiTinyMarginEnd"/>
+                        <Text text="4. Email Configuration"/>
+                    </HBox>
+                </VBox>
+            </l:VerticalLayout>
+        </content>
+    </Page>
+</mvc:View>

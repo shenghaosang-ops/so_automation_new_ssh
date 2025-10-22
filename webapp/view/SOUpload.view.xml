@@ -1,0 +1,265 @@
+<mvc:View
+    controllerName="yegeoaiso.controller.SOUpload"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:l="sap.ui.layout">
+
+    <Page
+        id="soUploadPage"
+        title="SO Upload to ERP"
+        showNavButton="true"
+        navButtonPress="onNavBack"
+        backgroundDesign="Transparent">
+
+        <content>
+            <!-- Upload Summary -->
+            <Panel
+                expandable="true"
+                expanded="true"
+                headerText="Upload Summary"
+                width="auto"
+                class="sapUiNoContentPadding">
+                <headerToolbar>
+                    <Toolbar style="Clear">
+                        <Title text="SO Data Summary"/>
+                        <ToolbarSpacer/>
+                        <core:Icon src="sap-icon://infoget rich" class="sapUiTinyMarginEnd"/>
+                    </Toolbar>
+                </headerToolbar>
+                <content>
+                    <l:HorizontalLayout class="sapUiSmallMargin">
+                        <l:VerticalLayout width="200px" class="sapUiSmallMarginEnd">
+                            <ObjectStatus
+                                title="Total Records"
+                                text="{soUpload>/totalRecords}"
+                                state="Information"
+                                icon="sap-icon://documents"/>
+                        </l:VerticalLayout>
+                        <l:VerticalLayout width="200px" class="sapUiSmallMarginEnd">
+                            <ObjectStatus
+                                title="Valid Records"
+                                text="{soUpload>/validRecords}"
+                                state="Success"
+                                icon="sap-icon://status-positive"/>
+                        </l:VerticalLayout>
+                        <l:VerticalLayout width="200px">
+                            <ObjectStatus
+                                title="Invalid Records"
+                                text="{soUpload>/invalidRecords}"
+                                state="Warning"
+                                icon="sap-icon://status-error"/>
+                        </l:VerticalLayout>
+                    </l:HorizontalLayout>
+                </content>
+            </Panel>
+
+            <!-- SO Data Table -->
+            <Panel
+                expandable="true"
+                expanded="true"
+                headerText="SO Data for Upload"
+                width="auto"
+                class="sapUiNoContentPadding">
+                <headerToolbar>
+                    <Toolbar style="Clear">
+                        <Title text="Review SO Data"/>
+                        <ToolbarSpacer/>
+                        <SearchField 
+                            width="15rem" 
+                            placeholder="Search..." 
+                            search="onSearchData"/>
+                        <core:Icon src="sap-icon://table-view" class="sapUiTinyMarginEnd"/>
+                    </Toolbar>
+                </headerToolbar>
+                <content>
+                    <VBox class="sapUiSmallMargin">
+                        <Table
+                            id="soDataTable"
+                            items="{soUpload>/soData}"
+                            sticky="ColumnHeaders"
+                            growing="true"
+                            growingThreshold="50"
+                            mode="MultiSelect">
+                            <columns>
+                                <Column width="60px"><Text text="Row #"/></Column>
+                                <Column width="80px"><Text text="Status"/></Column>
+                                <Column><Text text="Customer Code"/></Column>
+                                <Column><Text text="PO Number"/></Column>
+                                <Column><Text text="PO Date"/></Column>
+                                <Column><Text text="Item No"/></Column>
+                                <Column><Text text="Part No"/></Column>
+                                <Column><Text text="Quantity"/></Column>
+                                <Column><Text text="Request Date"/></Column>
+                                <Column><Text text="Sales Order Type"/></Column>
+                                <Column width="200px"><Text text="Validation Message"/></Column>
+                            </columns>
+                            <items>
+                                <ColumnListItem>
+                                    <cells>
+                                        <Text text="{soUpload>rowIndex}"/>
+                                        <ObjectStatus
+                                            text="{= ${soUpload>valid} ? 'Valid' : 'Invalid'}"
+                                            state="{= ${soUpload>valid} ? 'Success' : 'Warning'}"
+                                            icon="{= ${soUpload>valid} ? 'sap-icon://accept' : 'sap-icon://alert'}"/>
+                                        <Text text="{soUpload>customerCode}"/>
+                                        <Text text="{soUpload>poNumber}"/>
+                                        <Text text="{soUpload>poDate}"/>
+                                        <Text text="{soUpload>itemNo}"/>
+                                        <Text text="{soUpload>partNo}"/>
+                                        <Text text="{soUpload>quantity}"/>
+                                        <Text text="{soUpload>requestDate}"/>
+                                        <Text text="{soUpload>salesOrderType}"/>
+                                        <Text text="{soUpload>validationMessage}"/>
+                                    </cells>
+                                </ColumnListItem>
+                            </items>
+                        </Table>
+                    </VBox>
+                </content>
+            </Panel>
+
+            <!-- Validation & Upload Actions -->
+            <Panel
+                expandable="true"
+                expanded="true"
+                headerText="Upload Actions"
+                width="auto"
+                class="sapUiNoContentPadding">
+                <headerToolbar>
+                    <Toolbar style="Clear">
+                        <Title text="Validate and Upload"/>
+                        <ToolbarSpacer/>
+                        <core:Icon src="sap-icon://action" class="sapUiTinyMarginEnd"/>
+                    </Toolbar>
+                </headerToolbar>
+                <content>
+                    <VBox class="sapUiSmallMargin">
+                        <HBox justifyContent="SpaceBetween" class="sapUiSmallMarginBottom">
+                            <VBox width="60%">
+                                <Label text="ERP System Configuration" class="sapUiTinyMarginBottom"/>
+                                <HBox alignItems="Center" class="sapUiSmallMarginBottom">
+                                    <Label text="System:" width="100px"/>
+                                    <Input 
+                                        value="{soUpload>/erpSystem}" 
+                                        placeholder="SAP S/4HANA"
+                                        width="300px"/>
+                                </HBox>
+                                <HBox alignItems="Center" class="sapUiSmallMarginBottom">
+                                    <Label text="Connection:" width="100px"/>
+                                    <ObjectStatus
+                                        text="{soUpload>/connectionStatus}"
+                                        state="{= ${soUpload>/connectionStatus} === 'Connected' ? 'Success' : 'Error'}"
+                                        icon="{= ${soUpload>/connectionStatus} === 'Connected' ? 'sap-icon://connected' : 'sap-icon://disconnected'}"/>
+                                </HBox>
+                            </VBox>
+                            <VBox width="35%">
+                                <Button
+                                    text="Check Data Validity"
+                                    type="Transparent"
+                                    icon="sap-icon://inspect"
+                                    press="onCheckData"
+                                    width="100%"
+                                    class="sapUiTinyMarginBottom"/>
+                                <Button
+                                    text="Execute Upload to ERP"
+                                    type="Emphasized"
+                                    icon="sap-icon://upload-to-cloud"
+                                    press="onExecuteUpload"
+                                    enabled="{= ${soUpload>/validRecords} > 0}"
+                                    width="100%"/>
+                            </VBox>
+                        </HBox>
+
+                        <!-- Upload Progress -->
+                        <VBox 
+                            visible="{= ${soUpload>/uploadInProgress} === true}"
+                            class="sapUiSmallMarginTop">
+                            <Label text="Upload Progress" class="sapUiTinyMarginBottom"/>
+                            <ProgressIndicator
+                                percentValue="{soUpload>/uploadProgress}"
+                                displayValue="{soUpload>/uploadProgress}%"
+                                showValue="true"
+                                state="{= ${soUpload>/uploadProgress} === 100 ? 'Success' : 'Information'}"/>
+                            <Text 
+                                text="{soUpload>/uploadedCount} of {soUpload>/totalRecords} records uploaded"
+                                class="sapUiTinyMarginTop"/>
+                        </VBox>
+                    </VBox>
+                </content>
+            </Panel>
+
+            <!-- Upload Results -->
+            <Panel
+                id="uploadResultsPanel"
+                expandable="true"
+                expanded="true"
+                headerText="Upload Results"
+                visible="{= ${soUpload>/uploadResults} !== undefined &amp;&amp; ${soUpload>/uploadResults/length} > 0}"
+                width="auto"
+                class="sapUiNoContentPadding">
+                <headerToolbar>
+                    <Toolbar style="Clear">
+                        <Title text="Upload Status"/>
+                        <ToolbarSpacer/>
+                        <Button
+                            text="Export Results"
+                            icon="sap-icon://excel-attachment"
+                            press="onExportResults"/>
+                        <core:Icon src="sap-icon://message-success" class="sapUiTinyMarginEnd"/>
+                    </Toolbar>
+                </headerToolbar>
+                <content>
+                    <VBox class="sapUiSmallMargin">
+                        <MessageStrip
+                            text="{soUpload>/uploadSummaryMessage}"
+                            type="{soUpload>/uploadSummaryType}"
+                            showIcon="true"
+                            class="sapUiSmallMarginBottom"/>
+                        
+                        <Table
+                            id="uploadResultsTable"
+                            items="{soUpload>/uploadResults}"
+                            growing="true"
+                            growingThreshold="20">
+                            <columns>
+                                <Column width="60px"><Text text="Row #"/></Column>
+                                <Column><Text text="PO Number"/></Column>
+                                <Column><Text text="SO Number"/></Column>
+                                <Column width="100px"><Text text="Upload Status"/></Column>
+                                <Column><Text text="Message"/></Column>
+                            </columns>
+                            <items>
+                                <ColumnListItem>
+                                    <cells>
+                                        <Text text="{soUpload>rowIndex}"/>
+                                        <Text text="{soUpload>poNumber}"/>
+                                        <Text text="{soUpload>soNumber}"/>
+                                        <ObjectStatus
+                                            text="{soUpload>status}"
+                                            state="{= ${soUpload>status} === 'Success' ? 'Success' : 'Error'}"
+                                            icon="{= ${soUpload>status} === 'Success' ? 'sap-icon://message-success' : 'sap-icon://message-error'}"/>
+                                        <Text text="{soUpload>message}"/>
+                                    </cells>
+                                </ColumnListItem>
+                            </items>
+                        </Table>
+                    </VBox>
+                </content>
+            </Panel>
+        </content>
+
+        <footer>
+            <Toolbar>
+                <ToolbarSpacer/>
+                <Button
+                    text="Next: Email Notification"
+                    type="Emphasized"
+                    icon="sap-icon://navigation-right-arrow"
+                    iconDensityAware="false"
+                    press="onNavigateToEmailNotification"
+                    enabled="{= ${soUpload>/uploadResults} !== undefined &amp;&amp; ${soUpload>/uploadResults/length} > 0}"/>
+            </Toolbar>
+        </footer>
+    </Page>
+</mvc:View>

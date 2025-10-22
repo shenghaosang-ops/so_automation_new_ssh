@@ -24,6 +24,8 @@
     <Page
         id="page"
         title="SO Automation Demo"
+        showNavButton="true"
+        navButtonPress="onNavBack"
         backgroundDesign="Transparent">
 
         <content>
@@ -331,5 +333,18 @@
                 </content>
             </Panel>
         </content>
+
+        <footer>
+            <Toolbar>
+                <ToolbarSpacer/>
+                <Button
+                    text="Next: SO Upload"
+                    type="Emphasized"
+                    icon="sap-icon://navigation-right-arrow"
+                    iconDensityAware="false"
+                    press="onNavigateToSOUpload"
+                    enabled="{= ${results>/rows/length} > 0}"/>
+            </Toolbar>
+        </footer>
     </Page>
 </mvc:View>

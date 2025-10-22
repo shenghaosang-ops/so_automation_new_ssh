@@ -199,6 +199,46 @@ sap.ui.define([
                 console.error("Table manager not initialized");
                 MessageToast.show("Table settings not available");
             }
+        },
+
+        /**
+         * Navigate to SO Upload page
+         */
+        onNavigateToSOUpload: function() {
+            var oResultsModel = this.getView().getModel("results");
+            var aResults = oResultsModel.getProperty("/rows");
+            
+            if (!aResults || aResults.length === 0) {
+                sap.m.MessageBox.warning("No processed data available. Please process data first.");
+                return;
+            }
+
+            // Store results in global model
+            var oGlobalModel = this.getOwnerComponent().getModel("globalData");
+            if (!oGlobalModel) {
+                oGlobalModel = new sap.ui.model.json.JSONModel({});
+                this.getOwnerComponent().setModel(oGlobalModel, "globalData");
+            }
+            oGlobalModel.setProperty("/processedData", aResults);
+
+            // Navigate to SO Upload
+            var oRouter = this.getOwnerComponent().getRouter();
+            oRouter.navTo("SOUpload");
+        },
+
+        /**
+         * Navigate back
+         */
+        onNavBack: function() {
+            var oHistory = sap.ui.core.routing.History.getInstance();
+            var sPreviousHash = oHistory.getPreviousHash();
+
+            if (sPreviousHash !== undefined) {
+                window.history.go(-1);
+            } else {
+                var oRouter = this.getOwnerComponent().getRouter();
+                oRouter.navTo("DataAcquisition", {}, true);
+            }
         }
     });
 });

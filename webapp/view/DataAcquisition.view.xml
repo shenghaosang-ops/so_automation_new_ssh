@@ -1,0 +1,248 @@
+<mvc:View
+    controllerName="yegeoaiso.controller.DataAcquisition"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:u="sap.ui.unified"
+    xmlns:l="sap.ui.layout"
+    xmlns:core="sap.ui.core"
+    xmlns:form="sap.ui.layout.form">
+
+    <Page
+        id="dataAcquisitionPage"
+        title="Data Acquisition"
+        showNavButton="true"
+        navButtonPress="onNavBack"
+        backgroundDesign="Transparent">
+
+        <content>
+            <!-- Data Type Selection -->
+            <Panel
+                expandable="true"
+                expanded="true"
+                headerText="Data Source Selection"
+                width="auto"
+                class="sapUiNoContentPadding">
+                <headerToolbar>
+                    <Toolbar style="Clear">
+                        <Title text="Select Data Source Type"/>
+                        <ToolbarSpacer/>
+                        <core:Icon src="sap-icon://database" class="sapUiTinyMarginEnd"/>
+                    </Toolbar>
+                </headerToolbar>
+                <content>
+                    <VBox class="sapUiSmallMargin">
+                        <Label text="Data Type" required="true" class="sapUiTinyMarginBottom"/>
+                        <SegmentedButton
+                            id="dataTypeSegmented"
+                            selectedKey="{dataAcquisition>/dataType}"
+                            selectionChange="onDataTypeChange"
+                            class="sapUiSmallMarginBottom">
+                            <items>
+                                <SegmentedButtonItem key="structured" icon="sap-icon://internet-browser" text="Structured Data (Web)"/>
+                                <SegmentedButtonItem key="unstructured" icon="sap-icon://document" text="Unstructured Data (PDF/Document)"/>
+                            </items>
+                        </SegmentedButton>
+                    </VBox>
+                </content>
+            </Panel>
+
+            <!-- Structured Data Input (Web Scraping) -->
+            <Panel
+                id="structuredDataPanel"
+                expandable="true"
+                expanded="true"
+                headerText="Structured Data Configuration"
+                visible="{= ${dataAcquisition>/dataType} === 'structured'}"
+                width="auto"
+                class="sapUiNoContentPadding">
+                <headerToolbar>
+                    <Toolbar style="Clear">
+                        <Title text="Web Data Extraction"/>
+                        <ToolbarSpacer/>
+                        <core:Icon src="sap-icon://globe" class="sapUiTinyMarginEnd"/>
+                    </Toolbar>
+                </headerToolbar>
+                <content>
+                    <form:SimpleForm
+                        editable="true"
+                        layout="ResponsiveGridLayout"
+                        labelSpanXL="3"
+                        labelSpanL="3"
+                        labelSpanM="3"
+                        labelSpanS="12"
+                        adjustLabelSpan="false"
+                        emptySpanXL="0"
+                        emptySpanL="0"
+                        emptySpanM="0"
+                        emptySpanS="0"
+                        columnsXL="1"
+                        columnsL="1"
+                        columnsM="1"
+                        singleContainerFullSize="false"
+                        class="sapUiSmallMargin">
+                        <form:content>
+                            <Label text="Website URL" required="true"/>
+                            <Input
+                                id="websiteUrl"
+                                placeholder="Enter website URL (e.g., https://example.com)"
+                                value="{dataAcquisition>/websiteUrl}"
+                                width="100%"/>
+                            
+                            <Label text="Data Selectors"/>
+                            <TextArea
+                                id="dataSelectors"
+                                placeholder="Enter CSS selectors or XPath expressions (one per line)&#13;&#10;Example:&#13;&#10;.product-title&#13;&#10;#price&#13;&#10;//table[@id='data']"
+                                value="{dataAcquisition>/dataSelectors}"
+                                rows="5"
+                                width="100%"/>
+                            
+                            <Label text="Output Format" required="true"/>
+                            <Select
+                                id="outputFormat"
+                                selectedKey="{dataAcquisition>/outputFormat}"
+                                width="100%">
+                                <core:Item key="json" text="JSON"/>
+                                <core:Item key="csv" text="CSV"/>
+                                <core:Item key="excel" text="Excel"/>
+                            </Select>
+
+                            <Label text="Additional Configuration"/>
+                            <TextArea
+                                id="additionalConfig"
+                                placeholder="Optional: Add any additional configuration in JSON format"
+                                value="{dataAcquisition>/additionalConfig}"
+                                rows="3"
+                                width="100%"/>
+
+                            <ToolbarSpacer height="1rem"/>
+                            <Button
+                                text="Extract Web Data"
+                                type="Emphasized"
+                                icon="sap-icon://download"
+                                press="onExtractWebData"
+                                width="200px"/>
+                        </form:content>
+                    </form:SimpleForm>
+                </content>
+            </Panel>
+
+            <!-- Unstructured Data Input (PDF/Document Upload) -->
+            <Panel
+                id="unstructuredDataPanel"
+                expandable="true"
+                expanded="true"
+                headerText="Unstructured Data Upload"
+                visible="{= ${dataAcquisition>/dataType} === 'unstructured'}"
+                width="auto"
+                class="sapUiNoContentPadding">
+                <headerToolbar>
+                    <Toolbar style="Clear">
+                        <Title text="Document Data Extraction"/>
+                        <ToolbarSpacer/>
+                        <core:Icon src="sap-icon://pdf-attachment" class="sapUiTinyMarginEnd"/>
+                    </Toolbar>
+                </headerToolbar>
+                <content>
+                    <VBox class="sapUiSmallMargin">
+                        <Label text="Upload Document" required="true" class="sapUiTinyMarginBottom"/>
+                        <HBox alignItems="Center" class="sapUiSmallMarginBottom">
+                            <u:FileUploader
+                                id="documentUploader"
+                                buttonText="Choose Document"
+                                fileType="pdf,doc,docx,txt"
+                                change="onDocumentSelect"
+                                style="Emphasized"
+                                useMultipart="false"
+                                sendXHR="true"/>
+                            <MessageStrip
+                                id="documentNameStrip"
+                                text="No document selected"
+                                type="Information"
+                                showIcon="true"
+                                class="sapUiTinyMarginBegin"/>
+                        </HBox>
+
+                        <Label text="Extraction Template" class="sapUiTinyMarginTop"/>
+                        <TextArea
+                            id="extractionTemplate"
+                            placeholder="Describe the fields you want to extract (one per line)&#13;&#10;Example:&#13;&#10;Customer Name&#13;&#10;PO Number&#13;&#10;Order Date&#13;&#10;Item Details"
+                            value="{dataAcquisition>/extractionTemplate}"
+                            rows="6"
+                            width="100%"
+                            class="sapUiSmallMarginTop"/>
+
+                        <Label text="Output Format" required="true" class="sapUiSmallMarginTop"/>
+                        <Select
+                            id="unstructuredOutputFormat"
+                            selectedKey="{dataAcquisition>/outputFormat}"
+                            width="100%"
+                            class="sapUiSmallMarginTop">
+                            <core:Item key="json" text="JSON - Structured Data"/>
+                            <core:Item key="csv" text="CSV - Tabular Data"/>
+                            <core:Item key="excel" text="Excel - Spreadsheet"/>
+                        </Select>
+
+                        <HBox class="sapUiMediumMarginTop">
+                            <Button
+                                text="Extract Document Data"
+                                type="Emphasized"
+                                icon="sap-icon://document-text"
+                                press="onExtractDocumentData"
+                                width="200px"/>
+                        </HBox>
+                    </VBox>
+                </content>
+            </Panel>
+
+            <!-- Extraction Results Preview -->
+            <Panel
+                id="resultsPreviewPanel"
+                expandable="true"
+                expanded="true"
+                headerText="Extracted Data Preview"
+                visible="{= ${dataAcquisition>/extractedData} !== undefined &amp;&amp; ${dataAcquisition>/extractedData} !== ''}"
+                width="auto"
+                class="sapUiNoContentPadding">
+                <headerToolbar>
+                    <Toolbar style="Clear">
+                        <Title text="Data Preview"/>
+                        <ToolbarSpacer/>
+                        <Button
+                            text="Clear"
+                            icon="sap-icon://delete"
+                            press="onClearResults"/>
+                        <core:Icon src="sap-icon://table-view" class="sapUiTinyMarginEnd"/>
+                    </Toolbar>
+                </headerToolbar>
+                <content>
+                    <VBox class="sapUiSmallMargin">
+                        <MessageStrip
+                            text="Data extraction completed successfully. Review the data below before proceeding."
+                            type="Success"
+                            showIcon="true"
+                            class="sapUiSmallMarginBottom"/>
+                        <TextArea
+                            id="extractedDataPreview"
+                            value="{dataAcquisition>/extractedData}"
+                            rows="10"
+                            editable="false"
+                            width="100%"/>
+                    </VBox>
+                </content>
+            </Panel>
+        </content>
+
+        <footer>
+            <Toolbar>
+                <ToolbarSpacer/>
+                <Button
+                    text="Next: SO Processing"
+                    type="Emphasized"
+                    icon="sap-icon://navigation-right-arrow"
+                    iconDensityAware="false"
+                    press="onNavigateToSOAutomation"
+                    enabled="{= ${dataAcquisition>/extractedData} !== undefined &amp;&amp; ${dataAcquisition>/extractedData} !== ''}"/>
+            </Toolbar>
+        </footer>
+    </Page>
+</mvc:View>
