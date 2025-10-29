@@ -1,0 +1,6 @@
+applications:
+- name: sd-automation-frontend
+  memory: 128M
+  disk_quota: 256M
+  buildpack: staticfile_buildpack
+  path: webapp

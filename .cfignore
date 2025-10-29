@@ -1,0 +1,11 @@
+node_modules/
+.vscode/
+.git/
+.gitignore
+.gitattributes
+*.md
+ui5-local.yaml
+ui5.yaml
+package.json
+package-lock.json
+.appGenInfo.json
