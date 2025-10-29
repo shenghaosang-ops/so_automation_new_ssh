@@ -15,6 +15,56 @@
         backgroundDesign="Transparent">
 
         <content>
+            <!-- Customer Selection -->
+            <Panel
+                expandable="true"
+                expanded="true"
+                headerText="Customer Selection"
+                width="auto"
+                class="sapUiNoContentPadding">
+                <headerToolbar>
+                    <Toolbar style="Clear">
+                        <Title text="Select Customer"/>
+                        <ToolbarSpacer/>
+                        <core:Icon src="sap-icon://customer" class="sapUiTinyMarginEnd"/>
+                    </Toolbar>
+                </headerToolbar>
+                <content>
+                    <VBox class="sapUiSmallMargin">
+                        <Label text="Customer" required="true" class="sapUiTinyMarginBottom"/>
+                        <HBox alignItems="Center">
+                            <ComboBox
+                                id="customerSelect"
+                                selectedKey="{dataAcquisition>/selectedCustomer}"
+                                selectionChange="onCustomerChange"
+                                width="400px"
+                                placeholder="Select a customer..."
+                                showSecondaryValues="true"
+                                class="sapUiTinyMarginEnd">
+                                <core:ListItem key="customerA" text="Customer A" additionalText="Premium Partner" icon="sap-icon://customer"/>
+                                <core:ListItem key="customerB" text="Customer B" additionalText="Standard Partner" icon="sap-icon://customer"/>
+                            </ComboBox>
+                            <MessageStrip
+                                id="customerInfoStrip"
+                                text="Please select a customer to auto-configure data source"
+                                type="Information"
+                                showIcon="true"
+                                visible="{= !${dataAcquisition>/selectedCustomer}}"/>
+                            <MessageStrip
+                                text="Customer A - URL auto-configured"
+                                type="Success"
+                                showIcon="true"
+                                visible="{= ${dataAcquisition>/selectedCustomer} === 'customerA'}"/>
+                            <MessageStrip
+                                text="Customer B - Ready for configuration"
+                                type="Success"
+                                showIcon="true"
+                                visible="{= ${dataAcquisition>/selectedCustomer} === 'customerB'}"/>
+                        </HBox>
+                    </VBox>
+                </content>
+            </Panel>
+
             <!-- Data Type Selection -->
             <Panel
                 expandable="true"

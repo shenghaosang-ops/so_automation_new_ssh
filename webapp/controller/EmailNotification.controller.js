@@ -29,7 +29,20 @@ sap.ui.define([
                 sendProgress: 0,
                 sendResult: "",
                 sendResultMessage: "",
-                sendResultType: "Information"
+                sendResultType: "Information",
+                // AI Analysis properties
+                aiAnalyzing: false,
+                aiProgress: 0,
+                aiAnalysisComplete: false,
+                aiAnalysis: {
+                    successRate: 0,
+                    successInsight: "",
+                    failureInsight: "",
+                    topFailureReasons: [],
+                    recommendations: [],
+                    qualityScore: 0,
+                    qualityDescription: ""
+                }
             });
             this.getView().setModel(oEmailModel, "email");
 
@@ -94,6 +107,217 @@ sap.ui.define([
          */
         onResultTypeChange: function() {
             this._generatePreview();
+        },
+
+        /**
+         * AI Analyze Data - Main Analysis Function
+         */
+        onAnalyzeData: function() {
+            var oModel = this.getView().getModel("email");
+            var aEmailData = oModel.getProperty("/emailData");
+            
+            if (!aEmailData || aEmailData.length === 0) {
+                MessageBox.warning("No data available for analysis");
+                return;
+            }
+
+            // Start AI analysis animation
+            oModel.setProperty("/aiAnalyzing", true);
+            oModel.setProperty("/aiProgress", 0);
+            oModel.setProperty("/aiAnalysisComplete", false);
+            
+            // Simulate AI processing with progress
+            this._runAIAnalysis(aEmailData);
+        },
+
+        /**
+         * Run AI Analysis with simulation
+         */
+        _runAIAnalysis: function(aData) {
+            var oModel = this.getView().getModel("email");
+            var that = this;
+            var iProgress = 0;
+            
+            // Simulate AI thinking process
+            var oInterval = setInterval(function() {
+                iProgress += 20;
+                oModel.setProperty("/aiProgress", iProgress);
+                
+                if (iProgress >= 100) {
+                    clearInterval(oInterval);
+                    // Perform actual analysis
+                    that._performAIAnalysis(aData);
+                    oModel.setProperty("/aiAnalyzing", false);
+                    oModel.setProperty("/aiAnalysisComplete", true);
+                    MessageToast.show("AI Analysis Complete! ✨");
+                }
+            }, 300);
+        },
+
+        /**
+         * Perform AI Analysis - Calculate insights
+         */
+        _performAIAnalysis: function(aData) {
+            var oModel = this.getView().getModel("email");
+            var iTotalCount = aData.length;
+            var iSuccessCount = 0;
+            var iFailureCount = 0;
+            var oFailureReasons = {};
+            
+            // Analyze data
+            aData.forEach(function(oItem) {
+                if (oItem.status === "Success") {
+                    iSuccessCount++;
+                } else {
+                    iFailureCount++;
+                    var sReason = oItem.message || "Unknown Error";
+                    if (!oFailureReasons[sReason]) {
+                        oFailureReasons[sReason] = 0;
+                    }
+                    oFailureReasons[sReason]++;
+                }
+            });
+            
+            // Calculate success rate
+            var fSuccessRate = Math.round((iSuccessCount / iTotalCount) * 100);
+            
+            // Generate top failure reasons
+            var aTopFailureReasons = Object.keys(oFailureReasons).map(function(sReason) {
+                var iCount = oFailureReasons[sReason];
+                var fPercentage = Math.round((iCount / iFailureCount) * 100);
+                return {
+                    reason: sReason,
+                    count: iCount,
+                    percentage: fPercentage
+                };
+            }).sort(function(a, b) {
+                return b.count - a.count;
+            }).slice(0, 5); // Top 5 reasons
+            
+            // Generate AI insights
+            var sSuccessInsight = this._generateSuccessInsight(fSuccessRate, iSuccessCount, iTotalCount);
+            var sFailureInsight = this._generateFailureInsight(iFailureCount, iTotalCount);
+            var aRecommendations = this._generateRecommendations(fSuccessRate, aTopFailureReasons);
+            var oQuality = this._calculateQualityScore(fSuccessRate, aTopFailureReasons);
+            
+            // Update model with AI analysis results
+            oModel.setProperty("/aiAnalysis", {
+                successRate: fSuccessRate,
+                successInsight: sSuccessInsight,
+                failureInsight: sFailureInsight,
+                topFailureReasons: aTopFailureReasons,
+                recommendations: aRecommendations,
+                qualityScore: oQuality.score,
+                qualityDescription: oQuality.description
+            });
+        },
+
+        /**
+         * Generate success insight message
+         */
+        _generateSuccessInsight: function(fRate, iSuccess, iTotal) {
+            if (fRate >= 95) {
+                return `🎉 Excellent! ${iSuccess} out of ${iTotal} orders (${fRate}%) were created successfully. Your process is highly optimized!`;
+            } else if (fRate >= 80) {
+                return `✅ Good performance! ${iSuccess} out of ${iTotal} orders (${fRate}%) were created successfully. Minor improvements recommended.`;
+            } else if (fRate >= 50) {
+                return `⚠️ Moderate success rate. ${iSuccess} out of ${iTotal} orders (${fRate}%) were created successfully. Review failure patterns below.`;
+            } else {
+                return `❌ Low success rate detected. Only ${iSuccess} out of ${iTotal} orders (${fRate}%) were created successfully. Immediate attention required.`;
+            }
+        },
+
+        /**
+         * Generate failure insight message
+         */
+        _generateFailureInsight: function(iFailure, iTotal) {
+            if (iFailure === 0) {
+                return "";
+            }
+            var fFailureRate = Math.round((iFailure / iTotal) * 100);
+            return `${iFailure} orders (${fFailureRate}%) failed to create. AI has identified the top failure patterns below for your review.`;
+        },
+
+        /**
+         * Generate AI recommendations
+         */
+        _generateRecommendations: function(fSuccessRate, aFailureReasons) {
+            var aRecommendations = [];
+            
+            if (fSuccessRate < 80) {
+                aRecommendations.push({
+                    title: "Data Validation Enhancement",
+                    description: "Implement pre-upload validation rules to catch common errors before submission",
+                    icon: "sap-icon://validate"
+                });
+            }
+            
+            if (aFailureReasons.length > 0) {
+                var sTopReason = aFailureReasons[0].reason;
+                if (sTopReason.includes("duplicate") || sTopReason.includes("exist")) {
+                    aRecommendations.push({
+                        title: "Duplicate Detection",
+                        description: "Enable automatic duplicate checking before creating sales orders",
+                        icon: "sap-icon://copy"
+                    });
+                }
+                if (sTopReason.includes("material") || sTopReason.includes("part")) {
+                    aRecommendations.push({
+                        title: "Material Master Sync",
+                        description: "Verify material codes against the latest master data before processing",
+                        icon: "sap-icon://product"
+                    });
+                }
+                if (sTopReason.includes("date") || sTopReason.includes("time")) {
+                    aRecommendations.push({
+                        title: "Date Format Standardization",
+                        description: "Standardize date formats in source data to prevent parsing errors",
+                        icon: "sap-icon://calendar"
+                    });
+                }
+            }
+            
+            aRecommendations.push({
+                title: "Automated Retry Logic",
+                description: "Implement smart retry mechanism for transient failures to improve success rate",
+                icon: "sap-icon://refresh"
+            });
+            
+            aRecommendations.push({
+                title: "Real-time Monitoring Dashboard",
+                description: "Set up monitoring alerts for immediate notification of high failure rates",
+                icon: "sap-icon://monitor-payments"
+            });
+            
+            return aRecommendations;
+        },
+
+        /**
+         * Calculate data quality score
+         */
+        _calculateQualityScore: function(fSuccessRate, aFailureReasons) {
+            var iScore = fSuccessRate;
+            var sDescription = "";
+            
+            // Adjust score based on failure diversity
+            if (aFailureReasons.length > 5) {
+                iScore -= 5; // Many different failure types indicate data quality issues
+            }
+            
+            if (iScore >= 90) {
+                sDescription = "Excellent - Your data quality is outstanding with minimal errors";
+            } else if (iScore >= 75) {
+                sDescription = "Good - Data quality is acceptable with room for improvement";
+            } else if (iScore >= 50) {
+                sDescription = "Fair - Data quality needs attention to reduce failure rate";
+            } else {
+                sDescription = "Poor - Critical data quality issues detected, immediate action needed";
+            }
+            
+            return {
+                score: Math.max(0, Math.min(100, iScore)),
+                description: sDescription
+            };
         },
 
         /**

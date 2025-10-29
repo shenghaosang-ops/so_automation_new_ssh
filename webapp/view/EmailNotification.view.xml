@@ -104,6 +104,170 @@
                 </content>
             </Panel>
 
+            <!-- AI Analysis Panel -->
+            <Panel
+                expandable="true"
+                expanded="true"
+                headerText="AI-Powered Data Analysis"
+                width="auto"
+                class="sapUiNoContentPadding">
+                <headerToolbar>
+                    <Toolbar style="Clear">
+                        <Title text="AI Analysis &amp; Insights"/>
+                        <ToolbarSpacer/>
+                        <Button
+                            text="Analyze Data"
+                            icon="sap-icon://lab"
+                            type="Emphasized"
+                            press="onAnalyzeData"/>
+                        <core:Icon src="sap-icon://business-objects-experience" color="#0854a0" class="sapUiTinyMarginEnd"/>
+                    </Toolbar>
+                </headerToolbar>
+                <content>
+                    <VBox class="sapUiSmallMargin">
+                        <!-- Analysis Progress -->
+                        <VBox visible="{= ${email>/aiAnalyzing} === true}" class="sapUiSmallMarginBottom">
+                            <HBox alignItems="Center" class="sapUiTinyMarginBottom">
+                                <BusyIndicator size="1rem" class="sapUiTinyMarginEnd"/>
+                                <Text text="🤖 AI is analyzing your sales order data..." class="sapUiSmallMarginBegin"/>
+                            </HBox>
+                            <ProgressIndicator
+                                percentValue="{email>/aiProgress}"
+                                displayValue="Analyzing..."
+                                showValue="true"
+                                state="Information"/>
+                        </VBox>
+
+                        <!-- AI Analysis Results -->
+                        <VBox visible="{= ${email>/aiAnalysisComplete} === true}">
+                            <!-- Overall Summary Card -->
+                            <l:Grid defaultSpan="L6 M6 S12" class="sapUiSmallMarginBottom">
+                                <l:content>
+                                    <!-- Success Rate Card -->
+                                    <GenericTile
+                                        header="Success Rate"
+                                        subheader="Overall Performance"
+                                        frameType="TwoByOne"
+                                        press="onTilePress">
+                                        <tileContent>
+                                            <TileContent>
+                                                <content>
+                                                    <NumericContent
+                                                        value="{email>/aiAnalysis/successRate}"
+                                                        scale="%"
+                                                        valueColor="{= ${email>/aiAnalysis/successRate} >= 80 ? 'Good' : ${email>/aiAnalysis/successRate} >= 50 ? 'Critical' : 'Error'}"
+                                                        icon="sap-icon://arobase"
+                                                        iconDensityAware="false"/>
+                                                </content>
+                                            </TileContent>
+                                        </tileContent>
+                                    </GenericTile>
+
+                                    <!-- Total Orders Card -->
+                                    <GenericTile
+                                        header="Total Orders"
+                                        subheader="Processed in this batch"
+                                        frameType="TwoByOne">
+                                        <tileContent>
+                                            <TileContent>
+                                                <content>
+                                                    <NumericContent
+                                                        value="{email>/totalCount}"
+                                                        icon="sap-icon://sales-order"
+                                                        iconDensityAware="false"/>
+                                                </content>
+                                            </TileContent>
+                                        </tileContent>
+                                    </GenericTile>
+                                </l:content>
+                            </l:Grid>
+
+                            <!-- AI Insights -->
+                            <VBox class="sapUiSmallMarginTop">
+                                <Title text="💡 AI Insights &amp; Recommendations" level="H4" class="sapUiSmallMarginBottom"/>
+                                
+                                <!-- Success Analysis -->
+                                <MessageStrip
+                                    text="{email>/aiAnalysis/successInsight}"
+                                    type="Success"
+                                    showIcon="true"
+                                    class="sapUiTinyMarginBottom"/>
+
+                                <!-- Failure Analysis -->
+                                <MessageStrip
+                                    text="{email>/aiAnalysis/failureInsight}"
+                                    type="Warning"
+                                    showIcon="true"
+                                    visible="{= ${email>/failedCount} > 0}"
+                                    class="sapUiTinyMarginBottom"/>
+
+                                <!-- Top Failure Reasons -->
+                                <VBox visible="{= ${email>/failedCount} > 0}" class="sapUiSmallMarginTop">
+                                    <Title text="🔍 Top Failure Reasons (AI Detected)" level="H5" class="sapUiTinyMarginBottom"/>
+                                    <List
+                                        items="{email>/aiAnalysis/topFailureReasons}"
+                                        class="sapUiTinyMarginTop">
+                                        <CustomListItem>
+                                            <HBox alignItems="Center">
+                                                <core:Icon src="sap-icon://warning" color="#E9730C" class="sapUiTinyMarginEnd"/>
+                                                <VBox width="100%">
+                                                    <HBox justifyContent="SpaceBetween">
+                                                        <Text text="{email>reason}" class="sapUiSmallMarginEnd"/>
+                                                        <Text text="{email>count} occurrences ({email>percentage}%)" class="sapUiTinyMarginBegin"/>
+                                                    </HBox>
+                                                    <ProgressIndicator
+                                                        percentValue="{email>percentage}"
+                                                        showValue="false"
+                                                        state="Warning"
+                                                        width="100%"/>
+                                                </VBox>
+                                            </HBox>
+                                        </CustomListItem>
+                                    </List>
+                                </VBox>
+
+                                <!-- AI Recommendations -->
+                                <VBox class="sapUiSmallMarginTop">
+                                    <Title text="🎯 AI Recommendations" level="H5" class="sapUiTinyMarginBottom"/>
+                                    <List
+                                        items="{email>/aiAnalysis/recommendations}">
+                                        <StandardListItem
+                                            title="{email>title}"
+                                            description="{email>description}"
+                                            icon="{email>icon}"
+                                            iconInset="false"
+                                            type="Active"/>
+                                    </List>
+                                </VBox>
+
+                                <!-- Data Quality Score -->
+                                <VBox class="sapUiSmallMarginTop">
+                                    <HBox justifyContent="SpaceBetween" alignItems="Center" class="sapUiTinyMarginBottom">
+                                        <Title text="📊 Data Quality Score" level="H5"/>
+                                        <Text text="{email>/aiAnalysis/qualityScore}/100" class="sapUiSmallMarginEnd"/>
+                                    </HBox>
+                                    <ProgressIndicator
+                                        percentValue="{email>/aiAnalysis/qualityScore}"
+                                        displayValue="{email>/aiAnalysis/qualityScore}%"
+                                        showValue="true"
+                                        state="{= ${email>/aiAnalysis/qualityScore} >= 80 ? 'Success' : ${email>/aiAnalysis/qualityScore} >= 50 ? 'Warning' : 'Error'}"/>
+                                    <Text 
+                                        text="{email>/aiAnalysis/qualityDescription}" 
+                                        class="sapUiTinyMarginTop"/>
+                                </VBox>
+                            </VBox>
+                        </VBox>
+
+                        <!-- No Data Message -->
+                        <MessageStrip
+                            visible="{= ${email>/aiAnalysisComplete} !== true &amp;&amp; ${email>/aiAnalyzing} !== true}"
+                            text="Click 'Analyze Data' to get AI-powered insights on your sales order creation results"
+                            type="Information"
+                            showIcon="true"/>
+                    </VBox>
+                </content>
+            </Panel>
+
             <!-- Data Preview with Status Column -->
             <Panel
                 expandable="true"

@@ -13,6 +13,7 @@ sap.ui.define([
         onInit: function() {
             // Initialize data acquisition model
             var oDataModel = new JSONModel({
+                selectedCustomer: "",
                 dataType: "structured",
                 websiteUrl: "",
                 dataSelectors: "",
@@ -26,6 +27,28 @@ sap.ui.define([
 
             // Initialize service
             DataAcquisitionService.init(this);
+        },
+
+        /**
+         * Handle customer selection change
+         */
+        onCustomerChange: function(oEvent) {
+            var sSelectedKey = oEvent.getParameter("selectedItem").getKey();
+            var oModel = this.getView().getModel("dataAcquisition");
+            
+            // Set selected customer
+            oModel.setProperty("/selectedCustomer", sSelectedKey);
+            
+            // Auto-fill URL based on customer selection
+            if (sSelectedKey === "customerA") {
+                oModel.setProperty("/websiteUrl", "https://www.filemail.com/d/tzivrghywfzivdn");
+                MessageToast.show("Customer A selected - URL auto-filled");
+            } else if (sSelectedKey === "customerB") {
+                oModel.setProperty("/websiteUrl", "");
+                MessageToast.show("Customer B selected");
+            } else {
+                oModel.setProperty("/websiteUrl", "");
+            }
         },
 
         /**
