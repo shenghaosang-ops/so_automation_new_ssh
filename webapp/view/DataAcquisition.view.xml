@@ -107,12 +107,40 @@
                 class="sapUiNoContentPadding">
                 <headerToolbar>
                     <Toolbar style="Clear">
-                        <Title text="Web Data Extraction"/>
+                        <Title text="Automatic Download Data from Excel"/>
                         <ToolbarSpacer/>
                         <core:Icon src="sap-icon://globe" class="sapUiTinyMarginEnd"/>
                     </Toolbar>
                 </headerToolbar>
                 <content>
+                    <VBox class="sapUiSmallMargin">
+                        <Label text="Website URL" required="true"/>
+                        <Input
+                            id="websiteUrl"
+                            value="{dataAcquisition>/websiteUrl}"
+                            width="100%"
+                            enabled="false"
+                            class="sapUiSmallMarginBottom"/>
+
+                        <Button
+                            id="downloadButton"
+                            text="Download Excel File"
+                            type="Emphasized"
+                            icon="sap-icon://download"
+                            press="onDownloadExcel"
+                            enabled="{= !${dataAcquisition>/downloadSuccess}}"
+                            width="200px"
+                            class="sapUiSmallMarginBottom"/>
+
+                        <MessageStrip
+                            id="downloadStatus"
+                            visible="{= ${dataAcquisition>/downloadStatus} !== ''}"
+                            text="{dataAcquisition>/downloadStatus}"
+                            type="{= ${dataAcquisition>/downloadSuccess} ? 'Success' : 'Error'}"
+                            showIcon="true"/>
+                    </VBox>
+                </content>
+                <!-- <content>
                     <form:SimpleForm
                         editable="true"
                         layout="ResponsiveGridLayout"
@@ -131,49 +159,23 @@
                         singleContainerFullSize="false"
                         class="sapUiSmallMargin">
                         <form:content>
-                            <Label text="Website URL" required="true"/>
-                            <Input
-                                id="websiteUrl"
-                                placeholder="Enter website URL (e.g., https://example.com)"
-                                value="{dataAcquisition>/websiteUrl}"
-                                width="100%"/>
-                            
-                            <Label text="Data Selectors"/>
-                            <TextArea
-                                id="dataSelectors"
-                                placeholder="Enter CSS selectors or XPath expressions (one per line)&#13;&#10;Example:&#13;&#10;.product-title&#13;&#10;#price&#13;&#10;//table[@id='data']"
-                                value="{dataAcquisition>/dataSelectors}"
-                                rows="5"
-                                width="100%"/>
-                            
-                            <Label text="Output Format" required="true"/>
-                            <Select
-                                id="outputFormat"
-                                selectedKey="{dataAcquisition>/outputFormat}"
-                                width="100%">
-                                <core:Item key="json" text="JSON"/>
-                                <core:Item key="csv" text="CSV"/>
-                                <core:Item key="excel" text="Excel"/>
-                            </Select>
+                <Label text="Website URL" required="true"/>
+                <Input
+                    id="websiteUrl"
+                    value="{dataAcquisition>/websiteUrl}"
+                    width="100%"
+                    enabled="false"/>
 
-                            <Label text="Additional Configuration"/>
-                            <TextArea
-                                id="additionalConfig"
-                                placeholder="Optional: Add any additional configuration in JSON format"
-                                value="{dataAcquisition>/additionalConfig}"
-                                rows="3"
-                                width="100%"/>
-
-                            <ToolbarSpacer height="1rem"/>
-                            <Button
-                                text="Extract Web Data"
-                                type="Emphasized"
-                                icon="sap-icon://download"
-                                press="onExtractWebData"
-                                width="200px"/>
-                        </form:content>
+                <ToolbarSpacer height="1rem"/>
+                <Button
+                    text="Download Excel File"
+                    type="Emphasized"
+                    icon="sap-icon://download"
+                    press="onDownloadExcel"
+                    width="200px"/>
+            </form:content>
                     </form:SimpleForm>
-                </content>
+                </content> -->
             </Panel>
 
             <!-- Unstructured Data Input (PDF/Document Upload) -->
@@ -245,7 +247,7 @@
             </Panel>
 
             <!-- Extraction Results Preview -->
-            <Panel
+            <!-- <Panel
                 id="resultsPreviewPanel"
                 expandable="true"
                 expanded="true"
@@ -279,7 +281,7 @@
                             width="100%"/>
                     </VBox>
                 </content>
-            </Panel>
+            </Panel> -->
         </content>
 
         <footer>
@@ -291,7 +293,7 @@
                     icon="sap-icon://navigation-right-arrow"
                     iconDensityAware="false"
                     press="onNavigateToSOAutomation"
-                    enabled="{= ${dataAcquisition>/extractedData} !== undefined &amp;&amp; ${dataAcquisition>/extractedData} !== ''}"/>
+                    enabled="{= ${dataAcquisition>/downloadSuccess} &amp;&amp; ${dataAcquisition>/extractedData} !== ''}"/>
             </Toolbar>
         </footer>
     </Page>

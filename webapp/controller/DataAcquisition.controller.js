@@ -21,7 +21,9 @@ sap.ui.define([
                 additionalConfig: "",
                 extractionTemplate: "",
                 extractedData: "",
-                documentFile: null
+                documentFile: null,
+                downloadSuccess: false,
+                downloadStatus: "",
             });
             this.getView().setModel(oDataModel, "dataAcquisition");
 
@@ -116,6 +118,67 @@ sap.ui.define([
                 MessageBox.error("Failed to extract web data: " + oError.message);
             }.bind(this));
         },
+
+        /**
+         * Download Excel file from URL
+         */
+        onDownloadExcel: function() {
+            var that = this;
+            var oModel = this.getView().getModel("dataAcquisition");
+            var sUrl = oModel.getProperty("/websiteUrl");
+            
+            if (!sUrl) {
+                oModel.setProperty("/downloadStatus", "Please select a customer first");
+                oModel.setProperty("/downloadSuccess", false);
+                return;
+            }
+
+            // Show loading status
+            oModel.setProperty("/downloadStatus", "Downloading file...");
+
+            DataAcquisitionService.downloadExcelFile(sUrl)
+                .then(function(oResult) {
+                    if (oResult.success) {
+                        oModel.setProperty("/downloadStatus", "File downloaded successfully to: " + oResult.filePath);
+                        oModel.setProperty("/downloadSuccess", true);
+                        // Enable the Next button by setting some extracted data
+                        oModel.setProperty("/extractedData", "Download completed");
+                    } else {
+                        oModel.setProperty("/downloadStatus", "Failed to download file");
+                        oModel.setProperty("/downloadSuccess", false);
+                    }
+                })
+                .catch(function(oError) {
+                    oModel.setProperty("/downloadStatus", "Error downloading file: " + oError.message);
+                    oModel.setProperty("/downloadSuccess", false);
+                });
+        },
+        // onDownloadExcel: function() {
+        //     var sUrl = this.getView().getModel("dataAcquisition").getProperty("/websiteUrl");
+            
+        //     if (!sUrl) {
+        //         MessageToast.show("Please select a customer first");
+        //         return;
+        //     }
+
+        //     // Show loading indicator
+        //     sap.ui.core.BusyIndicator.show();
+
+        //     DataAcquisitionService.downloadExcelFile(sUrl)
+        //         .then(function(oResult) {
+        //             if (oResult.success) {
+        //                 MessageBox.success("File downloaded successfully to: " + oResult.filePath);
+        //             } else {
+        //                 MessageBox.error("Failed to download file");
+        //             }
+        //         })
+        //         .catch(function(oError) {
+        //             MessageBox.error("Error downloading file: " + oError.message);
+        //         })
+        //         .finally(function() {
+        //             sap.ui.core.BusyIndicator.hide();
+        //         });
+        // },
 
         /**
          * Extract data from document (PDF, DOC, TXT)
