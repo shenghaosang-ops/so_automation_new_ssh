@@ -15,6 +15,16 @@ sap.ui.define([
 ], function(Controller, JSONModel, MessageToast, FileHandler, RuleManager, BatchProcessor, ResultsHandler, TableManager) {
     "use strict";
     return Controller.extend("yegeoaiso.controller.View1", {
+        onRowCountChange: function(oEvent) {
+            var iRowCount = oEvent.getParameter("value");
+            var oTable = this.byId("previewTable");
+            
+            // Update binding
+            var oBinding = oTable.getBinding("items");
+            if (oBinding) {
+                oBinding.setLength(iRowCount);
+            }
+        },
         onInit: function() {
             // 1. 初始化所有模型和配置
             FileHandler.init(this);
@@ -76,7 +86,58 @@ sap.ui.define([
             }
             
             // 2. 其他初始化操作可在此扩展
+
+            // Initialize view model for file upload and preview
+            var oViewModel = new JSONModel({
+                showPreview: false,
+                excelData: [],
+                rowCount: 0,
+                previewRowCount: 5,
+                uploadStatus: {
+                    fileName: "",
+                    message: "No file selected",
+                    type: "Information"
+                }
+            });
+            this.getView().setModel(oViewModel, "viewData");
+
             this._initializeEventHandlers();
+        },
+
+        // Add method to update preview table columns
+        _updatePreviewTable: function(aData) {
+            if (!aData || !aData.length) return;
+            
+            var oTable = this.byId("previewTable");
+            if (!oTable) return;
+            
+            // Get columns from first data row
+            var aColumns = Object.keys(aData[0]);
+            
+            // Remove existing columns
+            oTable.removeAllColumns();
+            
+            // Add new columns
+            aColumns.forEach(function(sColumn) {
+                oTable.addColumn(new sap.m.Column({
+                    header: new sap.m.Text({ text: sColumn })
+                }));
+            });
+            
+            // Create template for items
+            var oCells = aColumns.map(function(sColumn) {
+                return new sap.m.Text({ text: "{viewData>" + sColumn + "}" });
+            });
+            
+            // Set template
+            var oTemplate = new sap.m.ColumnListItem({
+                cells: oCells
+            });
+            
+            oTable.bindItems({
+                path: "viewData>/excelData",
+                template: oTemplate
+            });
         },
         
         /**

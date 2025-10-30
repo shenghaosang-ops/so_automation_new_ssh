@@ -70,6 +70,40 @@ sap.ui.define([
                 oBinding.filter([]);
             }
         },
+
+        updatePreviewData: function(oTable, aData) {
+            if (!aData || !aData.length) return;
+            
+            // Get columns from first data row and limit to first 5
+            var aColumns = Object.keys(aData[0]).slice(0, 5);
+            
+            // Remove existing columns
+            oTable.removeAllColumns();
+            
+            // Add only the first 5 columns
+            aColumns.forEach(function(sColumn) {
+                oTable.addColumn(new sap.ui.table.Column({
+                    label: new sap.m.Label({
+                        text: this._formatColumnHeader(sColumn)
+                    }),
+                    template: new sap.m.Text({
+                        text: "{" + sColumn + "}"
+                    }),
+                    sortProperty: sColumn,
+                    filterProperty: sColumn,
+                    width: "200px" // 添加固定宽度使显示更整齐
+                }));
+            }.bind(this));
+
+            // Create and set model
+            var oModel = new sap.ui.model.json.JSONModel(aData);
+            oTable.setModel(oModel);
+            oTable.bindRows("/");
+            
+            // Set visible row count
+            var iVisibleRowCount = Math.min(aData.length, 10);
+            oTable.setVisibleRowCount(iVisibleRowCount);
+        },
         
         /**
          * 打开表格设置对话框

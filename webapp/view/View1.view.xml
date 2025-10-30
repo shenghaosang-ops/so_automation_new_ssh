@@ -52,36 +52,74 @@
                     </Toolbar>
                 </headerToolbar>
                 <content>
-                    <HBox alignItems="Center" class="sapUiSmallMargin">
-                        <!-- <u:FileUploader
-                            id="fileUploader"
-                            buttonText="Choose Excel File"
-                            accept=".xlsx"
-                            change="onFileSelect"
-                            style="Emphasized"/> -->
-                        <u:FileUploader
-                            id="fileUploader"
-                            buttonText="Choose Excel File"
-                            fileType="xlsx"
-                            change="onFileSelect"
-                            style="Emphasized"
-                            useMultipart="false"
-                            sendXHR="true"/>
-                        <Button
-                            id="extractButton"
-                            text="Extract Excel File"
-                            press="onExtractPress"
-                            type="Emphasized"
-                            icon="sap-icon://excel-attachment"
-                            class="sapUiTinyMarginBegin"
-                            tooltip="Extract data from the selected Excel file"/>
-                        <MessageStrip
-                            id="fileNameStrip"
-                            text="No file selected"
-                            type="Information"
-                            showIcon="true"
-                            class="sapUiTinyMarginBegin"/>
-                    </HBox>
+                    <VBox class="sapUiSmallMargin">
+                        <HBox alignItems="Center" class="sapUiSmallMargin">
+                            <!-- <u:FileUploader
+                                id="fileUploader"
+                                buttonText="Choose Excel File"
+                                accept=".xlsx"
+                                change="onFileSelect"
+                                style="Emphasized"/> -->
+                            <u:FileUploader
+                                id="fileUploader"
+                                buttonText="Choose Excel File"
+                                fileType="xlsx"
+                                change="onFileSelect"
+                                style="Emphasized"
+                                useMultipart="false"
+                                sendXHR="true"/>
+                            <Button
+                                id="extractButton"
+                                text="Extract Excel File"
+                                press="onExtractPress"
+                                type="Emphasized"
+                                icon="sap-icon://excel-attachment"
+                                class="sapUiTinyMarginBegin"
+                                tooltip="Extract data from the selected Excel file"/>
+                            <MessageStrip
+                                id="fileNameStrip"
+                                text="No file selected"
+                                type="Information"
+                                showIcon="true"
+                                class="sapUiTinyMarginBegin"/>
+                        </HBox>
+                        <!-- Preview Panel with Expand/Collapse -->
+                        <Panel
+                            id="previewPanel"
+                            expandable="true"
+                            expanded="false"
+                            headerText="Excel Data Preview"
+                            class="sapUiTinyMarginTop previewPanel">
+                            <headerToolbar>
+                                <Toolbar>
+                                    <Title text="Excel Data Preview (First 5 Columns)"/>
+                                    <ToolbarSpacer/>
+                                    <Text text="{viewData>/rowCount} rows loaded" class="sapUiTinyMarginEnd"/>
+                                </Toolbar>
+                            </headerToolbar>
+                            <content>
+                                <Table
+                                    id="previewTable"
+                                    items="{
+                                        path: 'viewData>/excelData',
+                                        length: 5
+                                    }"
+                                    growing="false"
+                                    class="sapUiTinyMarginTop">
+                                    <columns>
+                                        <!-- Columns will be created dynamically -->
+                                    </columns>
+                                    <items>
+                                        <ColumnListItem>
+                                            <cells>
+                                                <!-- Cells will be created dynamically -->
+                                            </cells>
+                                        </ColumnListItem>
+                                    </items>
+                                </Table>
+                            </content>
+                        </Panel>
+                    </VBox>
                 </content>
             </Panel>
 
