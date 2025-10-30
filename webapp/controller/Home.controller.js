@@ -35,11 +35,11 @@ sap.ui.define([
         },
 
         /**
-         * Navigate to Email Notification page
+         * Navigate to Review & Report page
          */
-        onNavigateToEmailNotification: function() {
+        onNavigateToReviewReport: function() {
             var oRouter = this.getOwnerComponent().getRouter();
-            oRouter.navTo("EmailNotification");
+            oRouter.navTo("ReviewReport");
         }
     });
 });

@@ -3,12 +3,11 @@
     xmlns:mvc="sap.ui.core.mvc"
     xmlns="sap.m"
     xmlns:core="sap.ui.core"
-    xmlns:l="sap.ui.layout"
     xmlns:form="sap.ui.layout.form">
 
     <Page
         id="emailNotificationPage"
-        title="Email Notification Configuration"
+        title="Email Notification"
         showNavButton="true"
         navButtonPress="onNavBack"
         backgroundDesign="Transparent">
@@ -38,22 +37,6 @@
                         labelSpanS="12"
                         class="sapUiSmallMargin">
                         <form:content>
-                            <!-- Result Type Selection -->
-                            <Label text="Upload Result Type" required="true"/>
-                            <SegmentedButton
-                                id="resultTypeSegmented"
-                                selectedKey="{email>/resultType}"
-                                selectionChange="onResultTypeChange">
-                                <items>
-                                    <SegmentedButtonItem key="success" icon="sap-icon://message-success" text="Success"/>
-                                    <SegmentedButtonItem key="failure" icon="sap-icon://message-error" text="Failure"/>
-                                    <SegmentedButtonItem key="both" icon="sap-icon://email" text="Both"/>
-                                </items>
-                            </SegmentedButton>
-
-                            <Label text=""/>
-                            <Text text=""/>
-
                             <!-- Email Recipients -->
                             <Label text="To (Recipients)" required="true"/>
                             <Input
@@ -72,255 +55,108 @@
                                 value="{email>/subject}"
                                 placeholder="SO Upload Results - {date}"
                                 width="100%"/>
-
-                            <!-- Success Message Configuration -->
-                            <Label 
-                                text="Success Message Template"
-                                visible="{= ${email>/resultType} === 'success' || ${email>/resultType} === 'both'}"/>
-                            <TextArea
-                                value="{email>/successMessage}"
-                                placeholder="Enter success message template..."
-                                rows="5"
-                                width="100%"
-                                visible="{= ${email>/resultType} === 'success' || ${email>/resultType} === 'both'}"/>
-
-                            <!-- Failure Message Configuration -->
-                            <Label 
-                                text="Failure Message Template"
-                                visible="{= ${email>/resultType} === 'failure' || ${email>/resultType} === 'both'}"/>
-                            <TextArea
-                                value="{email>/failureMessage}"
-                                placeholder="Enter failure message template..."
-                                rows="5"
-                                width="100%"
-                                visible="{= ${email>/resultType} === 'failure' || ${email>/resultType} === 'both'}"/>
-
-                            <Label text="Attach Data"/>
-                            <CheckBox
-                                text="Attach detailed results as Excel file"
-                                selected="{email>/attachExcel}"/>
                         </form:content>
                     </form:SimpleForm>
                 </content>
             </Panel>
 
-            <!-- AI Analysis Panel -->
+            <!-- Smart Email Content Preview -->
             <Panel
                 expandable="true"
                 expanded="true"
-                headerText="AI-Powered Data Analysis"
+                headerText="Email Content Preview"
                 width="auto"
                 class="sapUiNoContentPadding">
                 <headerToolbar>
                     <Toolbar style="Clear">
-                        <Title text="AI Analysis &amp; Insights"/>
+                        <Title text="Auto-Generated Email Content"/>
                         <ToolbarSpacer/>
-                        <Button
-                            text="Analyze Data"
-                            icon="sap-icon://lab"
-                            type="Emphasized"
-                            press="onAnalyzeData"/>
-                        <core:Icon src="sap-icon://business-objects-experience" color="#0854a0" class="sapUiTinyMarginEnd"/>
+                        <Text text="{email>/emailContentType}" class="sapUiTinyMarginEnd"/>
+                        <core:Icon src="sap-icon://message-information" class="sapUiTinyMarginEnd"/>
                     </Toolbar>
                 </headerToolbar>
                 <content>
                     <VBox class="sapUiSmallMargin">
-                        <!-- Analysis Progress -->
-                        <VBox visible="{= ${email>/aiAnalyzing} === true}" class="sapUiSmallMarginBottom">
-                            <HBox alignItems="Center" class="sapUiTinyMarginBottom">
-                                <BusyIndicator size="1rem" class="sapUiTinyMarginEnd"/>
-                                <Text text="🤖 AI is analyzing your sales order data..." class="sapUiSmallMarginBegin"/>
-                            </HBox>
-                            <ProgressIndicator
-                                percentValue="{email>/aiProgress}"
-                                displayValue="Analyzing..."
-                                showValue="true"
-                                state="Information"/>
-                        </VBox>
-
-                        <!-- AI Analysis Results -->
-                        <VBox visible="{= ${email>/aiAnalysisComplete} === true}">
-                            <!-- Overall Summary Card -->
-                            <l:Grid defaultSpan="L6 M6 S12" class="sapUiSmallMarginBottom">
-                                <l:content>
-                                    <!-- Success Rate Card -->
-                                    <GenericTile
-                                        header="Success Rate"
-                                        subheader="Overall Performance"
-                                        frameType="TwoByOne"
-                                        press="onTilePress">
-                                        <tileContent>
-                                            <TileContent>
-                                                <content>
-                                                    <NumericContent
-                                                        value="{email>/aiAnalysis/successRate}"
-                                                        scale="%"
-                                                        valueColor="{= ${email>/aiAnalysis/successRate} >= 80 ? 'Good' : ${email>/aiAnalysis/successRate} >= 50 ? 'Critical' : 'Error'}"
-                                                        icon="sap-icon://arobase"
-                                                        iconDensityAware="false"/>
-                                                </content>
-                                            </TileContent>
-                                        </tileContent>
-                                    </GenericTile>
-
-                                    <!-- Total Orders Card -->
-                                    <GenericTile
-                                        header="Total Orders"
-                                        subheader="Processed in this batch"
-                                        frameType="TwoByOne">
-                                        <tileContent>
-                                            <TileContent>
-                                                <content>
-                                                    <NumericContent
-                                                        value="{email>/totalCount}"
-                                                        icon="sap-icon://sales-order"
-                                                        iconDensityAware="false"/>
-                                                </content>
-                                            </TileContent>
-                                        </tileContent>
-                                    </GenericTile>
-                                </l:content>
-                            </l:Grid>
-
-                            <!-- AI Insights -->
-                            <VBox class="sapUiSmallMarginTop">
-                                <Title text="💡 AI Insights &amp; Recommendations" level="H4" class="sapUiSmallMarginBottom"/>
-                                
-                                <!-- Success Analysis -->
-                                <MessageStrip
-                                    text="{email>/aiAnalysis/successInsight}"
-                                    type="Success"
-                                    showIcon="true"
-                                    class="sapUiTinyMarginBottom"/>
-
-                                <!-- Failure Analysis -->
-                                <MessageStrip
-                                    text="{email>/aiAnalysis/failureInsight}"
-                                    type="Warning"
-                                    showIcon="true"
-                                    visible="{= ${email>/failedCount} > 0}"
-                                    class="sapUiTinyMarginBottom"/>
-
-                                <!-- Top Failure Reasons -->
-                                <VBox visible="{= ${email>/failedCount} > 0}" class="sapUiSmallMarginTop">
-                                    <Title text="🔍 Top Failure Reasons (AI Detected)" level="H5" class="sapUiTinyMarginBottom"/>
-                                    <List
-                                        items="{email>/aiAnalysis/topFailureReasons}"
-                                        class="sapUiTinyMarginTop">
-                                        <CustomListItem>
-                                            <HBox alignItems="Center">
-                                                <core:Icon src="sap-icon://warning" color="#E9730C" class="sapUiTinyMarginEnd"/>
-                                                <VBox width="100%">
-                                                    <HBox justifyContent="SpaceBetween">
-                                                        <Text text="{email>reason}" class="sapUiSmallMarginEnd"/>
-                                                        <Text text="{email>count} occurrences ({email>percentage}%)" class="sapUiTinyMarginBegin"/>
-                                                    </HBox>
-                                                    <ProgressIndicator
-                                                        percentValue="{email>percentage}"
-                                                        showValue="false"
-                                                        state="Warning"
-                                                        width="100%"/>
-                                                </VBox>
-                                            </HBox>
-                                        </CustomListItem>
-                                    </List>
-                                </VBox>
-
-                                <!-- AI Recommendations -->
-                                <VBox class="sapUiSmallMarginTop">
-                                    <Title text="🎯 AI Recommendations" level="H5" class="sapUiTinyMarginBottom"/>
-                                    <List
-                                        items="{email>/aiAnalysis/recommendations}">
-                                        <StandardListItem
-                                            title="{email>title}"
-                                            description="{email>description}"
-                                            icon="{email>icon}"
-                                            iconInset="false"
-                                            type="Active"/>
-                                    </List>
-                                </VBox>
-
-                                <!-- Data Quality Score -->
-                                <VBox class="sapUiSmallMarginTop">
-                                    <HBox justifyContent="SpaceBetween" alignItems="Center" class="sapUiTinyMarginBottom">
-                                        <Title text="📊 Data Quality Score" level="H5"/>
-                                        <Text text="{email>/aiAnalysis/qualityScore}/100" class="sapUiSmallMarginEnd"/>
-                                    </HBox>
-                                    <ProgressIndicator
-                                        percentValue="{email>/aiAnalysis/qualityScore}"
-                                        displayValue="{email>/aiAnalysis/qualityScore}%"
-                                        showValue="true"
-                                        state="{= ${email>/aiAnalysis/qualityScore} >= 80 ? 'Success' : ${email>/aiAnalysis/qualityScore} >= 50 ? 'Warning' : 'Error'}"/>
-                                    <Text 
-                                        text="{email>/aiAnalysis/qualityDescription}" 
-                                        class="sapUiTinyMarginTop"/>
-                                </VBox>
-                            </VBox>
-                        </VBox>
-
-                        <!-- No Data Message -->
+                        <!-- Success Scenario -->
                         <MessageStrip
-                            visible="{= ${email>/aiAnalysisComplete} !== true &amp;&amp; ${email>/aiAnalyzing} !== true}"
-                            text="Click 'Analyze Data' to get AI-powered insights on your sales order creation results"
-                            type="Information"
-                            showIcon="true"/>
+                            visible="{= ${email>/successCount} === ${email>/totalCount} &amp;&amp; ${email>/totalCount} &gt; 0}"
+                            text="🎉 All records uploaded successfully!"
+                            type="Success"
+                            showIcon="true"
+                            class="sapUiSmallMarginBottom"/>
+
+                        <!-- Partial Success Scenario -->
+                        <MessageStrip
+                            visible="{= ${email>/failedCount} &gt; 0 &amp;&amp; ${email>/failedCount} &lt; ${email>/totalCount}}"
+                            text="⚠️ Partial success - Some records failed to upload"
+                            type="Warning"
+                            showIcon="true"
+                            class="sapUiSmallMarginBottom"/>
+
+                        <!-- Complete Failure Scenario -->
+                        <MessageStrip
+                            visible="{= ${email>/failedCount} === ${email>/totalCount} &amp;&amp; ${email>/totalCount} &gt; 0}"
+                            text="❌ All records failed to upload"
+                            type="Error"
+                            showIcon="true"
+                            class="sapUiSmallMarginBottom"/>
+
+                        <!-- Email Content -->
+                        <TextArea
+                            value="{email>/emailContent}"
+                            rows="15"
+                            editable="false"
+                            width="100%"/>
                     </VBox>
                 </content>
             </Panel>
 
-            <!-- Data Preview with Status Column -->
+            <!-- Failed Records Details (Only shown when there are failures) -->
             <Panel
                 expandable="true"
                 expanded="true"
-                headerText="Email Data Preview"
+                headerText="Failed Records Details"
+                visible="{= ${email>/failedCount} &gt; 0}"
                 width="auto"
                 class="sapUiNoContentPadding">
                 <headerToolbar>
                     <Toolbar style="Clear">
-                        <Title text="Data to be Sent in Email"/>
+                        <Title text="Records that Failed to Upload"/>
                         <ToolbarSpacer/>
-                        <Text text="Total: {email>/totalCount} | Success: {email>/successCount} | Failed: {email>/failedCount}"/>
+                        <Text text="Failed: {email>/failedCount} of {email>/totalCount}"/>
                         <ToolbarSpacer width="1rem"/>
-                        <SearchField 
-                            width="15rem" 
-                            placeholder="Search..." 
-                            search="onSearchEmailData"/>
-                        <core:Icon src="sap-icon>/table-view" class="sapUiTinyMarginEnd"/>
+                        <core:Icon src="sap-icon://warning" color="#E9730C" class="sapUiTinyMarginEnd"/>
                     </Toolbar>
                 </headerToolbar>
                 <content>
                     <VBox class="sapUiSmallMargin">
                         <Table
-                            id="emailDataTable"
-                            items="{email>/emailData}"
-                            sticky="ColumnHeaders"
-                            growing="true"
-                            growingThreshold="50">
+                            id="failedRecordsTable"
+                            items="{
+                                path: 'email>/emailData',
+                                filters: [{
+                                    path: 'status',
+                                    operator: 'NE',
+                                    value1: 'Success'
+                                }]
+                            }"
+                            sticky="ColumnHeaders">
                             <columns>
                                 <Column width="60px"><Text text="Row #"/></Column>
-                                <Column width="100px"><Text text="Status"/></Column>
                                 <Column><Text text="PO Number"/></Column>
-                                <Column><Text text="SO Number"/></Column>
                                 <Column><Text text="Customer Code"/></Column>
                                 <Column><Text text="Part No"/></Column>
                                 <Column><Text text="Quantity"/></Column>
-                                <Column><Text text="Request Date"/></Column>
-                                <Column width="200px"><Text text="Result Message"/></Column>
+                                <Column width="250px"><Text text="Error Reason"/></Column>
                             </columns>
                             <items>
                                 <ColumnListItem>
                                     <cells>
                                         <Text text="{email>rowIndex}"/>
-                                        <ObjectStatus
-                                            text="{email>status}"
-                                            state="{= ${email>status} === 'Success' ? 'Success' : 'Error'}"
-                                            icon="{= ${email>status} === 'Success' ? 'sap-icon://message-success' : 'sap-icon://message-error'}"/>
                                         <Text text="{email>poNumber}"/>
-                                        <Text text="{email>soNumber}"/>
                                         <Text text="{email>customerCode}"/>
                                         <Text text="{email>partNo}"/>
                                         <Text text="{email>quantity}"/>
-                                        <Text text="{email>requestDate}"/>
                                         <Text text="{email>message}"/>
                                     </cells>
                                 </ColumnListItem>
@@ -330,51 +166,7 @@
                 </content>
             </Panel>
 
-            <!-- Email Preview -->
-            <Panel
-                id="emailPreviewPanel"
-                expandable="true"
-                expanded="false"
-                headerText="Email Preview"
-                width="auto"
-                class="sapUiNoContentPadding">
-                <headerToolbar>
-                    <Toolbar style="Clear">
-                        <Title text="Preview Email Content"/>
-                        <ToolbarSpacer/>
-                        <Button
-                            text="Refresh Preview"
-                            icon="sap-icon://refresh"
-                            press="onRefreshPreview"/>
-                        <core:Icon src="sap-icon://preview" class="sapUiTinyMarginEnd"/>
-                    </Toolbar>
-                </headerToolbar>
-                <content>
-                    <VBox class="sapUiSmallMargin">
-                        <form:SimpleForm editable="false" layout="ResponsiveGridLayout">
-                            <form:content>
-                                <Label text="To:"/>
-                                <Text text="{email>/recipients}"/>
-                                
-                                <Label text="CC:"/>
-                                <Text text="{email>/cc}"/>
-                                
-                                <Label text="Subject:"/>
-                                <Text text="{email>/subject}"/>
-                                
-                                <Label text="Message:"/>
-                                <TextArea
-                                    value="{email>/previewMessage}"
-                                    editable="false"
-                                    rows="10"
-                                    width="100%"/>
-                            </form:content>
-                        </form:SimpleForm>
-                    </VBox>
-                </content>
-            </Panel>
-
-            <!-- Send Actions -->
+            <!-- Send Email Section -->
             <Panel
                 expandable="false"
                 expanded="true"
@@ -383,10 +175,10 @@
                 class="sapUiNoContentPadding">
                 <content>
                     <VBox class="sapUiSmallMargin">
-                        <HBox justifyContent="SpaceBetween">
+                        <HBox justifyContent="SpaceBetween" alignItems="Center">
                             <VBox width="60%">
                                 <MessageStrip
-                                    text="Review the email configuration and data before sending."
+                                    text="Review the email content above and click Send to notify stakeholders."
                                     type="Information"
                                     showIcon="true"/>
                             </VBox>
@@ -428,14 +220,11 @@
             <Toolbar>
                 <ToolbarSpacer/>
                 <Button
-                    text="Back to Home"
-                    icon="sap-icon://home"
-                    press="onNavigateToHome"/>
-                <Button
-                    text="Complete Workflow"
-                    type="Success"
-                    icon="sap-icon://accept"
-                    press="onCompleteWorkflow"
+                    text="Next: Review &amp; Report"
+                    type="Emphasized"
+                    icon="sap-icon://navigation-right-arrow"
+                    iconDensityAware="false"
+                    press="onNavigateToReviewReport"
                     enabled="{= ${email>/sendResult} === 'success'}"/>
             </Toolbar>
         </footer>

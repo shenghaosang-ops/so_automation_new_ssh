@@ -43,7 +43,7 @@
                                    class="sapUiTinyMarginBottom" textAlign="Center"/>
                             <Text text="Upload Excel data and process sales orders with AI-powered automation" 
                                   textAlign="Center" class="sapUiTinyMarginBottom"/>
-                            <Button text="Start Me..." type="Emphasized" 
+                            <Button text="Start Me..." type="Default" 
                                     press="onNavigateToSOAutomation"/>
                         </VBox>
                     </HBox>
@@ -58,20 +58,20 @@
                                    class="sapUiTinyMarginBottom" textAlign="Center"/>
                             <Text text="Validate and upload sales orders to ERP system with real-time status tracking" 
                                   textAlign="Center" class="sapUiTinyMarginBottom"/>
-                            <Button text="Start Me..." type="Emphasized" 
+                            <Button text="Start Me..." type="Default" 
                                     press="onNavigateToSOUpload"/>
                         </VBox>
 
-                        <!-- Email Configuration -->
+                        <!-- Review & Report -->
                         <VBox alignItems="Center" width="280px" class="sapUiMediumMargin">
-                            <core:Icon src="sap-icon://email" size="3rem" color="#0854a0" 
+                            <core:Icon src="sap-icon://business-objects-experience" size="3rem" color="#0854a0" 
                                       class="sapUiSmallMarginBottom"/>
-                            <Title text="4. Email Configuration" level="H4" 
+                            <Title text="4. Review &amp; Report" level="H4" 
                                    class="sapUiTinyMarginBottom" textAlign="Center"/>
-                            <Text text="Configure and send automated email notifications with upload results" 
+                            <Text text="AI-powered analysis and insights with comprehensive reporting capabilities" 
                                   textAlign="Center" class="sapUiTinyMarginBottom"/>
-                            <Button text="Start Me..." type="Emphasized" 
-                                    press="onNavigateToEmailNotification"/>
+                            <Button text="Start Me..." type="Default" 
+                                    press="onNavigateToReviewReport"/>
                         </VBox>
                     </HBox>
                 </VBox>
@@ -86,7 +86,7 @@
                         <core:Icon src="sap-icon://navigation-right-arrow" size="0.8rem" color="#0854a0" class="sapUiTinyMarginEnd"/>
                         <Text text="3. SO Upload" class="sapUiTinyMarginEnd"/>
                         <core:Icon src="sap-icon://navigation-right-arrow" size="0.8rem" color="#0854a0" class="sapUiTinyMarginEnd"/>
-                        <Text text="4. Email Configuration"/>
+                        <Text text="4. Review &amp; Report"/>
                     </HBox>
                 </VBox>
             </l:VerticalLayout>

@@ -98,10 +98,17 @@
                                 <ColumnListItem>
                                     <cells>
                                         <Text text="{soUpload>rowIndex}"/>
-                                        <ObjectStatus
-                                            text="{= ${soUpload>valid} ? 'Valid' : 'Invalid'}"
-                                            state="{= ${soUpload>valid} ? 'Success' : 'Warning'}"
-                                            icon="{= ${soUpload>valid} ? 'sap-icon://accept' : 'sap-icon://alert'}"/>
+                                        <HBox alignItems="Center">
+                                            <core:Icon 
+                                                src="sap-icon://business-objects-experience" 
+                                                color="#0854a0" 
+                                                size="1rem"
+                                                class="sapUiTinyMarginEnd"/>
+                                            <ObjectStatus
+                                                text="{= ${soUpload>valid} ? 'Valid' : 'Invalid'}"
+                                                state="{= ${soUpload>valid} ? 'Success' : 'Warning'}"
+                                                icon="{= ${soUpload>valid} ? 'sap-icon://accept' : 'sap-icon://alert'}"/>
+                                        </HBox>
                                         <Text text="{soUpload>customerCode}"/>
                                         <Text text="{soUpload>poNumber}"/>
                                         <Text text="{soUpload>poDate}"/>
@@ -224,9 +231,10 @@
                             growingThreshold="20">
                             <columns>
                                 <Column width="60px"><Text text="Row #"/></Column>
-                                <Column><Text text="PO Number"/></Column>
-                                <Column><Text text="SO Number"/></Column>
-                                <Column width="100px"><Text text="Upload Status"/></Column>
+                                <Column width="110px"><Text text="PO Number"/></Column>
+                                <Column width="110px"><Text text="SO Number"/></Column>
+                                <Column width="110px"><Text text="Created Date"/></Column>
+                                <Column width="120px"><Text text="Upload Status"/></Column>
                                 <Column><Text text="Message"/></Column>
                             </columns>
                             <items>
@@ -235,6 +243,7 @@
                                         <Text text="{soUpload>rowIndex}"/>
                                         <Text text="{soUpload>poNumber}"/>
                                         <Text text="{soUpload>soNumber}"/>
+                                        <Text text="{soUpload>createdDate}"/>
                                         <ObjectStatus
                                             text="{soUpload>status}"
                                             state="{= ${soUpload>status} === 'Success' ? 'Success' : 'Error'}"
@@ -247,18 +256,136 @@
                     </VBox>
                 </content>
             </Panel>
+
+            <!-- Email Notification Configuration -->
+            <Panel
+                expandable="true"
+                expanded="true"
+                headerText="Email Notification"
+                visible="{= ${soUpload>/uploadResults} !== undefined &amp;&amp; ${soUpload>/uploadResults/length} &gt; 0}"
+                width="auto"
+                class="sapUiNoContentPadding">
+                <headerToolbar>
+                    <Toolbar style="Clear">
+                        <Title text="Configure Email Settings"/>
+                        <ToolbarSpacer/>
+                        <core:Icon src="sap-icon://email" class="sapUiTinyMarginEnd"/>
+                    </Toolbar>
+                </headerToolbar>
+                <content>
+                    <VBox class="sapUiSmallMargin">
+                        <!-- Email Configuration Form -->
+                        <VBox class="sapUiSmallMarginBottom">
+                            <Label text="To (Recipients)" required="true" class="sapUiTinyMarginBottom"/>
+                            <Input
+                                value="{soUpload>/email/recipients}"
+                                placeholder="recipents@sap.com"
+                                width="100%"
+                                editable="false"/>
+                        </VBox>
+
+                        <VBox class="sapUiSmallMarginBottom">
+                            <Label text="CC (Carbon Copy)" class="sapUiTinyMarginBottom"/>
+                            <Input
+                                value="{soUpload>/email/cc}"
+                                placeholder="cc@example.com"
+                                width="100%"/>
+                        </VBox>
+
+                        <VBox class="sapUiSmallMarginBottom">
+                            <Label text="Subject" required="true" class="sapUiTinyMarginBottom"/>
+                            <Input
+                                value="{soUpload>/email/subject}"
+                                placeholder="SO Upload Results - [Date]"
+                                width="100%"/>
+                        </VBox>
+
+                        <!-- Smart Email Content Preview -->
+                        <VBox class="sapUiSmallMarginBottom">
+                            <Label text="Email Preview (Auto-generated)" class="sapUiTinyMarginBottom"/>
+                            
+                            <!-- All Success Scenario -->
+                            <MessageStrip
+                                visible="{= ${soUpload>/successCount} === ${soUpload>/totalUploadCount} &amp;&amp; ${soUpload>/totalUploadCount} &gt; 0}"
+                                text="✅ All records uploaded successfully!"
+                                type="Success"
+                                showIcon="true"
+                                class="sapUiSmallMarginBottom"/>
+
+                            <!-- Partial Success Scenario -->
+                            <MessageStrip
+                                visible="{= ${soUpload>/failedCount} &gt; 0 &amp;&amp; ${soUpload>/failedCount} &lt; ${soUpload>/totalUploadCount}}"
+                                text="⚠️ Partial success - Some records failed to upload"
+                                type="Warning"
+                                showIcon="true"
+                                class="sapUiSmallMarginBottom"/>
+
+                            <!-- Complete Failure Scenario -->
+                            <MessageStrip
+                                visible="{= ${soUpload>/failedCount} === ${soUpload>/totalUploadCount} &amp;&amp; ${soUpload>/totalUploadCount} &gt; 0}"
+                                text="❌ All records failed to upload"
+                                type="Error"
+                                showIcon="true"
+                                class="sapUiSmallMarginBottom"/>
+
+                            <!-- Email Content -->
+                            <TextArea
+                                value="{soUpload>/email/content}"
+                                rows="10"
+                                width="100%"
+                                editable="false"
+                                class="sapUiSmallMarginBottom"/>
+                        </VBox>
+
+                        <!-- Send Email Button -->
+                        <VBox class="sapUiSmallMarginTop">
+                            <HBox justifyContent="End">
+                                <Button
+                                    text="Send Email"
+                                    type="Emphasized"
+                                    icon="sap-icon://email"
+                                    press="onSendEmail"
+                                    enabled="{= ${soUpload>/email/recipients} !== '' &amp;&amp; ${soUpload>/email/subject} !== ''}"/>
+                            </HBox>
+                            
+                            <!-- Email Send Progress -->
+                            <VBox 
+                                visible="{= ${soUpload>/email/sending} === true}"
+                                class="sapUiSmallMarginTop">
+                                <HBox alignItems="Center" class="sapUiTinyMarginBottom">
+                                    <BusyIndicator size="1rem" class="sapUiTinyMarginEnd"/>
+                                    <Text text="Sending email..."/>
+                                </HBox>
+                                <ProgressIndicator
+                                    percentValue="{soUpload>/email/sendProgress}"
+                                    displayValue="Sending..."
+                                    showValue="true"
+                                    state="Information"/>
+                            </VBox>
+
+                            <!-- Email Send Result -->
+                            <MessageStrip
+                                visible="{= ${soUpload>/email/sent} === true}"
+                                text="✅ Email sent successfully to {soUpload>/email/recipients}"
+                                type="Success"
+                                showIcon="true"
+                                class="sapUiSmallMarginTop"/>
+                        </VBox>
+                    </VBox>
+                </content>
+            </Panel>
         </content>
 
         <footer>
             <Toolbar>
                 <ToolbarSpacer/>
                 <Button
-                    text="Next: Email Notification"
+                    text="Next: Review &amp; Report"
                     type="Emphasized"
                     icon="sap-icon://navigation-right-arrow"
                     iconDensityAware="false"
-                    press="onNavigateToEmailNotification"
-                    enabled="{= ${soUpload>/uploadResults} !== undefined &amp;&amp; ${soUpload>/uploadResults/length} > 0}"/>
+                    press="onNavigateToReviewReport"
+                    enabled="{= ${soUpload>/uploadResults} !== undefined &amp;&amp; ${soUpload>/uploadResults/length} &gt; 0}"/>
             </Toolbar>
         </footer>
     </Page>

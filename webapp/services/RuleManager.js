@@ -35,9 +35,9 @@ sap.ui.define([], function() {
                     "Delete data where PO Date is less than or equal to 20241129",
                     "Add two new columns to the right of the Plant column, named 'Sold To' and 'Ship To'. The values for Sold To and Ship To are determined based on the Plant value: If Plant is 2310, then Sold To is 132274 and Ship To is 132279; If Plant is 2370, then Sold To is 132274 and Ship To is 660076; If Plant is 2350, then Sold To is 132274 and Ship To is 660082; If Plant is 2381, additional differentiation is required by checking Part No - if Part No contains letter 'A', then both Sold To and Ship To are 660081, if Part No does not contain letter 'A', then Sold To is 132274 and Ship To is 660075; If Plant is 2380, additional differentiation is required by checking Part No - if Part No contains letters 'AAA', then both Sold To and Ship To are 660084, if Part No does not contain letter 'A', then Sold To is 132274 and Ship To is 660077.",
                     "Create a new column to the right of Delivery Date, named 'CRD'. The CRD value is a date that equals Delivery Date minus 20 days.",
-                    "Create a new column to the right of Order Qty, named 'Qty'. The value equals Order Qty divided by 1000.",
+                    "Create a new column to the right of Order Qty, named 'Quantity'. The value equals Order Qty divided by 1000.",
                     "Add a new column to the left of Manuf. P/N, named 'SalesOrderType'. For Part No values with the first two characters starting with (AT, RT, P prefix, RL, RC0100, RC0075, RP, CC0100, 500V↑, AC, CQ, CS, CC_105↑(1 uF and above)) & RC_P, the sales type is ZOR1. For CustomerPartNO values with the first two characters starting with (AC, AA, RC0201↑, AF, YC, TC, RE, SR, AS, AH, RV, CC general products), the sales type is ZCO.",
-                    "Extract the following fields from the data table for Excel output: Vendor NO, PO Number, Item No, Part No, Delivery Date, PO Date, Qty, Manuf. P/N, Plant, Ship To, SalesOrderType."
+                    "Extract the following fields from the data table for Excel output: Vendor NO, PO Number, Item No, Part No, Delivery Date, PO Date, Quantity, Manuf. P/N, Plant, Ship To, SalesOrderType."
                 ],
                 "C003": [
                     "Check that Order Qty is greater than 0",

@@ -24,7 +24,19 @@ sap.ui.define([
                 uploadedCount: 0,
                 uploadResults: [],
                 uploadSummaryMessage: "",
-                uploadSummaryType: "Information"
+                uploadSummaryType: "Information",
+                successCount: 0,
+                failedCount: 0,
+                totalUploadCount: 0,
+                email: {
+                    recipients: "",
+                    cc: "",
+                    subject: "SO Upload Result " + this._formatDate(new Date()),
+                    content: "",
+                    sending: false,
+                    sendProgress: 0,
+                    sent: false
+                }
             });
             this.getView().setModel(oUploadModel, "soUpload");
 
@@ -40,12 +52,27 @@ sap.ui.define([
          * Handle route matched - load data from previous page
          */
         _onRouteMatched: function() {
+            var oModel = this.getView().getModel("soUpload");
             var oGlobalModel = this.getOwnerComponent().getModel("globalData");
+            
             if (oGlobalModel) {
                 var aProcessedData = oGlobalModel.getProperty("/processedData");
                 if (aProcessedData && aProcessedData.length > 0) {
                     this._loadSOData(aProcessedData);
                 }
+                
+                // Auto-populate email recipients based on selected customer
+                var sSelectedCustomer = oGlobalModel.getProperty("/selectedCustomer");
+                if (sSelectedCustomer === "customerB") {
+                    oModel.setProperty("/email/recipients", "recipents@sap.com");
+                } else if (sSelectedCustomer === "customerA") {
+                    oModel.setProperty("/email/recipients", "customerA@sap.com");
+                }
+            }
+            
+            // Set default recipient if not set
+            if (!oModel.getProperty("/email/recipients")) {
+                oModel.setProperty("/email/recipients", "recipents@sap.com");
             }
         },
 
@@ -58,6 +85,12 @@ sap.ui.define([
             var iInvalid = 0;
 
             aData.forEach(function(oItem) {
+                // If valid field is undefined, default to true (assume valid until checked)
+                if (oItem.valid === undefined) {
+                    oItem.valid = true;
+                    oItem.validationMessage = "Not yet validated";
+                }
+                
                 if (oItem.valid) {
                     iValid++;
                 } else {
@@ -194,8 +227,14 @@ sap.ui.define([
                 
                 oModel.setProperty("/uploadSummaryMessage", sMessage);
                 oModel.setProperty("/uploadSummaryType", sType);
+                oModel.setProperty("/successCount", iSuccess);
+                oModel.setProperty("/failedCount", iFailure);
+                oModel.setProperty("/totalUploadCount", aResults.length);
                 
-                // Store results in global model for email notification
+                // Generate email content
+                this._generateEmailContent(aResults, iSuccess, iFailure);
+                
+                // Store results in global model for review report
                 var oGlobalModel = this.getOwnerComponent().getModel("globalData");
                 if (!oGlobalModel) {
                     oGlobalModel = new JSONModel({});
@@ -219,26 +258,163 @@ sap.ui.define([
         },
 
         /**
-         * Navigate to Email Notification page
+         * Format date as DD.MM.YYYY
          */
-        onNavigateToEmailNotification: function() {
-            var oRouter = this.getOwnerComponent().getRouter();
-            oRouter.navTo("EmailNotification");
+        _formatDate: function(oDate) {
+            var sDay = ("0" + oDate.getDate()).slice(-2);
+            var sMonth = ("0" + (oDate.getMonth() + 1)).slice(-2);
+            var sYear = oDate.getFullYear();
+            return sDay + "." + sMonth + "." + sYear;
         },
 
         /**
-         * Navigate back
+         * Generate email content based on upload results - only successful records in table format
+         */
+        _generateEmailContent: function(aResults, iSuccess, iFailure) {
+            var oModel = this.getView().getModel("soUpload");
+            var iTotal = aResults.length;
+            var sContent = "";
+
+            // Filter only successful records for email
+            var aSuccessful = aResults.filter(function(r) { return r.status === "Success"; });
+
+            // Store failed records in global model for Review & Report page
+            var aFailed = aResults.filter(function(r) { return r.status === "Failed"; });
+            var oGlobalModel = this.getOwnerComponent().getModel("globalData");
+            if (!oGlobalModel) {
+                oGlobalModel = new JSONModel({});
+                this.getOwnerComponent().setModel(oGlobalModel, "globalData");
+            }
+            oGlobalModel.setProperty("/failedRecords", aFailed);
+
+            // Update email subject with date
+            oModel.setProperty("/email/subject", "SO Upload Result " + this._formatDate(new Date()));
+
+            // Generate email content - show successful records in table format
+            if (iSuccess > 0) {
+                oModel.setProperty("/email/emailContentType", "success");
+                sContent = "Dear Team,\n\n";
+                sContent += "✅ Sales order upload completed successfully!\n\n";
+                sContent += "Summary:\n";
+                sContent += "- Total Successful Orders: " + iSuccess + "\n";
+                sContent += "- Upload Date: " + this._formatDate(new Date()) + "\n\n";
+                sContent += "Successful Orders:\n";
+                sContent += "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+                
+                // Table header
+                sContent += String.prototype.padEnd ? 
+                    "No.".padEnd(5) + "SO Number".padEnd(15) + "PO Number".padEnd(15) + "Customer".padEnd(25) + "Part Number".padEnd(20) + "Quantity".padEnd(12) + "Created Date\n" :
+                    "No.  SO Number      PO Number      Customer                 Part Number         Quantity    Created Date\n";
+                sContent += "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+                
+                // Table rows
+                aSuccessful.forEach(function(oRecord, index) {
+                    var sNo = String(index + 1);
+                    var sSONumber = oRecord.soNumber || "N/A";
+                    var sPONumber = oRecord.poNumber || "N/A";
+                    var sCustomer = (oRecord.customerName || "N/A").substring(0, 24);
+                    var sPartNumber = (oRecord.partNumber || "N/A").substring(0, 19);
+                    var sQuantity = String(oRecord.quantity || "N/A");
+                    var sCreatedDate = oRecord.createdDate || "N/A";
+                    
+                    if (String.prototype.padEnd) {
+                        sContent += sNo.padEnd(5) + sSONumber.padEnd(15) + sPONumber.padEnd(15) + 
+                                   sCustomer.padEnd(25) + sPartNumber.padEnd(20) + sQuantity.padEnd(12) + sCreatedDate + "\n";
+                    } else {
+                        // Fallback for older browsers
+                        sContent += sNo + "    " + sSONumber + "   " + sPONumber + "   " + 
+                                   sCustomer + "   " + sPartNumber + "   " + sQuantity + "   " + sCreatedDate + "\n";
+                    }
+                });
+                
+                sContent += "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n";
+                
+                if (iFailure > 0) {
+                    sContent += "Note: " + iFailure + " record(s) failed. Please check the Review & Report page for detailed failure analysis.\n\n";
+                }
+                
+                sContent += "All sales orders are now active in the system and ready for processing.\n\n";
+                sContent += "Best regards,\nSO Automation System";
+            } else {
+                // All failed - redirect to Review & Report page
+                oModel.setProperty("/email/emailContentType", "allFailed");
+                sContent = "Dear Team,\n\n";
+                sContent += "❌ Sales order upload encountered issues.\n\n";
+                sContent += "Summary:\n";
+                sContent += "- Total Orders Attempted: " + iTotal + "\n";
+                sContent += "- Failed Orders: " + iFailure + "\n\n";
+                sContent += "⚠️ All uploads failed. Please check the Review & Report page for detailed failure analysis and recommendations.\n\n";
+                sContent += "Best regards,\nSO Automation System";
+            }
+
+            oModel.setProperty("/email/content", sContent);
+        },
+
+        /**
+         * Detect if errors are system-related
+         */
+        _detectSystemError: function(aResults) {
+            var aSystemKeywords = ["connection", "timeout", "network", "s4", "server", "unavailable", "unreachable"];
+            
+            for (var i = 0; i < aResults.length; i++) {
+                var sError = (aResults[i].errorMessage || aResults[i].message || "").toLowerCase();
+                for (var j = 0; j < aSystemKeywords.length; j++) {
+                    if (sError.indexOf(aSystemKeywords[j]) !== -1) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        },
+
+        /**
+         * Send email notification
+         */
+        onSendEmail: function() {
+            var oModel = this.getView().getModel("soUpload");
+            var sRecipients = oModel.getProperty("/email/recipients");
+            var sSubject = oModel.getProperty("/email/subject");
+            var sContent = oModel.getProperty("/email/content");
+
+            if (!sRecipients || !sSubject) {
+                MessageBox.warning("Please fill in recipients and subject");
+                return;
+            }
+
+            // Set sending state
+            oModel.setProperty("/email/sending", true);
+            oModel.setProperty("/email/sendProgress", 0);
+            oModel.setProperty("/email/sent", false);
+
+            // Simulate email sending with progress
+            var iProgress = 0;
+            var oInterval = setInterval(function() {
+                iProgress += 20;
+                oModel.setProperty("/email/sendProgress", iProgress);
+
+                if (iProgress >= 100) {
+                    clearInterval(oInterval);
+                    oModel.setProperty("/email/sending", false);
+                    oModel.setProperty("/email/sent", true);
+                    MessageToast.show("Email sent successfully!");
+                }
+            }, 300);
+        },
+
+        /**
+         * Navigate to Review & Report page
+         */
+        onNavigateToReviewReport: function() {
+            var oRouter = this.getOwnerComponent().getRouter();
+            oRouter.navTo("ReviewReport");
+        },
+
+        /**
+         * Navigate back to SO Automation
          */
         onNavBack: function() {
-            var oHistory = History.getInstance();
-            var sPreviousHash = oHistory.getPreviousHash();
-
-            if (sPreviousHash !== undefined) {
-                window.history.go(-1);
-            } else {
-                var oRouter = this.getOwnerComponent().getRouter();
-                oRouter.navTo("RouteView1", {}, true);
-            }
+            var oRouter = this.getOwnerComponent().getRouter();
+            oRouter.navTo("RouteView1");
         }
     });
 });

@@ -13,36 +13,20 @@ sap.ui.define([
         onInit: function() {
             // Initialize Email model
             var oEmailModel = new JSONModel({
-                resultType: "both",
                 recipients: "",
                 cc: "",
                 subject: "SO Upload Results - " + new Date().toLocaleDateString(),
-                successMessage: "Dear Team,\n\nThe Sales Order upload has been completed successfully.\n\nPlease find the details below:\n\nTotal Records Processed: {totalCount}\nSuccessful Uploads: {successCount}\n\nThank you.",
-                failureMessage: "Dear Team,\n\nThe Sales Order upload encountered some issues.\n\nPlease find the details below:\n\nTotal Records Processed: {totalCount}\nFailed Uploads: {failedCount}\n\nPlease review the attached details and take necessary action.\n\nThank you.",
-                attachExcel: true,
                 emailData: [],
                 totalCount: 0,
                 successCount: 0,
                 failedCount: 0,
-                previewMessage: "",
+                emailContent: "",
+                emailContentType: "",
                 sendInProgress: false,
                 sendProgress: 0,
                 sendResult: "",
                 sendResultMessage: "",
-                sendResultType: "Information",
-                // AI Analysis properties
-                aiAnalyzing: false,
-                aiProgress: 0,
-                aiAnalysisComplete: false,
-                aiAnalysis: {
-                    successRate: 0,
-                    successInsight: "",
-                    failureInsight: "",
-                    topFailureReasons: [],
-                    recommendations: [],
-                    qualityScore: 0,
-                    qualityDescription: ""
-                }
+                sendResultType: "Information"
             });
             this.getView().setModel(oEmailModel, "email");
 
@@ -63,7 +47,7 @@ sap.ui.define([
                 var aUploadResults = oGlobalModel.getProperty("/uploadResults");
                 if (aUploadResults && aUploadResults.length > 0) {
                     this._loadEmailData(aUploadResults);
-                    this._generatePreview();
+                    this._generateSmartEmailContent();
                 }
             }
         },
@@ -103,285 +87,139 @@ sap.ui.define([
         },
 
         /**
-         * Handle result type change
+         * Generate smart email content based on upload results
          */
-        onResultTypeChange: function() {
-            this._generatePreview();
-        },
-
-        /**
-         * AI Analyze Data - Main Analysis Function
-         */
-        onAnalyzeData: function() {
+        _generateSmartEmailContent: function() {
             var oModel = this.getView().getModel("email");
-            var aEmailData = oModel.getProperty("/emailData");
-            
-            if (!aEmailData || aEmailData.length === 0) {
-                MessageBox.warning("No data available for analysis");
-                return;
-            }
-
-            // Start AI analysis animation
-            oModel.setProperty("/aiAnalyzing", true);
-            oModel.setProperty("/aiProgress", 0);
-            oModel.setProperty("/aiAnalysisComplete", false);
-            
-            // Simulate AI processing with progress
-            this._runAIAnalysis(aEmailData);
-        },
-
-        /**
-         * Run AI Analysis with simulation
-         */
-        _runAIAnalysis: function(aData) {
-            var oModel = this.getView().getModel("email");
-            var that = this;
-            var iProgress = 0;
-            
-            // Simulate AI thinking process
-            var oInterval = setInterval(function() {
-                iProgress += 20;
-                oModel.setProperty("/aiProgress", iProgress);
-                
-                if (iProgress >= 100) {
-                    clearInterval(oInterval);
-                    // Perform actual analysis
-                    that._performAIAnalysis(aData);
-                    oModel.setProperty("/aiAnalyzing", false);
-                    oModel.setProperty("/aiAnalysisComplete", true);
-                    MessageToast.show("AI Analysis Complete! ✨");
-                }
-            }, 300);
-        },
-
-        /**
-         * Perform AI Analysis - Calculate insights
-         */
-        _performAIAnalysis: function(aData) {
-            var oModel = this.getView().getModel("email");
-            var iTotalCount = aData.length;
-            var iSuccessCount = 0;
-            var iFailureCount = 0;
-            var oFailureReasons = {};
-            
-            // Analyze data
-            aData.forEach(function(oItem) {
-                if (oItem.status === "Success") {
-                    iSuccessCount++;
-                } else {
-                    iFailureCount++;
-                    var sReason = oItem.message || "Unknown Error";
-                    if (!oFailureReasons[sReason]) {
-                        oFailureReasons[sReason] = 0;
-                    }
-                    oFailureReasons[sReason]++;
-                }
-            });
-            
-            // Calculate success rate
-            var fSuccessRate = Math.round((iSuccessCount / iTotalCount) * 100);
-            
-            // Generate top failure reasons
-            var aTopFailureReasons = Object.keys(oFailureReasons).map(function(sReason) {
-                var iCount = oFailureReasons[sReason];
-                var fPercentage = Math.round((iCount / iFailureCount) * 100);
-                return {
-                    reason: sReason,
-                    count: iCount,
-                    percentage: fPercentage
-                };
-            }).sort(function(a, b) {
-                return b.count - a.count;
-            }).slice(0, 5); // Top 5 reasons
-            
-            // Generate AI insights
-            var sSuccessInsight = this._generateSuccessInsight(fSuccessRate, iSuccessCount, iTotalCount);
-            var sFailureInsight = this._generateFailureInsight(iFailureCount, iTotalCount);
-            var aRecommendations = this._generateRecommendations(fSuccessRate, aTopFailureReasons);
-            var oQuality = this._calculateQualityScore(fSuccessRate, aTopFailureReasons);
-            
-            // Update model with AI analysis results
-            oModel.setProperty("/aiAnalysis", {
-                successRate: fSuccessRate,
-                successInsight: sSuccessInsight,
-                failureInsight: sFailureInsight,
-                topFailureReasons: aTopFailureReasons,
-                recommendations: aRecommendations,
-                qualityScore: oQuality.score,
-                qualityDescription: oQuality.description
-            });
-        },
-
-        /**
-         * Generate success insight message
-         */
-        _generateSuccessInsight: function(fRate, iSuccess, iTotal) {
-            if (fRate >= 95) {
-                return `🎉 Excellent! ${iSuccess} out of ${iTotal} orders (${fRate}%) were created successfully. Your process is highly optimized!`;
-            } else if (fRate >= 80) {
-                return `✅ Good performance! ${iSuccess} out of ${iTotal} orders (${fRate}%) were created successfully. Minor improvements recommended.`;
-            } else if (fRate >= 50) {
-                return `⚠️ Moderate success rate. ${iSuccess} out of ${iTotal} orders (${fRate}%) were created successfully. Review failure patterns below.`;
-            } else {
-                return `❌ Low success rate detected. Only ${iSuccess} out of ${iTotal} orders (${fRate}%) were created successfully. Immediate attention required.`;
-            }
-        },
-
-        /**
-         * Generate failure insight message
-         */
-        _generateFailureInsight: function(iFailure, iTotal) {
-            if (iFailure === 0) {
-                return "";
-            }
-            var fFailureRate = Math.round((iFailure / iTotal) * 100);
-            return `${iFailure} orders (${fFailureRate}%) failed to create. AI has identified the top failure patterns below for your review.`;
-        },
-
-        /**
-         * Generate AI recommendations
-         */
-        _generateRecommendations: function(fSuccessRate, aFailureReasons) {
-            var aRecommendations = [];
-            
-            if (fSuccessRate < 80) {
-                aRecommendations.push({
-                    title: "Data Validation Enhancement",
-                    description: "Implement pre-upload validation rules to catch common errors before submission",
-                    icon: "sap-icon://validate"
-                });
-            }
-            
-            if (aFailureReasons.length > 0) {
-                var sTopReason = aFailureReasons[0].reason;
-                if (sTopReason.includes("duplicate") || sTopReason.includes("exist")) {
-                    aRecommendations.push({
-                        title: "Duplicate Detection",
-                        description: "Enable automatic duplicate checking before creating sales orders",
-                        icon: "sap-icon://copy"
-                    });
-                }
-                if (sTopReason.includes("material") || sTopReason.includes("part")) {
-                    aRecommendations.push({
-                        title: "Material Master Sync",
-                        description: "Verify material codes against the latest master data before processing",
-                        icon: "sap-icon://product"
-                    });
-                }
-                if (sTopReason.includes("date") || sTopReason.includes("time")) {
-                    aRecommendations.push({
-                        title: "Date Format Standardization",
-                        description: "Standardize date formats in source data to prevent parsing errors",
-                        icon: "sap-icon://calendar"
-                    });
-                }
-            }
-            
-            aRecommendations.push({
-                title: "Automated Retry Logic",
-                description: "Implement smart retry mechanism for transient failures to improve success rate",
-                icon: "sap-icon://refresh"
-            });
-            
-            aRecommendations.push({
-                title: "Real-time Monitoring Dashboard",
-                description: "Set up monitoring alerts for immediate notification of high failure rates",
-                icon: "sap-icon://monitor-payments"
-            });
-            
-            return aRecommendations;
-        },
-
-        /**
-         * Calculate data quality score
-         */
-        _calculateQualityScore: function(fSuccessRate, aFailureReasons) {
-            var iScore = fSuccessRate;
-            var sDescription = "";
-            
-            // Adjust score based on failure diversity
-            if (aFailureReasons.length > 5) {
-                iScore -= 5; // Many different failure types indicate data quality issues
-            }
-            
-            if (iScore >= 90) {
-                sDescription = "Excellent - Your data quality is outstanding with minimal errors";
-            } else if (iScore >= 75) {
-                sDescription = "Good - Data quality is acceptable with room for improvement";
-            } else if (iScore >= 50) {
-                sDescription = "Fair - Data quality needs attention to reduce failure rate";
-            } else {
-                sDescription = "Poor - Critical data quality issues detected, immediate action needed";
-            }
-            
-            return {
-                score: Math.max(0, Math.min(100, iScore)),
-                description: sDescription
-            };
-        },
-
-        /**
-         * Search email data
-         */
-        onSearchEmailData: function(oEvent) {
-            var sQuery = oEvent.getParameter("query");
-            var oTable = this.byId("emailDataTable");
-            var oBinding = oTable.getBinding("items");
-            
-            if (oBinding) {
-                if (sQuery) {
-                    var aFilters = [
-                        new sap.ui.model.Filter("poNumber", sap.ui.model.FilterOperator.Contains, sQuery),
-                        new sap.ui.model.Filter("soNumber", sap.ui.model.FilterOperator.Contains, sQuery),
-                        new sap.ui.model.Filter("status", sap.ui.model.FilterOperator.Contains, sQuery)
-                    ];
-                    var oFilter = new sap.ui.model.Filter({
-                        filters: aFilters,
-                        and: false
-                    });
-                    oBinding.filter(oFilter);
-                } else {
-                    oBinding.filter([]);
-                }
-            }
-        },
-
-        /**
-         * Refresh email preview
-         */
-        onRefreshPreview: function() {
-            this._generatePreview();
-            MessageToast.show("Preview refreshed");
-        },
-
-        /**
-         * Generate email preview
-         */
-        _generatePreview: function() {
-            var oModel = this.getView().getModel("email");
-            var sResultType = oModel.getProperty("/resultType");
             var iTotal = oModel.getProperty("/totalCount");
             var iSuccess = oModel.getProperty("/successCount");
             var iFailed = oModel.getProperty("/failedCount");
+            var aEmailData = oModel.getProperty("/emailData");
             
-            var sMessage = "";
+            var sContent = "";
+            var sContentType = "";
             
-            if (sResultType === "success" || sResultType === "both") {
-                var sSuccessTemplate = oModel.getProperty("/successMessage");
-                sMessage += sSuccessTemplate
-                    .replace("{totalCount}", iTotal)
-                    .replace("{successCount}", iSuccess);
+            // Scenario 1: All Success
+            if (iSuccess === iTotal && iTotal > 0) {
+                sContentType = "✅ All Success";
+                sContent = "Dear Team,\n\n";
+                sContent += "🎉 Congratulations! All sales orders have been uploaded successfully!\n\n";
+                sContent += "═══════════════════════════════════════\n";
+                sContent += "📊 Summary:\n";
+                sContent += "───────────────────────────────────────\n";
+                sContent += "Total Records Processed: " + iTotal + "\n";
+                sContent += "Successful Uploads: " + iSuccess + " (100%)\n";
+                sContent += "Failed Uploads: 0\n";
+                sContent += "═══════════════════════════════════════\n\n";
+                sContent += "All sales orders have been created successfully in the system.\n\n";
+                sContent += "Thank you for using SO Automation Agent!\n\n";
+                sContent += "Best Regards,\n";
+                sContent += "SO Automation Team";
+            }
+            // Scenario 2: Partial Success (some failures)
+            else if (iFailed > 0 && iFailed < iTotal) {
+                sContentType = "⚠️ Partial Success";
+                var fSuccessRate = Math.round((iSuccess / iTotal) * 100);
+                sContent = "Dear Team,\n\n";
+                sContent += "The sales order upload has been completed with some issues.\n\n";
+                sContent += "═══════════════════════════════════════\n";
+                sContent += "📊 Summary:\n";
+                sContent += "───────────────────────────────────────\n";
+                sContent += "Total Records Processed: " + iTotal + "\n";
+                sContent += "✅ Successful Uploads: " + iSuccess + " (" + fSuccessRate + "%)\n";
+                sContent += "❌ Failed Uploads: " + iFailed + " (" + (100 - fSuccessRate) + "%)\n";
+                sContent += "═══════════════════════════════════════\n\n";
+                
+                // Add failed records details
+                sContent += "❌ Failed Records Details:\n";
+                sContent += "───────────────────────────────────────\n";
+                var aFailedRecords = aEmailData.filter(function(oItem) {
+                    return oItem.status !== "Success";
+                });
+                
+                aFailedRecords.forEach(function(oRecord, index) {
+                    sContent += "\n" + (index + 1) + ". Row #" + oRecord.rowIndex + "\n";
+                    sContent += "   PO Number: " + oRecord.poNumber + "\n";
+                    sContent += "   Customer: " + oRecord.customerCode + "\n";
+                    sContent += "   Part No: " + oRecord.partNo + "\n";
+                    sContent += "   Quantity: " + oRecord.quantity + "\n";
+                    sContent += "   ⚠️ Error: " + oRecord.message + "\n";
+                });
+                
+                sContent += "\n═══════════════════════════════════════\n\n";
+                sContent += "Please review the failed records above and take necessary action.\n\n";
+                sContent += "Best Regards,\n";
+                sContent += "SO Automation Team";
+            }
+            // Scenario 3: Complete Failure
+            else if (iFailed === iTotal && iTotal > 0) {
+                sContentType = "❌ All Failed";
+                sContent = "Dear Team,\n\n";
+                sContent += "⚠️ ATTENTION: All sales orders failed to upload!\n\n";
+                sContent += "═══════════════════════════════════════\n";
+                sContent += "📊 Summary:\n";
+                sContent += "───────────────────────────────────────\n";
+                sContent += "Total Records Processed: " + iTotal + "\n";
+                sContent += "Successful Uploads: 0\n";
+                sContent += "❌ Failed Uploads: " + iFailed + " (100%)\n";
+                sContent += "═══════════════════════════════════════\n\n";
+                
+                // Analyze common error patterns
+                var oErrorReasons = {};
+                aEmailData.forEach(function(oRecord) {
+                    var sReason = oRecord.message || "Unknown Error";
+                    if (!oErrorReasons[sReason]) {
+                        oErrorReasons[sReason] = 0;
+                    }
+                    oErrorReasons[sReason]++;
+                });
+                
+                // Check for system errors
+                var bSystemError = false;
+                for (var sReason in oErrorReasons) {
+                    if (sReason.toLowerCase().includes("connection") || 
+                        sReason.toLowerCase().includes("s4") ||
+                        sReason.toLowerCase().includes("timeout") ||
+                        sReason.toLowerCase().includes("network")) {
+                        bSystemError = true;
+                        break;
+                    }
+                }
+                
+                if (bSystemError) {
+                    sContent += "🔴 System Error Detected:\n";
+                    sContent += "───────────────────────────────────────\n";
+                    sContent += "The upload failure appears to be caused by system connectivity issues.\n\n";
+                    sContent += "Possible causes:\n";
+                    sContent += "• S4/HANA system connection error\n";
+                    sContent += "• Network timeout or instability\n";
+                    sContent += "• Service temporarily unavailable\n";
+                    sContent += "• Authentication/Authorization issues\n\n";
+                    sContent += "Recommended Actions:\n";
+                    sContent += "1. Verify S4/HANA system status\n";
+                    sContent += "2. Check network connectivity\n";
+                    sContent += "3. Retry the upload after system is stable\n";
+                    sContent += "4. Contact IT support if issue persists\n\n";
+                } else {
+                    sContent += "📋 Common Error Reasons:\n";
+                    sContent += "───────────────────────────────────────\n";
+                    var iReasonIndex = 1;
+                    for (var sErrorReason in oErrorReasons) {
+                        sContent += iReasonIndex + ". " + sErrorReason + " (" + oErrorReasons[sErrorReason] + " occurrences)\n";
+                        iReasonIndex++;
+                    }
+                    sContent += "\n";
+                }
+                
+                sContent += "═══════════════════════════════════════\n\n";
+                sContent += "⚠️ IMMEDIATE ACTION REQUIRED\n";
+                sContent += "Please review the error details and contact the system administrator.\n\n";
+                sContent += "Best Regards,\n";
+                sContent += "SO Automation Team";
             }
             
-            if (sResultType === "failure" || sResultType === "both") {
-                if (sMessage) sMessage += "\n\n---\n\n";
-                var sFailureTemplate = oModel.getProperty("/failureMessage");
-                sMessage += sFailureTemplate
-                    .replace("{totalCount}", iTotal)
-                    .replace("{failedCount}", iFailed);
-            }
-            
-            oModel.setProperty("/previewMessage", sMessage);
+            oModel.setProperty("/emailContent", sContent);
+            oModel.setProperty("/emailContentType", sContentType);
         },
 
         /**
@@ -426,8 +264,7 @@ sap.ui.define([
                 recipients: oModel.getProperty("/recipients"),
                 cc: oModel.getProperty("/cc"),
                 subject: oModel.getProperty("/subject"),
-                message: oModel.getProperty("/previewMessage"),
-                attachExcel: oModel.getProperty("/attachExcel"),
+                message: oModel.getProperty("/emailContent"),
                 data: oModel.getProperty("/emailData")
             };
 
@@ -460,26 +297,11 @@ sap.ui.define([
         },
 
         /**
-         * Navigate to home
+         * Navigate to Review and Report page
          */
-        onNavigateToHome: function() {
+        onNavigateToReviewReport: function() {
             var oRouter = this.getOwnerComponent().getRouter();
-            oRouter.navTo("Home");
-        },
-
-        /**
-         * Complete workflow
-         */
-        onCompleteWorkflow: function() {
-            MessageBox.success(
-                "Workflow completed successfully!\n\nAll steps have been executed:\n• Data Acquisition\n• SO Processing\n• ERP Upload\n• Email Notification",
-                {
-                    title: "Workflow Complete",
-                    onClose: function() {
-                        this.onNavigateToHome();
-                    }.bind(this)
-                }
-            );
+            oRouter.navTo("ReviewReport");
         },
 
         /**

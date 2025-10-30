@@ -22,7 +22,7 @@ sap.ui.define([], function() {
             var sCustomer = ctrl.byId("customerSelect").getSelectedKey();
             var fieldMappings = {
                 "C001": { customerCode: "CustomerPurchaseCode", poNumber: "PONo", poDate: "PODate", itemNo: "POItemNo", poLine: "PO+POLINE", customerPartNo: "CustomerPartNO", quantity: "QTY", requestDate: "RequestDate", netPrice: "NetPrice", partNo: "PartNo", salesOrderType: "SalesOrderType" },
-                "C002": { vendorNo: "Vendor NO", customerCode: "Vendor NO", poNumber: "PO Number", poDate: "PO Date", itemNo: "Item No", deliveryDate: "Delivery Date", requestDate: "Delivery Date", quantity: "Order Qty", orderQty: "Order Qty", customerPartNo: "Manuf. P/N", partNo: "Part No", plant: "Plant", shipTo: "Ship To", soldTo: "Sold To", crd: "CRD", orderType: "Order Type", salesOrderType: "SalesOrderType" }
+                "C002": { vendorNo: "Vendor NO", customerCode: "Vendor NO", poNumber: "PO Number", poDate: "PO Date", itemNo: "Item No", deliveryDate: "Delivery Date", requestDate: "Delivery Date", quantity: "Quantity", orderQty: "Order Qty", customerPartNo: "Manuf. P/N", partNo: "Part No", plant: "Plant", shipTo: "Ship To", soldTo: "Sold To", crd: "CRD", orderType: "Order Type", salesOrderType: "SalesOrderType" }
             };
             var mapping = fieldMappings[sCustomer] || {};
             var aTableRows = oApiResponse.data.map(function(oItem, index) {

@@ -105,10 +105,10 @@
           ]
         },
         {
-          "name": "EmailNotification",
-          "pattern": "email-notification",
+          "name": "ReviewReport",
+          "pattern": "review-report",
           "target": [
-            "TargetEmailNotification"
+            "TargetReviewReport"
           ]
         }
       ],
@@ -129,9 +129,9 @@
           "id": "SOUpload",
           "name": "SOUpload"
         },
-        "TargetEmailNotification": {
-          "id": "EmailNotification",
-          "name": "EmailNotification"
+        "TargetReviewReport": {
+          "id": "ReviewReport",
+          "name": "ReviewReport"
         }
       }
     },

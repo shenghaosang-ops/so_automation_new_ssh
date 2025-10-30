@@ -21,7 +21,9 @@ sap.ui.define([
                 additionalConfig: "",
                 extractionTemplate: "",
                 extractedData: "",
-                documentFile: null
+                documentFile: null,
+                downloadSuccess: false,
+                downloadStatus: "",
             });
             this.getView().setModel(oDataModel, "dataAcquisition");
 
@@ -118,6 +120,40 @@ sap.ui.define([
         },
 
         /**
+         * Download Excel file from URL
+         */
+        onDownloadExcel: function() {
+            var that = this;
+            var oModel = this.getView().getModel("dataAcquisition");
+            var sUrl = oModel.getProperty("/websiteUrl");
+            
+            if (!sUrl) {
+                oModel.setProperty("/downloadStatus", "Please select a customer first");
+                oModel.setProperty("/downloadSuccess", false);
+                return;
+            }
+
+            // Show loading status
+            oModel.setProperty("/downloadStatus", "Downloading file...");
+
+            DataAcquisitionService.downloadExcelFile(sUrl)
+                .then(function(oResult) {
+                    if (oResult.success) {
+                        oModel.setProperty("/downloadStatus", "File downloaded successfully to: " + oResult.filePath);
+                        oModel.setProperty("/downloadSuccess", true);
+                        // Enable the Next button by setting some extracted data
+                        oModel.setProperty("/extractedData", "Download completed");
+                    } else {
+                        oModel.setProperty("/downloadStatus", "Failed to download file");
+                        oModel.setProperty("/downloadSuccess", false);
+                    }
+                })
+                .catch(function(oError) {
+                    oModel.setProperty("/downloadStatus", "Error downloading file: " + oError.message);
+                    oModel.setProperty("/downloadSuccess", false);
+                });
+        },
+        /**
          * Extract data from document (PDF, DOC, TXT)
          */
         onExtractDocumentData: function() {
@@ -173,13 +209,14 @@ sap.ui.define([
                 return;
             }
 
-            // Store extracted data in a global model for the next page
+            // Store extracted data and selected customer in a global model for the next page
             var oGlobalModel = this.getOwnerComponent().getModel("globalData");
             if (!oGlobalModel) {
                 oGlobalModel = new JSONModel({});
                 this.getOwnerComponent().setModel(oGlobalModel, "globalData");
             }
             oGlobalModel.setProperty("/acquiredData", sExtractedData);
+            oGlobalModel.setProperty("/selectedCustomer", oModel.getProperty("/selectedCustomer"));
 
             // Navigate to SO Automation
             var oRouter = this.getOwnerComponent().getRouter();

@@ -18,8 +18,7 @@
     xmlns="sap.m"
     xmlns:u="sap.ui.unified"
     xmlns:l="sap.ui.layout"
-    xmlns:core="sap.ui.core"
-    xmlns:m="sap.m">
+    xmlns:core="sap.ui.core">
 
     <Page
         id="page"
@@ -343,7 +342,7 @@
                     icon="sap-icon://navigation-right-arrow"
                     iconDensityAware="false"
                     press="onNavigateToSOUpload"
-                    enabled="{= ${results>/rows/length} > 0}"/>
+                    enabled="{= ${results>/rows/length} &gt; 0}"/>
             </Toolbar>
         </footer>
     </Page>

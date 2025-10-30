@@ -1,0 +1,219 @@
+<mvc:View
+    controllerName="yegeoaiso.controller.ReviewReport"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:l="sap.ui.layout"
+    xmlns:viz="sap.viz.ui5.controls"
+    xmlns:viz.feeds="sap.viz.ui5.controls.common.feeds"
+    xmlns:viz.data="sap.viz.ui5.data">
+
+    <Page
+        id="reviewReportPage"
+        title="Review &amp; Report - AI Insights"
+        showNavButton="true"
+        navButtonPress="onNavBack"
+        backgroundDesign="Transparent">
+
+        <content>
+            <!-- AI Analysis Panel -->
+            <Panel
+                expandable="true"
+                expanded="true"
+                headerText="AI-Powered Analysis"
+                width="auto"
+                class="sapUiNoContentPadding">
+                <headerToolbar>
+                    <Toolbar style="Clear">
+                        <Title text="AI Analysis &amp; Insights"/>
+                        <ToolbarSpacer/>
+                        <Button
+                            text="Analyze Data"
+                            icon="sap-icon://lab"
+                            type="Emphasized"
+                            press="onAnalyzeData"/>
+                        <core:Icon src="sap-icon://business-objects-experience" color="#0854a0" class="sapUiTinyMarginEnd"/>
+                    </Toolbar>
+                </headerToolbar>
+                <content>
+                    <VBox class="sapUiSmallMargin">
+                        <!-- Analysis Progress -->
+                        <VBox visible="{= ${report>/aiAnalyzing} === true}" class="sapUiSmallMarginBottom">
+                            <HBox alignItems="Center" class="sapUiTinyMarginBottom">
+                                <BusyIndicator size="1rem" class="sapUiTinyMarginEnd"/>
+                                <Text text="🤖 AI is analyzing your sales order data..." class="sapUiSmallMarginBegin"/>
+                            </HBox>
+                            <ProgressIndicator
+                                percentValue="{report>/aiProgress}"
+                                displayValue="Analyzing..."
+                                showValue="true"
+                                state="Information"/>
+                        </VBox>
+
+                        <!-- AI Analysis Results -->
+                        <VBox visible="{= ${report>/aiAnalysisComplete} === true}">
+                            <!-- Overall Summary Cards -->
+                            <l:Grid defaultSpan="L4 M6 S12" class="sapUiSmallMarginBottom">
+                                <l:content>
+                                    <!-- Success Rate Card -->
+                                    <GenericTile
+                                        header="Success Rate"
+                                        subheader="Overall Performance"
+                                        frameType="TwoByOne">
+                                        <tileContent>
+                                            <TileContent>
+                                                <content>
+                                                    <NumericContent
+                                                        value="{report>/aiAnalysis/successRate}"
+                                                        scale="%"
+                                                        valueColor="{= ${report>/aiAnalysis/successRate} >= 80 ? 'Good' : ${report>/aiAnalysis/successRate} >= 50 ? 'Critical' : 'Error'}"
+                                                        icon="sap-icon://arobase"
+                                                        iconDensityAware="false"/>
+                                                </content>
+                                            </TileContent>
+                                        </tileContent>
+                                    </GenericTile>
+
+                                    <!-- Total Orders Card -->
+                                    <GenericTile
+                                        header="Total Orders"
+                                        subheader="Processed in this batch"
+                                        frameType="TwoByOne">
+                                        <tileContent>
+                                            <TileContent>
+                                                <content>
+                                                    <NumericContent
+                                                        value="{report>/totalCount}"
+                                                        icon="sap-icon://sales-order"
+                                                        iconDensityAware="false"/>
+                                                </content>
+                                            </TileContent>
+                                        </tileContent>
+                                    </GenericTile>
+
+                                    <!-- Failed Orders Card -->
+                                    <GenericTile
+                                        header="Failed Orders"
+                                        subheader="Click to view details"
+                                        frameType="TwoByOne"
+                                        press="onShowFailedOrders">
+                                        <tileContent>
+                                            <TileContent>
+                                                <content>
+                                                    <NumericContent
+                                                        value="{report>/failedCount}"
+                                                        scale="/ {report>/totalCount}"
+                                                        valueColor="Error"
+                                                        iconDensityAware="false"/>
+                                                </content>
+                                            </TileContent>
+                                        </tileContent>
+                                    </GenericTile>
+                                </l:content>
+                            </l:Grid>
+
+                            <!-- AI Insights - Hidden by default, shown on Failed Orders click -->
+                            <VBox visible="false" class="sapUiSmallMarginTop">
+                                <Title text="� AI Insights &amp; Recommendations" level="H4" class="sapUiSmallMarginBottom"/>
+                            </VBox>
+                        </VBox>
+
+                        <!-- No Data Message -->
+                        <MessageStrip
+                            visible="{= ${report>/aiAnalysisComplete} !== true &amp;&amp; ${report>/aiAnalyzing} !== true}"
+                            text="Click 'Analyze Data' to get AI-powered insights on your sales order creation results"
+                            type="Information"
+                            showIcon="true"/>
+                    </VBox>
+                </content>
+            </Panel>
+        </content>
+
+        <footer>
+            <Toolbar>
+                <ToolbarSpacer/>
+                <Button
+                    text="Back to Home"
+                    icon="sap-icon://home"
+                    press="onNavigateToHome"/>
+                <Button
+                    text="Complete Workflow"
+                    type="Success"
+                    icon="sap-icon://accept"
+                    press="onCompleteWorkflow"/>
+            </Toolbar>
+        </footer>
+
+        <!-- Failed Orders Details Dialog -->
+        <dependents>
+            <Dialog
+                id="failedOrdersDialog"
+                title="Failed Orders Analysis"
+                contentWidth="900px"
+                contentHeight="600px"
+                resizable="true"
+                draggable="true">
+                <content>
+                    <VBox class="sapUiSmallMargin">
+                        <MessageStrip
+                            text="{= 'Total Failed Orders: ' + ${report>/failedCount} + ' out of ' + ${report>/totalCount}}"
+                            type="Error"
+                            showIcon="true"
+                            class="sapUiSmallMarginBottom"/>
+                        
+                        <Table
+                            id="failedOrdersTable"
+                            items="{report>/failedOrders}"
+                            growing="true"
+                            growingThreshold="20"
+                            sticky="ColumnHeaders">
+                            <columns>
+                                <Column width="60px"><Text text="Row #"/></Column>
+                                <Column width="120px"><Text text="PO Number"/></Column>
+                                <Column width="150px"><Text text="Customer"/></Column>
+                                <Column width="120px"><Text text="Part Number"/></Column>
+                                <Column width="80px"><Text text="Qty"/></Column>
+                                <Column minWidth="200px"><Text text="Error Reason"/></Column>
+                                <Column minWidth="250px"><Text text="AI Recommendation"/></Column>
+                            </columns>
+                            <items>
+                                <ColumnListItem>
+                                    <cells>
+                                        <Text text="{report>rowIndex}"/>
+                                        <Text text="{report>poNumber}"/>
+                                        <Text text="{report>customerName}"/>
+                                        <Text text="{report>partNumber}"/>
+                                        <Text text="{report>quantity}"/>
+                                        <VBox>
+                                            <HBox alignItems="Center">
+                                                <core:Icon src="sap-icon://error" color="#BB0000" size="1rem" class="sapUiTinyMarginEnd"/>
+                                                <Text text="{report>errorMessage}" class="sapUiSmallMarginEnd"/>
+                                            </HBox>
+                                        </VBox>
+                                        <VBox>
+                                            <HBox alignItems="Center">
+                                                <core:Icon src="sap-icon://lightbulb" color="#0854a0" size="1rem" class="sapUiTinyMarginEnd"/>
+                                                <Text text="{report>recommendation}" class="sapUiSmallMarginEnd"/>
+                                            </HBox>
+                                        </VBox>
+                                    </cells>
+                                </ColumnListItem>
+                            </items>
+                        </Table>
+                    </VBox>
+                </content>
+                <beginButton>
+                    <Button
+                        text="Export to Excel"
+                        icon="sap-icon://excel-attachment"
+                        press="onExportFailedOrders"/>
+                </beginButton>
+                <endButton>
+                    <Button
+                        text="Close"
+                        press="onCloseFailedOrdersDialog"/>
+                </endButton>
+            </Dialog>
+        </dependents>
+    </Page>
+</mvc:View>
