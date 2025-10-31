@@ -24,6 +24,9 @@ sap.ui.define([
                 documentFile: null,
                 downloadSuccess: false,
                 downloadStatus: "",
+                documentAIStatus: "",
+                documentAIStatusType: "Information",
+                documentAIDataConfirmed: false
             });
             this.getView().setModel(oDataModel, "dataAcquisition");
 
@@ -58,10 +61,17 @@ sap.ui.define([
          */
         onDataTypeChange: function(oEvent) {
             var sSelectedKey = oEvent.getParameter("item").getKey();
-            this.getView().getModel("dataAcquisition").setProperty("/dataType", sSelectedKey);
+            var oModel = this.getView().getModel("dataAcquisition");
+            oModel.setProperty("/dataType", sSelectedKey);
             
             // Clear previous extraction results
-            this.getView().getModel("dataAcquisition").setProperty("/extractedData", "");
+            oModel.setProperty("/extractedData", "");
+            
+            // Reset Document AI status if switching to unstructured
+            if (sSelectedKey === "unstructured") {
+                oModel.setProperty("/documentAIStatus", "");
+                oModel.setProperty("/documentAIDataConfirmed", false);
+            }
         },
 
         /**
@@ -198,15 +208,62 @@ sap.ui.define([
         },
 
         /**
+         * Open SAP Document AI application
+         */
+        onOpenDocumentAI: function() {
+            var oModel = this.getView().getModel("dataAcquisition");
+            
+            // Document AI URL
+            var sDocumentAIUrl = "https://test-a2diuda5.eu12-canary.doc.cloud.sap/ui?clientId=irpa_shared#/invoiceviewer";
+            
+            // Open in new window
+            window.open(sDocumentAIUrl, "_blank");
+            
+            // Update status
+            oModel.setProperty("/documentAIStatus", "Document AI application opened in new window. Please process your documents and return here when complete.");
+            oModel.setProperty("/documentAIStatusType", "Information");
+            
+            MessageToast.show("Document AI application opened in new window");
+        },
+
+        /**
+         * Confirm data downloaded from Document AI
+         */
+        onConfirmDocumentAIData: function() {
+            var oModel = this.getView().getModel("dataAcquisition");
+            
+            // Set confirmation flag
+            oModel.setProperty("/documentAIDataConfirmed", true);
+            oModel.setProperty("/documentAIStatus", "Data successfully downloaded from Document AI application.");
+            oModel.setProperty("/documentAIStatusType", "Success");
+            
+            // Set extracted data flag to enable Next button
+            oModel.setProperty("/extractedData", "Document AI data confirmed");
+            
+            MessageToast.show("Document AI data confirmed successfully");
+        },
+
+        /**
          * Navigate to SO Automation page with extracted data
          */
         onNavigateToSOAutomation: function() {
             var oModel = this.getView().getModel("dataAcquisition");
+            var sDataType = oModel.getProperty("/dataType");
             var sExtractedData = oModel.getProperty("/extractedData");
             
-            if (!sExtractedData) {
-                MessageBox.warning("Please extract data before proceeding");
-                return;
+            // Check data availability based on data type
+            if (sDataType === "structured") {
+                var bDownloadSuccess = oModel.getProperty("/downloadSuccess");
+                if (!bDownloadSuccess || !sExtractedData) {
+                    MessageBox.warning("Please download Excel file before proceeding");
+                    return;
+                }
+            } else if (sDataType === "unstructured") {
+                var bDocumentAIConfirmed = oModel.getProperty("/documentAIDataConfirmed");
+                if (!bDocumentAIConfirmed) {
+                    MessageBox.warning("Please confirm data download from Document AI before proceeding");
+                    return;
+                }
             }
 
             // Store extracted data and selected customer in a global model for the next page
@@ -217,6 +274,7 @@ sap.ui.define([
             }
             oGlobalModel.setProperty("/acquiredData", sExtractedData);
             oGlobalModel.setProperty("/selectedCustomer", oModel.getProperty("/selectedCustomer"));
+            oGlobalModel.setProperty("/dataType", sDataType);
 
             // Navigate to SO Automation
             var oRouter = this.getOwnerComponent().getRouter();

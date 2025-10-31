@@ -178,70 +178,77 @@
                 </content> -->
             </Panel>
 
-            <!-- Unstructured Data Input (PDF/Document Upload) -->
+            <!-- Unstructured Data Input (Document AI Integration) -->
             <Panel
                 id="unstructuredDataPanel"
                 expandable="true"
                 expanded="true"
-                headerText="Unstructured Data Upload"
+                headerText="Document AI Processing"
                 visible="{= ${dataAcquisition>/dataType} === 'unstructured'}"
                 width="auto"
                 class="sapUiNoContentPadding">
                 <headerToolbar>
                     <Toolbar style="Clear">
-                        <Title text="Document AI"/>
+                        <Title text="SAP Document AI"/>
                         <ToolbarSpacer/>
-                        <core:Icon src="sap-icon://pdf-attachment" class="sapUiTinyMarginEnd"/>
+                        <core:Icon src="sap-icon://BusinessSuiteInAppSymbols/icon-ai" class="sapUiTinyMarginEnd"/>
                     </Toolbar>
                 </headerToolbar>
                 <content>
                     <VBox class="sapUiSmallMargin">
-                        <Label text="Upload Document" required="true" class="sapUiTinyMarginBottom"/>
-                        <HBox alignItems="Center" class="sapUiSmallMarginBottom">
-                            <u:FileUploader
-                                id="documentUploader"
-                                buttonText="Choose Document"
-                                fileType="pdf,doc,docx,txt"
-                                change="onDocumentSelect"
-                                style="Emphasized"
-                                useMultipart="false"
-                                sendXHR="true"/>
-                            <MessageStrip
-                                id="documentNameStrip"
-                                text="No document selected"
-                                type="Information"
-                                showIcon="true"
-                                class="sapUiTinyMarginBegin"/>
-                        </HBox>
+                        <!-- 说明信息 -->
+                        <MessageStrip
+                            text="Please process your documents using SAP Document AI application. Click the button below to open Document AI."
+                            type="Information"
+                            showIcon="true"
+                            class="sapUiSmallMarginBottom"/>
 
-                        <Label text="Extraction Template" class="sapUiTinyMarginTop"/>
-                        <TextArea
-                            id="extractionTemplate"
-                            placeholder="Describe the fields you want to extract (one per line)&#13;&#10;Example:&#13;&#10;Customer Name&#13;&#10;PO Number&#13;&#10;Order Date&#13;&#10;Item Details"
-                            value="{dataAcquisition>/extractionTemplate}"
-                            rows="6"
-                            width="100%"
-                            class="sapUiSmallMarginTop"/>
-
-                        <Label text="Output Format" required="true" class="sapUiSmallMarginTop"/>
-                        <Select
-                            id="unstructuredOutputFormat"
-                            selectedKey="{dataAcquisition>/outputFormat}"
-                            width="100%"
-                            class="sapUiSmallMarginTop">
-                            <core:Item key="json" text="JSON - Structured Data"/>
-                            <core:Item key="csv" text="CSV - Tabular Data"/>
-                            <core:Item key="excel" text="Excel - Spreadsheet"/>
-                        </Select>
-
-                        <HBox class="sapUiMediumMarginTop">
+                        <!-- 跳转到 Document AI 按钮 -->
+                        <VBox class="sapUiSmallMarginTop">
+                            <Label text="Step 1: Process Documents" class="sapUiTinyMarginBottom"/>
                             <Button
-                                text="Extract Document Data"
+                                id="openDocumentAIButton"
+                                text="Open SAP Document AI"
                                 type="Emphasized"
-                                icon="sap-icon://document-text"
-                                press="onExtractDocumentData"
-                                width="200px"/>
-                        </HBox>
+                                icon="sap-icon://BusinessSuiteInAppSymbols/icon-ai"
+                                press="onOpenDocumentAI"
+                                width="250px"
+                                class="sapUiSmallMarginBottom"/>
+                            <Text 
+                                text="This will open the SAP Document AI application in a new window. Process your documents there and return to this page when complete."
+                                class="sapUiTinyText"/>
+                        </VBox>
+
+                        <!-- 数据下载确认 -->
+                        <VBox class="sapUiMediumMarginTop">
+                            <Label text="Step 2: Confirm Data Download" class="sapUiTinyMarginBottom"/>
+                            <MessageStrip
+                                id="documentAIStatusStrip"
+                                text="{dataAcquisition>/documentAIStatus}"
+                                type="{dataAcquisition>/documentAIStatusType}"
+                                showIcon="true"
+                                visible="{= ${dataAcquisition>/documentAIStatus} !== ''}"
+                                class="sapUiSmallMarginBottom"/>
+                            
+                            <HBox alignItems="Center" class="sapUiSmallMarginTop">
+                                <Button
+                                    id="confirmDataDownloadButton"
+                                    text="Confirm Data Downloaded from Document AI"
+                                    type="Accept"
+                                    icon="sap-icon://accept"
+                                    press="onConfirmDocumentAIData"
+                                    width="350px"
+                                    enabled="{= !${dataAcquisition>/documentAIDataConfirmed}}"/>
+                            </HBox>
+                            
+                            <!-- 确认成功提示 -->
+                            <MessageStrip
+                                visible="{dataAcquisition>/documentAIDataConfirmed}"
+                                text="✓ Data has been successfully downloaded from Document AI application. You can now proceed to the next step."
+                                type="Success"
+                                showIcon="true"
+                                class="sapUiSmallMarginTop"/>
+                        </VBox>
                     </VBox>
                 </content>
             </Panel>
@@ -293,7 +300,7 @@
                     icon="sap-icon://navigation-right-arrow"
                     iconDensityAware="false"
                     press="onNavigateToSOAutomation"
-                    enabled="{= ${dataAcquisition>/downloadSuccess} &amp;&amp; ${dataAcquisition>/extractedData} !== ''}"/>
+                    enabled="{= (${dataAcquisition>/dataType} === 'structured' &amp;&amp; ${dataAcquisition>/downloadSuccess}) || (${dataAcquisition>/dataType} === 'unstructured' &amp;&amp; ${dataAcquisition>/documentAIDataConfirmed})}"/>
             </Toolbar>
         </footer>
     </Page>
