@@ -127,37 +127,33 @@
                     </VBox>
                 </content>
             </Panel>
-        </content>
 
-        <footer>
-            <Toolbar>
-                <ToolbarSpacer/>
-                <Button
-                    text="Back to Home"
-                    icon="sap-icon://home"
-                    press="onNavigateToHome"/>
-                <Button
-                    text="Complete Workflow"
-                    type="Success"
-                    icon="sap-icon://accept"
-                    press="onCompleteWorkflow"/>
-            </Toolbar>
-        </footer>
-
-        <!-- Failed Orders Details Dialog -->
-        <dependents>
-            <Dialog
-                id="failedOrdersDialog"
-                title="Failed Orders Analysis"
-                contentWidth="900px"
-                contentHeight="600px"
-                resizable="true"
-                draggable="true">
+            <!-- Failed Orders Details Section (Expandable) -->
+            <Panel
+                id="failedOrdersSection"
+                expandable="true"
+                expanded="{report>/showFailedDetails}"
+                headerText="Failed Orders Analysis"
+                width="auto"
+                visible="{= ${report>/failedCount} > 0}"
+                class="sapUiNoContentPadding">
+                <headerToolbar>
+                    <Toolbar style="Clear">
+                        <Title text="Failed Orders Analysis"/>
+                        <ToolbarSpacer/>
+                        <Button
+                            text="Export to Excel"
+                            icon="sap-icon://excel-attachment"
+                            press="onExportFailedOrders"
+                            type="Transparent"/>
+                        <core:Icon src="sap-icon://warning" color="#E78C07" class="sapUiTinyMarginBegin"/>
+                    </Toolbar>
+                </headerToolbar>
                 <content>
                     <VBox class="sapUiSmallMargin">
                         <VBox class="sapUiSmallMarginBottom">
                             <MessageStrip
-                                text="{= 'Total Failed Orders: ' + ${report>/failedCount} + ' (ERP Upload Failed: ' + ${report>/erpFailedCount} + ', Automation Validation Failed: ' + ${report>/validationFailedCount} + ')'}"
+                                text="{= 'Total Failed Orders: ' + ${report>/failedCount} + ' out of ' + ${report>/totalCount} + ' (ERP Upload Failed: ' + ${report>/erpFailedCount} + ', Automation Validation Failed: ' + ${report>/validationFailedCount} + ')'}"
                                 type="Error"
                                 showIcon="true"/>
                             <MessageStrip
@@ -212,18 +208,24 @@
                         </Table>
                     </VBox>
                 </content>
-                <beginButton>
-                    <Button
-                        text="Export to Excel"
-                        icon="sap-icon://excel-attachment"
-                        press="onExportFailedOrders"/>
-                </beginButton>
-                <endButton>
-                    <Button
-                        text="Close"
-                        press="onCloseFailedOrdersDialog"/>
-                </endButton>
-            </Dialog>
-        </dependents>
+            </Panel>
+        </content>
+
+        <footer>
+            <Toolbar>
+                <ToolbarSpacer/>
+                <Button
+                    text="Back to Home"
+                    icon="sap-icon://home"
+                    press="onNavigateToHome"/>
+                <Button
+                    text="Complete Workflow"
+                    type="Success"
+                    icon="sap-icon://accept"
+                    press="onCompleteWorkflow"/>
+            </Toolbar>
+        </footer>
+    </Page>
+</mvc:View>
     </Page>
 </mvc:View>

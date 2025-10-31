@@ -21,6 +21,7 @@ sap.ui.define([
                 validationFailedCount: 0,
                 emailData: [],
                 failedOrders: [],
+                showFailedDetails: false,
                 aiAnalyzing: false,
                 aiProgress: 0,
                 aiAnalysisComplete: false,
@@ -109,14 +110,18 @@ sap.ui.define([
             // Combine both types of failed orders
             var aAllFailedOrders = aErpFailedOrders.concat(aValidationFailedOrders);
             var iTotalFailed = aAllFailedOrders.length;
+            
+            // Total count should be ALL Excel data = Success + ERP Failed + Validation Failed
+            var iTotalExcelRecords = iSuccess + iTotalFailed;
 
             oModel.setProperty("/emailData", aEmailData);
             oModel.setProperty("/failedOrders", aAllFailedOrders);
-            oModel.setProperty("/totalCount", aEmailData.length);
+            oModel.setProperty("/totalCount", iTotalExcelRecords);
             oModel.setProperty("/successCount", iSuccess);
             oModel.setProperty("/failedCount", iTotalFailed);
             oModel.setProperty("/erpFailedCount", aErpFailedOrders.length);
             oModel.setProperty("/validationFailedCount", aValidationFailedOrders.length);
+            oModel.setProperty("/showFailedDetails", false); // Initially collapsed
         },
 
         /**
@@ -438,7 +443,7 @@ sap.ui.define([
         },
 
         /**
-         * Show failed orders dialog
+         * Toggle failed orders details display
          */
         onShowFailedOrders: function() {
             var oModel = this.getView().getModel("report");
@@ -449,19 +454,18 @@ sap.ui.define([
                 return;
             }
 
-            // Open dialog
-            if (!this._oFailedOrdersDialog) {
-                this._oFailedOrdersDialog = this.byId("failedOrdersDialog");
-            }
-            this._oFailedOrdersDialog.open();
-        },
-
-        /**
-         * Close failed orders dialog
-         */
-        onCloseFailedOrdersDialog: function() {
-            if (this._oFailedOrdersDialog) {
-                this._oFailedOrdersDialog.close();
+            // Toggle the failed details section
+            var bCurrentlyShown = oModel.getProperty("/showFailedDetails");
+            oModel.setProperty("/showFailedDetails", !bCurrentlyShown);
+            
+            // Scroll to failed orders section if expanding
+            if (!bCurrentlyShown) {
+                setTimeout(function() {
+                    var oFailedSection = this.byId("failedOrdersSection");
+                    if (oFailedSection && oFailedSection.getDomRef()) {
+                        oFailedSection.getDomRef().scrollIntoView({ behavior: "smooth", block: "start" });
+                    }
+                }.bind(this), 100);
             }
         },
 
