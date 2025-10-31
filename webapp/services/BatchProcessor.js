@@ -32,39 +32,67 @@ sap.ui.define([
          * Processes Excel data in batches with real-time progress updates
          */
         onStartAutomation: async function(ctrl) {
+            console.log("=== START AI AUTOMATION CLICKED ===");
             try {
-                if (!BatchProcessor._validateInputs(ctrl)) return;
+                console.log("Step 1: Validating inputs...");
+                if (!BatchProcessor._validateInputs(ctrl)) {
+                    console.log("Validation failed!");
+                    return;
+                }
+                console.log("Step 2: Initializing batch processing...");
                 BatchProcessor._initializeBatchProcessing(ctrl);
+                console.log("Step 3: Preparing batch configuration...");
                 var oBatchConfig = BatchProcessor._prepareBatchConfiguration(ctrl);
+                console.log("Batch config prepared:", oBatchConfig);
+                console.log("Step 4: Executing batch processing...");
                 await BatchProcessor._executeBatchProcessing(ctrl, oBatchConfig);
+                console.log("Step 5: Finalizing...");
                 BatchProcessor._finalizeBatchProcessing(ctrl, true);
             } catch (error) {
+                console.error("Error in onStartAutomation:", error);
                 BatchProcessor._handleBatchProcessingError(ctrl, error);
             }
         },
 
         _validateInputs: function(ctrl) {
+            console.log("Validating inputs...");
             var sCustomer = ctrl.byId("customerSelect").getSelectedKey();
+            console.log("Selected customer:", sCustomer);
             var sBatchSize = ctrl.byId("batchSizeSelect").getSelectedKey();
+            console.log("Selected batch size:", sBatchSize);
+            
             if (!sCustomer) {
+                console.log("No customer selected!");
                 sap.m.MessageToast.show("Please select a customer first");
                 return false;
             }
             if (!sBatchSize) {
+                console.log("No batch size selected!");
                 sap.m.MessageToast.show("Please select batch size");
                 return false;
             }
             var oCustomerRulesModel = ctrl.getView().getModel("customerRules");
             var aRules = oCustomerRulesModel.getProperty("/rules/" + sCustomer);
+            console.log("Customer rules:", aRules);
+            
             if (!aRules || !aRules.length) {
+                console.log("No rules configured for customer!");
                 sap.m.MessageToast.show("Selected customer has no configured rules");
                 return false;
             }
-            var oExcelModel = ctrl.getView().getModel("excelData");
-            if (!oExcelModel || !oExcelModel.getData().rows || oExcelModel.getData().rows.length === 0) {
-                sap.m.MessageToast.show("Please upload Excel file first");
+            
+            // 检查 viewData 模型中的 excelData
+            var oViewModel = ctrl.getView().getModel("viewData");
+            var aExcelData = oViewModel ? oViewModel.getProperty("/excelData") : null;
+            console.log("Excel data:", aExcelData ? aExcelData.length + " rows" : "null");
+            
+            if (!aExcelData || !aExcelData.length) {
+                console.log("No Excel data found!");
+                sap.m.MessageToast.show("Please extract Excel data first");
                 return false;
             }
+            
+            console.log("Validation passed!");
             return true;
         },
 
@@ -95,21 +123,26 @@ sap.ui.define([
             var iBatchSize = parseInt(ctrl.byId("batchSizeSelect").getSelectedKey(), 10);
             var oCustomerRulesModel = ctrl.getView().getModel("customerRules");
             var aRules = oCustomerRulesModel.getProperty("/rules/" + sCustomer);
-            var oExcelModel = ctrl.getView().getModel("excelData");
-            var oExcelData = oExcelModel.getData();
+            
+            // 从 viewData 模型获取 Excel 数据
+            var oViewModel = ctrl.getView().getModel("viewData");
+            var aExcelData = oViewModel.getProperty("/excelData");
+            
             var oBatchModel = ctrl.getView().getModel("batch");
             oBatchModel.setProperty("/selectedBatchSize", iBatchSize);
-            oBatchModel.setProperty("/total", oExcelData.rows.length);
-            var aHeaders = Object.keys(oExcelData.rows[0]);
-            var iTotalRows = oExcelData.rows.length;
+            oBatchModel.setProperty("/total", aExcelData.length);
+            
+            var aHeaders = Object.keys(aExcelData[0]);
+            var iTotalRows = aExcelData.length;
             var iTotalBatches = Math.ceil(iTotalRows / iBatchSize);
             ctrl._oBatchState.totalRows = iTotalRows;
             ctrl._oBatchState.totalBatches = iTotalBatches;
+            
             return {
                 customer: sCustomer,
                 batchSize: iBatchSize,
                 headers: aHeaders,
-                allRows: oExcelData.rows,
+                allRows: aExcelData,
                 rules: aRules,
                 totalBatches: iTotalBatches,
                 options: {

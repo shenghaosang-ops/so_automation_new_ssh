@@ -19,12 +19,16 @@ sap.ui.define([], function() {
             if (!oApiResponse.data || !Array.isArray(oApiResponse.data)) {
                 throw new Error("API response data format error: missing data array");
             }
+            
+            console.log("Processing batch response, first item:", oApiResponse.data[0]);
+            
             var sCustomer = ctrl.byId("customerSelect").getSelectedKey();
             var fieldMappings = {
                 "C001": { customerCode: "CustomerPurchaseCode", poNumber: "PONo", poDate: "PODate", itemNo: "POItemNo", poLine: "PO+POLINE", customerPartNo: "CustomerPartNO", quantity: "QTY", requestDate: "RequestDate", netPrice: "NetPrice", partNo: "PartNo", salesOrderType: "SalesOrderType" },
                 "C002": { vendorNo: "Vendor NO", customerCode: "Vendor NO", poNumber: "PO Number", poDate: "PO Date", itemNo: "Item No", deliveryDate: "Delivery Date", requestDate: "Delivery Date", quantity: "Quantity", orderQty: "Order Qty", customerPartNo: "Manuf. P/N", partNo: "Part No", plant: "Plant", shipTo: "Ship To", soldTo: "Sold To", crd: "CRD", orderType: "Order Type", salesOrderType: "SalesOrderType" }
             };
             var mapping = fieldMappings[sCustomer] || {};
+            
             var aTableRows = oApiResponse.data.map(function(oItem, index) {
                 var row = {
                     rowIndex: iBatchStartIndex + index + 1,
@@ -32,11 +36,37 @@ sap.ui.define([], function() {
                     result: oItem.valid ? "Processing Success" : "Processing Failed",
                     reason: oItem.reason || ""
                 };
+                
+                // 检查数据结构
+                var dataSource = oItem.data || oItem;
+                console.log("Row " + (iBatchStartIndex + index + 1) + " data source:", dataSource);
+                
+                // 先映射标准字段
                 Object.keys(mapping).forEach(function(key) {
-                    row[key] = oItem.data[mapping[key]] || "";
+                    var sourceField = mapping[key];
+                    row[key] = dataSource[sourceField] || "";
                 });
+                
+                // 保留所有原始数据字段（避免丢失数据）
+                if (dataSource && typeof dataSource === 'object') {
+                    Object.keys(dataSource).forEach(function(dataKey) {
+                        // 如果字段还没有被映射，则直接使用原始字段名
+                        var bAlreadyMapped = false;
+                        Object.keys(mapping).forEach(function(mappedKey) {
+                            if (mapping[mappedKey] === dataKey) {
+                                bAlreadyMapped = true;
+                            }
+                        });
+                        if (!bAlreadyMapped && dataKey !== 'valid' && dataKey !== 'reason') {
+                            row[dataKey] = dataSource[dataKey];
+                        }
+                    });
+                }
+                
+                console.log("Processed row:", row);
                 return row;
             });
+            
             var oResultsModel = ctrl.getView().getModel("results");
             var aCurrentRows = oResultsModel.getProperty("/rows") || [];
             oResultsModel.setProperty("/rows", aCurrentRows.concat(aTableRows));

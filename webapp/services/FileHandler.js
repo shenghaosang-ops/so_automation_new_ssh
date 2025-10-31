@@ -32,23 +32,47 @@ sap.ui.define([], function() {
             var oFile = oEvent.getParameter("files")[0];
             var sFileName = oEvent.getParameter("newValue");
             var oMessageStrip = ctrl.byId("fileNameStrip");
+            var oViewModel = ctrl.getView().getModel("viewData");
 
             if (!sFileName || !oFile) {
                 oMessageStrip.setText("No file selected. Only Excel (.xlsx) files are allowed.");
                 oMessageStrip.setType("Information");
+                ctrl.byId("extractButton").setEnabled(false);
+        
+                // 更新视图模型
+                oViewModel.setProperty("/uploadStatus", {
+                    fileName: "",
+                    message: "No file selected",
+                    type: "Information"
+                });
                 return;
             }
+
             if (!sFileName.endsWith(".xlsx")) {
                 oMessageStrip.setText("Invalid file type. Please select an Excel (.xlsx) file");
                 oMessageStrip.setType("Error");
+                ctrl.byId("extractButton").setEnabled(false);
+        
+                // 更新视图模型
+                oViewModel.setProperty("/uploadStatus", {
+                    fileName: sFileName,
+                    message: "Invalid file type",
+                    type: "Error"
+                });
                 return;
             }
             ctrl._uploadedFile = oFile;
             oMessageStrip.setText("Selected file: " + sFileName);
             oMessageStrip.setType("Success");
             ctrl.byId("extractButton").setEnabled(true);
-        },
 
+            // 更新视图模型
+            oViewModel.setProperty("/uploadStatus", {
+                fileName: sFileName,
+                message: "File selected successfully",
+                type: "Success"
+            });
+        },
         /**
          * 处理Extract Excel File按钮点击事件
          */
@@ -64,10 +88,33 @@ sap.ui.define([], function() {
                         var firstSheetName = workbook.SheetNames[0];
                         var worksheet = workbook.Sheets[firstSheetName];
                         var jsonData = XLSX.utils.sheet_to_json(worksheet);
-                        var oModel = new sap.ui.model.json.JSONModel({ rows: jsonData });
-                        ctrl.getView().setModel(oModel, "excelData");
-                        oMessageStrip.setText(jsonData.length + " rows extracted.");
+                        
+                        // 保存完整数据（所有列）
+                        var oViewModel = ctrl.getView().getModel("viewData");
+                        oViewModel.setProperty("/excelData", jsonData);
+                        oViewModel.setProperty("/rowCount", jsonData.length);
+                        oViewModel.setProperty("/showPreview", true);
+                        
+                        // 创建预览数据（仅前5列用于预览表格显示）
+                        var previewData = jsonData.map(function(row) {
+                            var columns = Object.keys(row);
+                            var previewRow = {};
+                            columns.slice(0, 5).forEach(function(column) {
+                                previewRow[column] = row[column];
+                            });
+                            return previewRow;
+                        });
+                        
+                        // 更新预览表格（仅显示前5列）
+                        if (ctrl._updatePreviewTable) {
+                            ctrl._updatePreviewTable(previewData);
+                        }
+                        
+                        oMessageStrip.setText(jsonData.length + " rows with " + Object.keys(jsonData[0]).length + " columns extracted successfully.");
                         oMessageStrip.setType("Success");
+                        
+                        console.log("Excel data extracted:", jsonData.length, "rows,", Object.keys(jsonData[0]).length, "columns");
+                        console.log("First row data:", jsonData[0]);
                     } catch (error) {
                         oMessageStrip.setText("File processing failed: " + error.message);
                         oMessageStrip.setType("Error");
