@@ -96,6 +96,62 @@ sap.ui.define([], function() {
             });
         },
 
+        extractPdfData: function(oFile) {
+            return new Promise(function(resolve, reject) {
+                // Mock API call
+                setTimeout(function() {
+                    // Mock response data
+                    var oResult = {
+                        status: "success",
+                        fields: [
+                            {
+                                label: "采购订单日期",
+                                value: "2024-01-04",
+                                confidence: 97
+                            },
+                            {
+                                label: "采购订单号",
+                                value: "104341",
+                                confidence: 99
+                            },
+                            {
+                                label: "金额总计",
+                                value: "6912000",
+                                confidence: 92
+                            },
+                            {
+                                label: "付款条件",
+                                value: "Net 60 Days",
+                                confidence: 88
+                            },
+                            {
+                                label: "采购商城市",
+                                value: "Fremont",
+                                confidence: 45
+                            },
+                            {
+                                label: "采购商名称",
+                                value: "Pivotal Systems Corporation",
+                                confidence: 98
+                            },
+                            {
+                                label: "采购商电话",
+                                value: "5107709125",
+                                confidence: 52
+                            },
+                            {
+                                label: "货币代码",
+                                value: "USD",
+                                confidence: 94
+                            }
+                        ]
+                    };
+                    
+                    resolve(oResult);
+                }, 1000);
+            });
+        },
+
         /**
          * Extract data from document (PDF, DOC, TXT)
          * @param {Object} oConfig - Configuration object with file
