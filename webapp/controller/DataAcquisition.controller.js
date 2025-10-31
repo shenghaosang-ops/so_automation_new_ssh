@@ -144,6 +144,7 @@ sap.ui.define([
             }
 
             // Show loading status
+            oModel.setProperty("/isDownloading", true);
             oModel.setProperty("/downloadStatus", "Downloading file...");
 
             DataAcquisitionService.downloadExcelFile(sUrl)
@@ -161,6 +162,9 @@ sap.ui.define([
                 .catch(function(oError) {
                     oModel.setProperty("/downloadStatus", "Error downloading file: " + oError.message);
                     oModel.setProperty("/downloadSuccess", false);
+                })
+                .finally(function() {
+                    oModel.setProperty("/isDownloading", false);
                 });
         },
         /**

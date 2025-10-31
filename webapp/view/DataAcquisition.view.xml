@@ -136,8 +136,15 @@
                             id="downloadStatus"
                             visible="{= ${dataAcquisition>/downloadStatus} !== ''}"
                             text="{dataAcquisition>/downloadStatus}"
-                            type="{= ${dataAcquisition>/downloadSuccess} ? 'Success' : 'Error'}"
-                            showIcon="true"/>
+                            type="{= ${dataAcquisition>/isDownloading} ? 'Information' : 
+                                ${dataAcquisition>/downloadSuccess} ? 'Success' : 'Error'}"
+                            showIcon="true">
+                            <customData>
+                                <core:CustomData 
+                                    key="showLoadingIndicator" 
+                                    value="{dataAcquisition>/isDownloading}"/>
+                            </customData>
+                        </MessageStrip>
                     </VBox>
                 </content>
                 <!-- <content>
