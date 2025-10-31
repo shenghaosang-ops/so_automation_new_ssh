@@ -280,12 +280,30 @@ sap.ui.define([
 
             // Store failed records in global model for Review & Report page
             var aFailed = aResults.filter(function(r) { return r.status === "Failed"; });
+            
+            // Also collect invalid records from automation stage (not uploaded to ERP)
+            var aAllData = oModel.getProperty("/soData");
+            var aInvalidRecords = aAllData.filter(function(oItem) { 
+                return oItem.valid === false; 
+            }).map(function(oItem) {
+                return {
+                    rowIndex: oItem.rowIndex || "",
+                    poNumber: oItem.poNumber || "",
+                    customerName: oItem.customerName || oItem.customerCode || "",
+                    partNumber: oItem.partNo || oItem.partNumber || "",
+                    quantity: oItem.quantity || 0,
+                    errorMessage: oItem.reason || oItem.validationMessage || "Validation failed",
+                    failureType: "Automation Validation"
+                };
+            });
+            
             var oGlobalModel = this.getOwnerComponent().getModel("globalData");
             if (!oGlobalModel) {
                 oGlobalModel = new JSONModel({});
                 this.getOwnerComponent().setModel(oGlobalModel, "globalData");
             }
             oGlobalModel.setProperty("/failedRecords", aFailed);
+            oGlobalModel.setProperty("/invalidRecords", aInvalidRecords);
 
             // Update email subject with date
             oModel.setProperty("/email/subject", "SO Upload Result " + this._formatDate(new Date()));

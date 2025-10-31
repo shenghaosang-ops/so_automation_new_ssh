@@ -35,7 +35,7 @@ sap.ui.define([], function() {
             var oViewModel = ctrl.getView().getModel("viewData");
 
             if (!sFileName || !oFile) {
-                oMessageStrip.setText("No file selected. Only Excel (.xlsx) files are allowed.");
+                oMessageStrip.setText("No file selected. Supported formats: CSV (.csv), Excel (.xlsx)");
                 oMessageStrip.setType("Information");
                 ctrl.byId("extractButton").setEnabled(false);
         
@@ -48,8 +48,12 @@ sap.ui.define([], function() {
                 return;
             }
 
-            if (!sFileName.endsWith(".xlsx")) {
-                oMessageStrip.setText("Invalid file type. Please select an Excel (.xlsx) file");
+            // 检查文件类型是否为 CSV 或 Excel
+            var bIsCSV = sFileName.toLowerCase().endsWith(".csv");
+            var bIsExcel = sFileName.toLowerCase().endsWith(".xlsx");
+            
+            if (!bIsCSV && !bIsExcel) {
+                oMessageStrip.setText("Invalid file type. Please select CSV (.csv) or Excel (.xlsx) file");
                 oMessageStrip.setType("Error");
                 ctrl.byId("extractButton").setEnabled(false);
         
@@ -61,8 +65,12 @@ sap.ui.define([], function() {
                 });
                 return;
             }
+            
             ctrl._uploadedFile = oFile;
-            oMessageStrip.setText("Selected file: " + sFileName);
+            ctrl._uploadedFileType = bIsCSV ? "csv" : "xlsx";
+            
+            var sFileTypeLabel = bIsCSV ? "CSV" : "Excel";
+            oMessageStrip.setText("Selected " + sFileTypeLabel + " file: " + sFileName);
             oMessageStrip.setType("Success");
             ctrl.byId("extractButton").setEnabled(true);
 
@@ -74,64 +82,169 @@ sap.ui.define([], function() {
             });
         },
         /**
-         * 处理Extract Excel File按钮点击事件
+         * 处理Extract按钮点击事件 - 支持 CSV 和 Excel
          */
         onExtractPress: function(ctrl, oEvent) {
             var oMessageStrip = ctrl.byId("fileNameStrip");
+            var sFileType = ctrl._uploadedFileType || "xlsx";
+            
             try {
                 var oReader = new FileReader();
-                oReader.onload = function(e) {
-                    try {
-                        var arrayBuffer = e.target.result;
-                        var data = new Uint8Array(arrayBuffer);
-                        var workbook = XLSX.read(data, { type: 'array' });
-                        var firstSheetName = workbook.SheetNames[0];
-                        var worksheet = workbook.Sheets[firstSheetName];
-                        var jsonData = XLSX.utils.sheet_to_json(worksheet);
-                        
-                        // 保存完整数据（所有列）
-                        var oViewModel = ctrl.getView().getModel("viewData");
-                        oViewModel.setProperty("/excelData", jsonData);
-                        oViewModel.setProperty("/rowCount", jsonData.length);
-                        oViewModel.setProperty("/showPreview", true);
-                        
-                        // 创建预览数据（仅前5列用于预览表格显示）
-                        var previewData = jsonData.map(function(row) {
-                            var columns = Object.keys(row);
-                            var previewRow = {};
-                            columns.slice(0, 5).forEach(function(column) {
-                                previewRow[column] = row[column];
-                            });
-                            return previewRow;
-                        });
-                        
-                        // 更新预览表格（仅显示前5列）
-                        if (ctrl._updatePreviewTable) {
-                            ctrl._updatePreviewTable(previewData);
+                
+                if (sFileType === "csv") {
+                    // 处理 CSV 文件
+                    oReader.onload = function(e) {
+                        try {
+                            var csvContent = e.target.result;
+                            var jsonData = FileHandler._parseCSV(csvContent);
+                            
+                            if (!jsonData || jsonData.length === 0) {
+                                throw new Error("No data found in CSV file");
+                            }
+                            
+                            FileHandler._processExtractedData(ctrl, jsonData, oMessageStrip, "CSV");
+                        } catch (error) {
+                            oMessageStrip.setText("CSV processing failed: " + error.message);
+                            oMessageStrip.setType("Error");
+                            console.error("CSV processing error:", error);
                         }
-                        
-                        oMessageStrip.setText(jsonData.length + " rows with " + Object.keys(jsonData[0]).length + " columns extracted successfully.");
-                        oMessageStrip.setType("Success");
-                        
-                        console.log("Excel data extracted:", jsonData.length, "rows,", Object.keys(jsonData[0]).length, "columns");
-                        console.log("First row data:", jsonData[0]);
-                    } catch (error) {
-                        oMessageStrip.setText("File processing failed: " + error.message);
-                        oMessageStrip.setType("Error");
-                        console.error("Excel processing error:", error);
-                    }
-                };
+                    };
+                    oReader.readAsText(ctrl._uploadedFile);
+                    
+                } else {
+                    // 处理 Excel 文件
+                    oReader.onload = function(e) {
+                        try {
+                            var arrayBuffer = e.target.result;
+                            var data = new Uint8Array(arrayBuffer);
+                            var workbook = XLSX.read(data, { type: 'array' });
+                            var firstSheetName = workbook.SheetNames[0];
+                            var worksheet = workbook.Sheets[firstSheetName];
+                            var jsonData = XLSX.utils.sheet_to_json(worksheet);
+                            
+                            if (!jsonData || jsonData.length === 0) {
+                                throw new Error("No data found in Excel file");
+                            }
+                            
+                            FileHandler._processExtractedData(ctrl, jsonData, oMessageStrip, "Excel");
+                        } catch (error) {
+                            oMessageStrip.setText("Excel processing failed: " + error.message);
+                            oMessageStrip.setType("Error");
+                            console.error("Excel processing error:", error);
+                        }
+                    };
+                    oReader.readAsArrayBuffer(ctrl._uploadedFile);
+                }
+                
                 oReader.onerror = function(error) {
                     oMessageStrip.setText("File reading failed");
                     oMessageStrip.setType("Error");
                     console.error("File reading error:", error);
                 };
-                oReader.readAsArrayBuffer(ctrl._uploadedFile);
+                
             } catch (error) {
                 oMessageStrip.setText("Error: " + error.message);
                 oMessageStrip.setType("Error");
                 console.error("Processing error:", error);
             }
+        },
+        
+        /**
+         * 解析 CSV 文件内容
+         */
+        _parseCSV: function(csvContent) {
+            var lines = csvContent.split(/\r?\n/);
+            var headers = [];
+            var jsonData = [];
+            
+            for (var i = 0; i < lines.length; i++) {
+                var line = lines[i].trim();
+                if (!line) continue;
+                
+                var values = FileHandler._parseCSVLine(line);
+                
+                if (i === 0) {
+                    // 第一行作为表头
+                    headers = values;
+                } else {
+                    // 数据行
+                    var row = {};
+                    for (var j = 0; j < headers.length; j++) {
+                        row[headers[j]] = values[j] || "";
+                    }
+                    jsonData.push(row);
+                }
+            }
+            
+            return jsonData;
+        },
+        
+        /**
+         * 解析 CSV 行（处理引号和逗号）
+         */
+        _parseCSVLine: function(line) {
+            var values = [];
+            var currentValue = "";
+            var inQuotes = false;
+            
+            for (var i = 0; i < line.length; i++) {
+                var char = line[i];
+                
+                if (char === '"') {
+                    if (inQuotes && line[i + 1] === '"') {
+                        // 双引号转义
+                        currentValue += '"';
+                        i++;
+                    } else {
+                        // 切换引号状态
+                        inQuotes = !inQuotes;
+                    }
+                } else if (char === ',' && !inQuotes) {
+                    // 字段分隔符
+                    values.push(currentValue.trim());
+                    currentValue = "";
+                } else {
+                    currentValue += char;
+                }
+            }
+            
+            // 添加最后一个字段
+            values.push(currentValue.trim());
+            
+            return values;
+        },
+        
+        /**
+         * 处理提取的数据（CSV 或 Excel）
+         */
+        _processExtractedData: function(ctrl, jsonData, oMessageStrip, sFileType) {
+            // 保存完整数据（所有列）
+            var oViewModel = ctrl.getView().getModel("viewData");
+            oViewModel.setProperty("/excelData", jsonData);
+            oViewModel.setProperty("/rowCount", jsonData.length);
+            oViewModel.setProperty("/showPreview", true);
+            
+            // 创建预览数据（仅前5列用于预览表格显示）
+            var previewData = jsonData.map(function(row) {
+                var columns = Object.keys(row);
+                var previewRow = {};
+                columns.slice(0, 5).forEach(function(column) {
+                    previewRow[column] = row[column];
+                });
+                return previewRow;
+            });
+            
+            // 更新预览表格（仅显示前5列）
+            if (ctrl._updatePreviewTable) {
+                ctrl._updatePreviewTable(previewData);
+            }
+            
+            var iColumns = Object.keys(jsonData[0]).length;
+            oMessageStrip.setText(sFileType + " file: " + jsonData.length + " rows with " + iColumns + " columns extracted successfully.");
+            oMessageStrip.setType("Success");
+            
+            console.log(sFileType + " data extracted:", jsonData.length, "rows,", iColumns, "columns");
+            console.log("First row data:", jsonData[0]);
         }
     };
 

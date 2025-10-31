@@ -155,11 +155,17 @@
                 draggable="true">
                 <content>
                     <VBox class="sapUiSmallMargin">
-                        <MessageStrip
-                            text="{= 'Total Failed Orders: ' + ${report>/failedCount} + ' out of ' + ${report>/totalCount}}"
-                            type="Error"
-                            showIcon="true"
-                            class="sapUiSmallMarginBottom"/>
+                        <VBox class="sapUiSmallMarginBottom">
+                            <MessageStrip
+                                text="{= 'Total Failed Orders: ' + ${report>/failedCount} + ' (ERP Upload Failed: ' + ${report>/erpFailedCount} + ', Automation Validation Failed: ' + ${report>/validationFailedCount} + ')'}"
+                                type="Error"
+                                showIcon="true"/>
+                            <MessageStrip
+                                text="ℹ️ ERP Upload Failed: Orders that passed validation but failed during ERP upload. Automation Validation Failed: Orders that failed business rule checks and were not uploaded."
+                                type="Information"
+                                showIcon="false"
+                                class="sapUiTinyMarginTop"/>
+                        </VBox>
                         
                         <Table
                             id="failedOrdersTable"
@@ -169,10 +175,11 @@
                             sticky="ColumnHeaders">
                             <columns>
                                 <Column width="60px"><Text text="Row #"/></Column>
+                                <Column width="130px"><Text text="Failure Type"/></Column>
                                 <Column width="120px"><Text text="PO Number"/></Column>
-                                <Column width="150px"><Text text="Customer"/></Column>
+                                <Column width="140px"><Text text="Customer"/></Column>
                                 <Column width="120px"><Text text="Part Number"/></Column>
-                                <Column width="80px"><Text text="Qty"/></Column>
+                                <Column width="70px"><Text text="Qty"/></Column>
                                 <Column minWidth="200px"><Text text="Error Reason"/></Column>
                                 <Column minWidth="250px"><Text text="AI Recommendation"/></Column>
                             </columns>
@@ -180,6 +187,9 @@
                                 <ColumnListItem>
                                     <cells>
                                         <Text text="{report>rowIndex}"/>
+                                        <ObjectStatus
+                                            text="{report>failureType}"
+                                            state="{report>failureTypeState}"/>
                                         <Text text="{report>poNumber}"/>
                                         <Text text="{report>customerName}"/>
                                         <Text text="{report>partNumber}"/>

@@ -40,12 +40,12 @@
             <Panel
                 expandable="true"
                 expanded="true"
-                headerText="Upload Excel File"
+                headerText="Upload CSV/Excel File"
                 width="auto"
                 class="sapUiNoContentPadding">
                 <headerToolbar>
                     <Toolbar style="Clear">
-                        <Title text="Upload Excel File"/>
+                        <Title text="Upload CSV/Excel File"/>
                         <ToolbarSpacer/>
                         <core:Icon src="sap-icon://upload" class="sapUiTinyMarginEnd"/>
                     </Toolbar>
@@ -53,31 +53,26 @@
                 <content>
                     <VBox class="sapUiSmallMargin">
                         <HBox alignItems="Center" class="sapUiSmallMargin">
-                            <!-- <u:FileUploader
-                                id="fileUploader"
-                                buttonText="Choose Excel File"
-                                accept=".xlsx"
-                                change="onFileSelect"
-                                style="Emphasized"/> -->
                             <u:FileUploader
                                 id="fileUploader"
-                                buttonText="Choose Excel File"
-                                fileType="xlsx"
+                                buttonText="Choose CSV/Excel File"
+                                fileType="csv,xlsx"
                                 change="onFileSelect"
                                 style="Emphasized"
                                 useMultipart="false"
-                                sendXHR="true"/>
+                                sendXHR="true"
+                                tooltip="Upload CSV or Excel file"/>
                             <Button
                                 id="extractButton"
-                                text="Extract Excel File"
+                                text="Extract Data"
                                 press="onExtractPress"
                                 type="Emphasized"
-                                icon="sap-icon://excel-attachment"
+                                icon="sap-icon://table-view"
                                 class="sapUiTinyMarginBegin"
-                                tooltip="Extract data from the selected Excel file"/>
+                                tooltip="Extract data from CSV or Excel file"/>
                             <MessageStrip
                                 id="fileNameStrip"
-                                text="No file selected"
+                                text="No file selected. Supported formats: CSV (.csv), Excel (.xlsx)"
                                 type="Information"
                                 showIcon="true"
                                 class="sapUiTinyMarginBegin"/>

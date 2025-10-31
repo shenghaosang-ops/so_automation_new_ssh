@@ -17,6 +17,8 @@ sap.ui.define([
                 totalCount: 0,
                 successCount: 0,
                 failedCount: 0,
+                erpFailedCount: 0,
+                validationFailedCount: 0,
                 emailData: [],
                 failedOrders: [],
                 aiAnalyzing: false,
@@ -49,6 +51,7 @@ sap.ui.define([
 
             var aResults = oGlobalModel.getProperty("/uploadResults") || [];
             var aFailedRecords = oGlobalModel.getProperty("/failedRecords") || [];
+            var aInvalidRecords = oGlobalModel.getProperty("/invalidRecords") || [];
             var oModel = this.getView().getModel("report");
 
             // Transform and count
@@ -73,8 +76,8 @@ sap.ui.define([
                 return item.status === "Failed";
             }).length;
 
-            // Process failed orders with AI recommendations
-            var aFailedOrders = aFailedRecords.map(function(item) {
+            // Process ERP upload failed orders with AI recommendations
+            var aErpFailedOrders = aFailedRecords.map(function(item) {
                 return {
                     rowIndex: item.rowIndex || item.rowNumber || "",
                     poNumber: item.poNumber || "",
@@ -82,15 +85,38 @@ sap.ui.define([
                     partNumber: item.partNumber || "",
                     quantity: item.quantity || 0,
                     errorMessage: item.errorMessage || item.message || "Unknown error",
+                    failureType: "ERP Upload",
+                    failureTypeState: "Error",
                     recommendation: this._generateRecommendation(item.errorMessage || item.message || "")
                 };
             }.bind(this));
 
+            // Process automation validation failed orders with AI recommendations
+            var aValidationFailedOrders = aInvalidRecords.map(function(item) {
+                return {
+                    rowIndex: item.rowIndex || "",
+                    poNumber: item.poNumber || "",
+                    customerName: item.customerName || "",
+                    partNumber: item.partNumber || "",
+                    quantity: item.quantity || 0,
+                    errorMessage: item.errorMessage || "Validation failed",
+                    failureType: "Automation Validation",
+                    failureTypeState: "Warning",
+                    recommendation: this._generateRecommendation(item.errorMessage || "Validation failed")
+                };
+            }.bind(this));
+
+            // Combine both types of failed orders
+            var aAllFailedOrders = aErpFailedOrders.concat(aValidationFailedOrders);
+            var iTotalFailed = aAllFailedOrders.length;
+
             oModel.setProperty("/emailData", aEmailData);
-            oModel.setProperty("/failedOrders", aFailedOrders);
+            oModel.setProperty("/failedOrders", aAllFailedOrders);
             oModel.setProperty("/totalCount", aEmailData.length);
             oModel.setProperty("/successCount", iSuccess);
-            oModel.setProperty("/failedCount", iFailed);
+            oModel.setProperty("/failedCount", iTotalFailed);
+            oModel.setProperty("/erpFailedCount", aErpFailedOrders.length);
+            oModel.setProperty("/validationFailedCount", aValidationFailedOrders.length);
         },
 
         /**
