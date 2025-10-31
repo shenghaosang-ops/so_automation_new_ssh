@@ -5,7 +5,6 @@
     xmlns:u="sap.ui.unified"
     xmlns:l="sap.ui.layout"
     xmlns:core="sap.ui.core"
-    xmlns:html="http://www.w3.org/1999/xhtml"
     xmlns:form="sap.ui.layout.form">
 
     <Page
@@ -215,231 +214,7 @@
                                 class="sapUiTinyMarginBegin"/>
                         </HBox>
 
-                        <!-- Document Preview and Extraction Results -->
-                        <HBox width="100%" height="600px" class="sapUiSmallMarginTop">
-                            <!-- Left side: PDF Preview -->
-                            <VBox width="50%" class="sapUiSmallMarginEnd">
-                                <Panel headerText="PDF Preview" height="100%">
-                                    <content>
-                                        <core:HTML
-                                            id="pdfViewerContainer"
-                                            content="&lt;iframe id='pdfViewer' width='100%' height='550px' style='border: 1px solid #ccc'&gt;&lt;/iframe&gt;"
-                                            preferDOM="true"
-                                            visible="{= !!${dataAcquisition>/documentUrl}}"/>
-                                    </content>
-                                    <!-- <PDFViewer
-                                        id="pdfViewer"
-                                        source="{dataAcquisition>/documentUrl}"
-                                        height="100%"
-                                        width="100%"
-                                        visible="{= ${dataAcquisition>/documentUrl} !== ''}"/> -->
-                                </Panel>
-                            </VBox>
-
-                            <!-- Right side: Extracted Fields -->
-                            <VBox width="50%">
-                                <Panel headerText="AI-Powered Data Extraction" height="100%">
-                                    <!-- <Table
-                                        id="extractedFieldsTable"
-                                        items="{dataAcquisition>/extractedFields}"
-                                        visible="{= ${dataAcquisition>/extractedFields}.length > 0}">
-                                        <headerToolbar>
-                                            <Toolbar>
-                                                <Title text="Extraction Results"/>
-                                                <ToolbarSpacer/>
-                                                <Text text="Total Fields: {dataAcquisition>/extractedFields}.length"/>
-                                            </Toolbar>
-                                        </headerToolbar>
-                                        <columns>
-                                            <Column>
-                                                <Text text="Field Name"/>
-                                            </Column>
-                                            <Column>
-                                                <Text text="Value"/>
-                                            </Column>
-                                            <Column>
-                                                <Text text="Confidence"/>
-                                            </Column>
-                                        </columns>
-                                        <items>
-                                            <ColumnListItem>
-                                                <cells>
-                                                    <Text text="{dataAcquisition>label}"/>
-                                                    <Text text="{dataAcquisition>value}"/>
-                                                    <ObjectStatus
-                                                        text="{dataAcquisition>confidence}%"
-                                                        state="{= ${dataAcquisition>confidence} >= 80 ? 'Success' : ${dataAcquisition>confidence} >= 50 ? 'Warning' : 'Error'}"/>
-                                                </cells>
-                                            </ColumnListItem>
-                                        </items>
-                                    </Table> -->
-
-                                    <headerToolbar>
-                                        <Toolbar>
-                                            <Title text="Extraction Results"/>
-                                            <ToolbarSpacer/>
-                                            <Button 
-                                                text="Edit"
-                                                icon="sap-icon://edit"
-                                                press="onToggleEditMode"
-                                                type="Transparent"/>
-                                        </Toolbar>
-                                    </headerToolbar>
-                                    <content>
-                                        <!-- Confidence Range Filter -->
-                                        <VBox class="sapUiTinyMarginBottom">
-                                            <Text text="Extraction Confidence Range:" class="sapUiTinyMarginBottom"/>
-                                            <HBox>
-                                                <Button
-                                                    text="0% - 51%"
-                                                    type="Reject"
-                                                    press="onFilterConfidence"
-                                                    class="sapUiTinyMarginEnd"/>
-                                                    <customData>
-                                                        <core:CustomData key="range" value="low"/>
-                                                    </customData>
-                                                <Button
-                                                    text="51% - 80%"
-                                                    type="Attention"
-                                                    press="onFilterConfidence"
-                                                    class="sapUiTinyMarginEnd"/>
-                                                    <customData>
-                                                        <core:CustomData key="range" value="medium"/>
-                                                    </customData>
-                                                <Button
-                                                    text="80% - 100%"
-                                                    type="Success"
-                                                    press="onFilterConfidence"
-                                                    class="sapUiTinyMarginEnd"/>
-                                                    <customData>
-                                                        <core:CustomData key="range" value="high"/>
-                                                    </customData>
-                                                <Button
-                                                    text="All"
-                                                    press="onFilterConfidence"/>
-                                                    <customData>
-                                                        <core:CustomData key="range" value="all"/>
-                                                    </customData>
-                                            </HBox>
-                                        </VBox>
-
-                                        <!-- Results Table -->
-                                        <Table
-                                            id="extractedFieldsTable"
-                                            items="{dataAcquisition>/filteredFields}"
-                                            visible="{= ${dataAcquisition>/extractedFields}.length > 0}">
-                                            <!-- ...existing columns... -->
-                                            <columns>
-                                                <Column width="3rem">
-                                                    <core:Icon src="sap-icon://lightbulb"/>
-                                                </Column>
-                                                <Column>
-                                                    <Text text="Field Name"/>
-                                                </Column>
-                                                <Column>
-                                                    <Text text="Value"/>
-                                                </Column>
-                                                <Column>
-                                                    <Text text="AI Confidence"/>
-                                                </Column>
-                                            </columns>
-                                            <items>
-                                                <ColumnListItem>
-                                                    <cells>
-                                                        <core:Icon 
-                                                            src="sap-icon://ai"
-                                                            color="{= ${dataAcquisition>confidence} >= 80 ? '#01b53e' : ${dataAcquisition>confidence} >= 51 ? '#f58b00' : '#ff0000'}"/>
-                                                        <Text text="{dataAcquisition>label}"/>
-                                                        <Input
-                                                            value="{dataAcquisition>value}"
-                                                            editable="{dataAcquisition>/editMode}"/>
-                                                        <VBox>
-                                                            <HBox alignItems="Center">
-                                                                <ProgressIndicator
-                                                                    percentValue="{dataAcquisition>confidence}"
-                                                                    displayValue="{dataAcquisition>confidence}%"
-                                                                    state="{= ${dataAcquisition>confidence} >= 80 ? 'Success' : ${dataAcquisition>confidence} >= 51 ? 'Warning' : 'Error'}"
-                                                                    width="100px"
-                                                                    height="12px"/>
-                                                            </HBox>
-                                                        </VBox>
-                                                    </cells>
-                                                </ColumnListItem>
-                                            </items>
-                                        </Table>
-                                    </content>
-
-                                    <!-- 以下是正确代码 -->
-                                    <!-- <Table
-                                        id="extractedFieldsTable"
-                                        items="{dataAcquisition>/extractedFields}"
-                                        visible="{= ${dataAcquisition>/extractedFields}.length > 0}">
-                                        <columns>
-                                            <Column width="3rem">
-                                                <core:Icon src="sap-icon://lightbulb"/>
-                                            </Column>
-                                            <Column>
-                                                <Text text="Field Name"/>
-                                            </Column>
-                                            <Column>
-                                                <Text text="Value"/>
-                                            </Column>
-                                            <Column>
-                                                <Text text="AI Confidence"/>
-                                            </Column>
-                                        </columns>
-                                        <items>
-                                            <ColumnListItem>
-                                                <cells>
-                                                    <core:Icon 
-                                                        src="sap-icon://ai"
-                                                        color="{= ${dataAcquisition>confidence} >= 80 ? '#01b53e' : ${dataAcquisition>confidence} >= 51 ? '#f58b00' : '#ff0000'}"/>
-                                                    <Text text="{dataAcquisition>label}"/>
-                                                    <Text text="{dataAcquisition>value}"/>
-                                                    <VBox>
-                                                        <HBox alignItems="Center">
-                                                            <ProgressIndicator
-                                                                percentValue="{dataAcquisition>confidence}"
-                                                                displayValue="{dataAcquisition>confidence}%"
-                                                                state="{= ${dataAcquisition>confidence} >= 80 ? 'Success' : ${dataAcquisition>confidence} >= 51 ? 'Warning' : 'Error'}"
-                                                                width="100px"
-                                                                height="12px"/>
-                                                        </HBox>
-                                                    </VBox>
-                                                </cells>
-                                            </ColumnListItem>
-                                        </items>
-                                    </Table> -->
-                                </Panel>
-                            </VBox>
-                        </HBox>
-
-                        <!-- Export Options -->
-                        <Panel class="sapUiSmallMarginTop">
-                            <headerToolbar>
-                                <Toolbar>
-                                    <Title text="Export Extracted Data"/>
-                                    <ToolbarSpacer/>
-                                    <Select
-                                        id="exportFormat"
-                                        selectedKey="json"
-                                        class="sapUiTinyMarginEnd">
-                                        <items>
-                                            <core:Item key="json" text="JSON"/>
-                                            <core:Item key="excel" text="Excel"/>
-                                            <core:Item key="csv" text="CSV"/>
-                                        </items>
-                                    </Select>
-                                    <Button
-                                        text="Download Results"
-                                        icon="sap-icon://download"
-                                        type="Emphasized"
-                                        press="onDownloadResults"/>
-                                </Toolbar>
-                            </headerToolbar>
-                        </Panel>
-
-                        <!-- <Label text="Extraction Template" class="sapUiTinyMarginTop"/>
+                        <Label text="Extraction Template" class="sapUiTinyMarginTop"/>
                         <TextArea
                             id="extractionTemplate"
                             placeholder="Describe the fields you want to extract (one per line)&#13;&#10;Example:&#13;&#10;Customer Name&#13;&#10;PO Number&#13;&#10;Order Date&#13;&#10;Item Details"
@@ -466,12 +241,11 @@
                                 icon="sap-icon://document-text"
                                 press="onExtractDocumentData"
                                 width="200px"/>
-                        </HBox> -->
+                        </HBox>
                     </VBox>
                 </content>
             </Panel>
 
-            
             <!-- Extraction Results Preview -->
             <!-- <Panel
                 id="resultsPreviewPanel"
@@ -519,7 +293,7 @@
                     icon="sap-icon://navigation-right-arrow"
                     iconDensityAware="false"
                     press="onNavigateToSOAutomation"
-                    enabled="{= (${dataAcquisition>/dataType} === 'structured' &amp;&amp; ${dataAcquisition>/downloadSuccess}) || (${dataAcquisition>/dataType} === 'unstructured' &amp;&amp; ${dataAcquisition>/hasDownloadedResults})}"/>
+                    enabled="{= ${dataAcquisition>/downloadSuccess} &amp;&amp; ${dataAcquisition>/extractedData} !== ''}"/>
             </Toolbar>
         </footer>
     </Page>
