@@ -9,7 +9,7 @@
 
     <Page
         id="dataAcquisitionPage"
-        title="Data Acquisition"
+        title="数据获取"
         showNavButton="true"
         navButtonPress="onNavBack"
         backgroundDesign="Transparent">
@@ -19,44 +19,44 @@
             <Panel
                 expandable="true"
                 expanded="true"
-                headerText="Customer Selection"
+                headerText="客户选择"
                 width="auto"
                 class="sapUiNoContentPadding">
                 <headerToolbar>
                     <Toolbar style="Clear">
-                        <Title text="Select Customer"/>
+                        <Title text="选择客户"/>
                         <ToolbarSpacer/>
                         <core:Icon src="sap-icon://customer" class="sapUiTinyMarginEnd"/>
                     </Toolbar>
                 </headerToolbar>
                 <content>
                     <VBox class="sapUiSmallMargin">
-                        <Label text="Customer" required="true" class="sapUiTinyMarginBottom"/>
+                        <Label text="客户" required="true" class="sapUiTinyMarginBottom"/>
                         <HBox alignItems="Center">
                             <ComboBox
                                 id="customerSelect"
                                 selectedKey="{dataAcquisition>/selectedCustomer}"
                                 selectionChange="onCustomerChange"
                                 width="400px"
-                                placeholder="Select a customer..."
+                                placeholder="请选择客户..."
                                 showSecondaryValues="true"
                                 class="sapUiTinyMarginEnd">
-                                <core:ListItem key="customerA" text="Customer A" additionalText="Premium Partner" icon="sap-icon://customer"/>
-                                <core:ListItem key="customerB" text="Customer B" additionalText="Standard Partner" icon="sap-icon://customer"/>
+                                <core:ListItem key="customerA" text="客户A" additionalText="高级合作伙伴" icon="sap-icon://customer"/>
+                                <core:ListItem key="customerB" text="客户B" additionalText="标准合作伙伴" icon="sap-icon://customer"/>
                             </ComboBox>
                             <MessageStrip
                                 id="customerInfoStrip"
-                                text="Please select a customer to auto-configure data source"
+                                text="请选择客户以自动配置数据源"
                                 type="Information"
                                 showIcon="true"
                                 visible="{= !${dataAcquisition>/selectedCustomer}}"/>
                             <MessageStrip
-                                text="Customer A - URL auto-configured"
+                                text="客户A - 链接已自动配置"
                                 type="Success"
                                 showIcon="true"
                                 visible="{= ${dataAcquisition>/selectedCustomer} === 'customerA'}"/>
                             <MessageStrip
-                                text="Customer B - Ready for configuration"
+                                text="客户B - 准备配置"
                                 type="Success"
                                 showIcon="true"
                                 visible="{= ${dataAcquisition>/selectedCustomer} === 'customerB'}"/>
@@ -69,27 +69,27 @@
             <Panel
                 expandable="true"
                 expanded="true"
-                headerText="Data Source Selection"
+                headerText="数据源选择"
                 width="auto"
                 class="sapUiNoContentPadding">
                 <headerToolbar>
                     <Toolbar style="Clear">
-                        <Title text="Select Data Source Type"/>
+                        <Title text="选择数据源类型"/>
                         <ToolbarSpacer/>
                         <core:Icon src="sap-icon://database" class="sapUiTinyMarginEnd"/>
                     </Toolbar>
                 </headerToolbar>
                 <content>
                     <VBox class="sapUiSmallMargin">
-                        <Label text="Data Type" required="true" class="sapUiTinyMarginBottom"/>
+                        <Label text="数据类型" required="true" class="sapUiTinyMarginBottom"/>
                         <SegmentedButton
                             id="dataTypeSegmented"
                             selectedKey="{dataAcquisition>/dataType}"
                             selectionChange="onDataTypeChange"
                             class="sapUiSmallMarginBottom">
                             <items>
-                                <SegmentedButtonItem key="structured" icon="sap-icon://internet-browser" text="Structured Data (Web)"/>
-                                <SegmentedButtonItem key="unstructured" icon="sap-icon://document" text="Unstructured Data (PDF/Document)"/>
+                                <SegmentedButtonItem key="structured" icon="sap-icon://internet-browser" text="结构化数据（网页）"/>
+                                <SegmentedButtonItem key="unstructured" icon="sap-icon://document" text="非结构化数据（PDF/文档）"/>
                             </items>
                         </SegmentedButton>
                     </VBox>
@@ -101,20 +101,20 @@
                 id="structuredDataPanel"
                 expandable="true"
                 expanded="true"
-                headerText="Structured Data Configuration"
+                headerText="结构化数据配置"
                 visible="{= ${dataAcquisition>/dataType} === 'structured'}"
                 width="auto"
                 class="sapUiNoContentPadding">
                 <headerToolbar>
                     <Toolbar style="Clear">
-                        <Title text="Automatic Download Data from Excel"/>
+                        <Title text="自动从Excel下载数据"/>
                         <ToolbarSpacer/>
                         <core:Icon src="sap-icon://globe" class="sapUiTinyMarginEnd"/>
                     </Toolbar>
                 </headerToolbar>
                 <content>
                     <VBox class="sapUiSmallMargin">
-                        <Label text="Website URL" required="true"/>
+                        <Label text="网站链接" required="true"/>
                         <Input
                             id="websiteUrl"
                             value="{dataAcquisition>/websiteUrl}"
@@ -124,7 +124,7 @@
 
                         <Button
                             id="downloadButton"
-                            text="Download Excel File"
+                            text="下载Excel文件"
                             type="Emphasized"
                             icon="sap-icon://download"
                             press="onDownloadExcel"
@@ -190,7 +190,7 @@
                 id="unstructuredDataPanel"
                 expandable="true"
                 expanded="true"
-                headerText="Document AI Processing"
+                headerText="Document AI处理"
                 visible="{= ${dataAcquisition>/dataType} === 'unstructured'}"
                 width="auto"
                 class="sapUiNoContentPadding">
@@ -205,30 +205,30 @@
                     <VBox class="sapUiSmallMargin">
                         <!-- 说明信息 -->
                         <MessageStrip
-                            text="Please process your documents using SAP Document AI application. Click the button below to open Document AI."
+                            text="请使用SAP Document AI应用程序处理您的文档。点击下方按钮打开Document AI。"
                             type="Information"
                             showIcon="true"
                             class="sapUiSmallMarginBottom"/>
 
                         <!-- 跳转到 Document AI 按钮 -->
                         <VBox class="sapUiSmallMarginTop">
-                            <Label text="Step 1: Process Documents" class="sapUiTinyMarginBottom"/>
+                            <Label text="步骤1：处理文档" class="sapUiTinyMarginBottom"/>
                             <Button
                                 id="openDocumentAIButton"
-                                text="Open SAP Document AI"
+                                text="打开Document AI"
                                 type="Emphasized"
                                 icon="sap-icon://BusinessSuiteInAppSymbols/icon-ai"
                                 press="onOpenDocumentAI"
                                 width="250px"
                                 class="sapUiSmallMarginBottom"/>
                             <Text 
-                                text="This will open the SAP Document AI application in a new window. Process your documents there and return to this page when complete."
+                                text="这将在新窗口中打开SAP Document AI应用程序。请在那里处理您的文档，完成后返回此页面。"
                                 class="sapUiTinyText"/>
                         </VBox>
 
                         <!-- 数据下载确认 -->
                         <VBox class="sapUiMediumMarginTop">
-                            <Label text="Step 2: Confirm Data Download" class="sapUiTinyMarginBottom"/>
+                            <Label text="步骤2：确认数据下载" class="sapUiTinyMarginBottom"/>
                             <MessageStrip
                                 id="documentAIStatusStrip"
                                 text="{dataAcquisition>/documentAIStatus}"
@@ -240,7 +240,7 @@
                             <HBox alignItems="Center" class="sapUiSmallMarginTop">
                                 <Button
                                     id="confirmDataDownloadButton"
-                                    text="Confirm Data Downloaded from Document AI"
+                                    text="确认已从Document AI下载数据"
                                     type="Accept"
                                     icon="sap-icon://accept"
                                     press="onConfirmDocumentAIData"
@@ -251,7 +251,7 @@
                             <!-- 确认成功提示 -->
                             <MessageStrip
                                 visible="{dataAcquisition>/documentAIDataConfirmed}"
-                                text="✓ Data has been successfully downloaded from Document AI application. You can now proceed to the next step."
+                                text="✓ 已成功从Document AI应用程序下载数据。现在可以进行下一步操作。"
                                 type="Success"
                                 showIcon="true"
                                 class="sapUiSmallMarginTop"/>
@@ -302,7 +302,7 @@
             <Toolbar>
                 <ToolbarSpacer/>
                 <Button
-                    text="Next: SO Processing"
+                    text="下一步：销售订单处理"
                     type="Emphasized"
                     icon="sap-icon://navigation-right-arrow"
                     iconDensityAware="false"

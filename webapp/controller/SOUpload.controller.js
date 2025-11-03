@@ -386,6 +386,35 @@ sap.ui.define([
         },
 
         /**
+         * Enable email content editing
+         */
+        onEditEmailContent: function() {
+            var oModel = this.getView().getModel("soUpload");
+            oModel.setProperty("/email/editMode", true);
+            oModel.setProperty("/email/originalContent", oModel.getProperty("/email/content"));
+        },
+
+        /**
+         * Save edited email content
+         */
+        onSaveEmailContent: function() {
+            var oModel = this.getView().getModel("soUpload");
+            var sOriginal = oModel.getProperty("/email/originalContent");
+            var sCurrent = oModel.getProperty("/email/content");
+            
+            // Exit edit mode
+            oModel.setProperty("/email/editMode", false);
+            
+            // Mark as modified if content changed
+            if (sOriginal !== sCurrent) {
+                oModel.setProperty("/email/isModified", true);
+                MessageToast.show("邮件内容已保存");
+            } else {
+                oModel.setProperty("/email/isModified", false);
+            }
+        },
+
+        /**
          * Send email notification
          */
         onSendEmail: function() {

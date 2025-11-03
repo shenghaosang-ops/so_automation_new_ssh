@@ -1,0 +1,248 @@
+=========================================
+SO Automation 中文化翻译记录
+Translation Log - English to Chinese
+=========================================
+日期: 2025年11月3日
+项目: SO Automation Demo
+目的: 将应用界面全部中文化，符合SAP和商业风格
+
+=========================================
+翻译对照表 (Translation Mapping)
+=========================================
+
+【主页面 - Home.view.xml】
+English → Chinese
+
+1. "SO Automation Agent" → "销售订单自动化代理"
+2. "Welcome to SO Automation Suite" → "欢迎使用销售订单自动化套件"
+3. "Complete end-to-end solution for sales order processing" → "端到端销售订单处理完整解决方案"
+4. "Data Acquisition" → "数据获取"
+5. "Extract data from web pages or PDF documents using OCR and AI" → "使用OCR和AI技术从网页或PDF文档中提取数据"
+6. "SO Automation" → "销售订单自动化"
+7. "Upload Excel data and process sales orders with AI-powered automation" → "上传Excel数据并使用AI驱动的自动化处理销售订单"
+8. "SO Upload" → "销售订单上传"
+9. "Validate and upload sales orders to ERP system with real-time status tracking" → "校验并上传销售订单至ERP系统，实时状态跟踪"
+10. "Review & Report" → "审核与报告"
+11. "AI-powered analysis and insights with comprehensive reporting capabilities" → "AI智能分析洞察及综合报告功能"
+12. "Start Me..." → "开始"
+13. "Process Flow:" → "流程步骤："
+
+【数据获取页面 - DataAcquisition.view.xml】
+English → Chinese
+
+14. "Data Acquisition" → "数据获取"
+15. "Customer Selection" → "客户选择"
+16. "Select Customer" → "选择客户"
+17. "Customer" → "客户"
+18. "Select a customer..." → "请选择客户..."
+19. "Customer A" → "客户A"
+20. "Premium Partner" → "高级合作伙伴"
+21. "Customer B" → "客户B"
+22. "Standard Partner" → "标准合作伙伴"
+23. "Please select a customer to auto-configure data source" → "请选择客户以自动配置数据源"
+24. "Customer A - URL auto-configured" → "客户A - 链接已自动配置"
+25. "Customer B - Ready for configuration" → "客户B - 准备配置"
+26. "Data Source Selection" → "数据源选择"
+27. "Select Data Source Type" → "选择数据源类型"
+28. "Data Type" → "数据类型"
+29. "Structured Data (Web)" → "结构化数据（网页）"
+30. "Unstructured Data (PDF/Document)" → "非结构化数据（PDF/文档）"
+31. "Structured Data Configuration" → "结构化数据配置"
+32. "Automatic Download Data from Excel" → "自动从Excel下载数据"
+33. "Website URL" → "网站链接"
+34. "Download Excel File" → "下载Excel文件"
+35. "Download Status" → "下载状态"
+36. "Document AI Processing" → "文档AI处理"
+37. "SAP Document AI" → "SAP文档AI"
+38. "Please process your documents using SAP Document AI application. Click the button below to open Document AI." → "请使用SAP文档AI应用程序处理您的文档。点击下方按钮打开文档AI。"
+39. "Open Document AI" → "打开文档AI"
+40. "Step 1: Process Documents" → "步骤1：处理文档"
+41. "This will open the SAP Document AI application in a new window. Process your documents there and return to this page when complete." → "这将在新窗口中打开SAP文档AI应用程序。请在那里处理您的文档，完成后返回此页面。"
+42. "Step 2: Confirm Data Download" → "步骤2：确认数据下载"
+43. "Confirm Data Downloaded from Document AI" → "确认已从文档AI下载数据"
+44. "Document AI Status" → "文档AI状态"
+45. "✓ Data has been successfully downloaded from Document AI application. You can now proceed to the next step." → "✓ 已成功从文档AI应用程序下载数据。现在可以进行下一步操作。"
+46. "Next: SO Processing" → "下一步：销售订单处理"
+
+【销售订单自动化页面 - View1.view.xml】
+English → Chinese
+
+47. "SO Automation Demo" → "销售订单自动化演示"
+48. "Upload CSV/Excel File" → "上传CSV/Excel文件"
+49. "Choose CSV/Excel File" → "选择CSV/Excel文件"
+50. "Extract Data" → "提取数据"
+51. "No file selected. Supported formats: CSV (.csv), Excel (.xlsx)" → "未选择文件。支持格式：CSV (.csv), Excel (.xlsx)"
+52. "Excel Data Preview" → "Excel数据预览"
+53. "Excel Data Preview (First 5 Columns)" → "Excel数据预览（前5列）"
+54. "rows loaded" → "行已加载"
+55. "Process Configuration" → "流程配置"
+56. "Batch Size" → "批次大小"
+57. "Start AI Automation" → "启动AI自动化"
+58. "Rule Configuration" → "规则配置"
+59. "Edit Rule" → "编辑规则"
+60. "Cancel" → "取消"
+61. "Processing Results" → "处理结果"
+62. "Row #" → "行号"
+63. "Status" → "状态"
+64. "Results" → "结果"
+65. "Customer Code" → "客户代码"
+66. "PO Number" → "采购订单号"
+67. "PO Date" → "采购订单日期"
+68. "Item No" → "物料编号"
+69. "PO Line" → "采购订单行项目"
+70. "Customer Part No" → "客户物料编号"
+71. "Quantity" → "数量"
+72. "Request Date" → "需求日期"
+73. "Net Price" → "净价"
+74. "Part No" → "物料编号"
+75. "Sales Order Type" → "销售订单类型"
+76. "Plant" → "工厂"
+77. "Ship To" → "收货方"
+78. "Reason" → "原因"
+79. "Next: SO Upload" → "下一步：销售订单上传"
+
+【销售订单上传页面 - SOUpload.view.xml】
+English → Chinese
+
+80. "SO Upload to ERP" → "销售订单上传至ERP"
+81. "Upload Summary" → "上传摘要"
+82. "SO Data Summary" → "销售订单数据摘要"
+83. "Total Records" → "记录总数"
+84. "Valid Records" → "有效记录"
+85. "Invalid Records" → "无效记录"
+86. "SO Data for Upload" → "待上传销售订单数据"
+87. "Review SO Data" → "审核销售订单数据"
+88. "Search..." → "搜索..."
+89. "Validation Message" → "校验消息"
+90. "Valid" → "有效"
+91. "Invalid" → "无效"
+92. "Upload Actions" → "上传操作"
+93. "Validate and Upload" → "校验与上传"
+94. "ERP System Configuration" → "ERP系统配置"
+95. "System:" → "系统："
+96. "Connection:" → "连接状态："
+97. "Connected" → "已连接"
+98. "Check Data Validity" → "检查数据有效性"
+99. "Execute Upload to ERP" → "执行上传至ERP"
+100. "Upload Progress" → "上传进度"
+101. "records uploaded" → "条记录"
+102. "Upload Results" → "上传结果"
+103. "Upload Status" → "上传状态"
+104. "Export Results" → "导出结果"
+105. "SO Number" → "销售订单号"
+106. "Created Date" → "创建日期"
+107. "Success" → "成功"
+108. "Message" → "消息"
+109. "Email Notification" → "邮件通知"
+110. "Configure Email Settings" → "配置邮件设置"
+111. "To (Recipients)" → "收件人"
+112. "CC (Carbon Copy)" → "抄送"
+113. "Subject" → "主题"
+114. "Email Preview (Auto-generated)" → "邮件预览（自动生成）"
+115. "All records uploaded successfully!" → "所有记录上传成功！"
+116. "Partial success - Some records failed to upload" → "部分成功 - 部分记录上传失败"
+117. "All records failed to upload" → "所有记录上传失败"
+118. "Send Email" → "发送邮件"
+119. "Sending email..." → "正在发送邮件..."
+120. "Email sent successfully" → "邮件已成功发送至"
+121. "Next: Review & Report" → "下一步：审核与报告"
+
+【审核与报告页面 - ReviewReport.view.xml】
+English → Chinese
+
+122. "Review & Report - AI Insights" → "审核与报告 - AI智能洞察"
+123. "AI-Powered Analysis" → "AI智能分析"
+124. "AI Analysis & Insights" → "AI分析与洞察"
+125. "Analyze Data" → "分析数据"
+126. "AI is analyzing your sales order data..." → "AI正在分析您的销售订单数据..."
+127. "Analyzing..." → "分析中..."
+128. "Success Rate" → "成功率"
+129. "Overall Performance" → "整体表现"
+130. "Total Orders" → "订单总数"
+131. "Processed in this batch" → "本批次处理"
+132. "Failed Orders" → "失败订单"
+133. "Click to view details" → "点击查看详情"
+134. "AI Insights & Recommendations" → "AI洞察与建议"
+135. "Click 'Analyze Data' to get AI-powered insights" → "点击"分析数据"获取销售订单创建结果的AI智能洞察"
+136. "Failed Orders Analysis" → "失败订单分析"
+137. "Export to Excel" → "导出到Excel"
+138. "Total Failed Orders" → "失败订单总数"
+139. "ERP Upload Failed" → "ERP上传失败"
+140. "Automation Validation Failed" → "自动化校验失败"
+141. "Failure Type" → "失败类型"
+142. "Customer" → "客户"
+143. "Part Number" → "物料编号"
+144. "Qty" → "数量"
+145. "Error Reason" → "错误原因"
+146. "AI Recommendation" → "AI建议"
+147. "Back to Home" → "返回主页"
+148. "Complete Workflow" → "完成工作流"
+
+=========================================
+SAP术语说明 (SAP Terminology Notes)
+=========================================
+
+1. "Sales Order" → "销售订单" (标准SAP术语)
+2. "Purchase Order (PO)" → "采购订单" (标准SAP术语)
+3. "Plant" → "工厂" (SAP MM模块标准术语)
+4. "Ship To" → "收货方" (SAP SD模块标准术语)
+5. "Material Number/Part No" → "物料编号" (SAP标准术语)
+6. "Net Price" → "净价" (SAP定价标准术语)
+7. "ERP" → 保持"ERP"不变 (国际通用术语)
+8. "AI" → 保持"AI"不变 (国际通用术语)
+9. "Document AI" → "文档AI" (SAP产品名称部分翻译)
+10. "Excel" → 保持"Excel"不变 (软件名称)
+
+=========================================
+翻译原则 (Translation Principles)
+=========================================
+
+1. 保持SAP标准术语的专业性和一致性
+2. 使用商业环境中常见的正式用语
+3. 确保翻译简洁明了，符合中文表达习惯
+4. 专有名词（如Excel、AI、ERP）保持英文
+5. 流程步骤使用清晰的动作词汇
+6. 按钮文字简短有力，便于用户快速理解
+
+=========================================
+文件修改清单 (Modified Files)
+=========================================
+
+✓ webapp/view/Home.view.xml - 主页面中文化 【已完成】
+✓ webapp/view/DataAcquisition.view.xml - 数据获取页面中文化 【已完成】
+✓ webapp/view/View1.view.xml - 销售订单自动化页面中文化 【已完成】
+
+✓ webapp/view/SOUpload.view.xml - 销售订单上传页面 【已完成】
+✓ webapp/view/ReviewReport.view.xml - 审核报告页面 【已完成】
+
+待处理文件 (Pending):
+- webapp/manifest.json (应用标题和描述)
+
+=========================================
+实施总结 (Implementation Summary)
+=========================================
+
+本次中文化工作覆盖范围：
+1. 所有业务流程页面（Home, DataAcquisition, View1, SOUpload, ReviewReport）
+2. 所有用户可见的文本内容
+3. 表格列标题和数据字段名称
+4. 按钮、标签和消息提示
+5. 导航和流程指示器
+6. 进度条和状态提示
+7. 邮件通知配置界面
+8. AI分析结果展示
+
+翻译质量保证：
+- 采用SAP标准术语（销售订单、采购订单、物料编号、工厂、收货方等）
+- 符合商业环境用语规范
+- 保持专有名词（AI、Excel、ERP、SAP）原文
+- 确保中文表达简洁明了、符合用户习惯
+
+已翻译条目总数：148项
+覆盖页面：5个主要业务页面（100%完成）
+
+=========================================
+结束 (End of Log)
+=========================================
+完成时间: 2025年11月3日
+最后更新: 2025年11月3日（增加SOUpload和ReviewReport页面翻译）

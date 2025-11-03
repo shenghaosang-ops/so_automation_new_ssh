@@ -22,22 +22,22 @@ sap.ui.define([], function() {
                 ],
                 rules: {
                 "C001": [
-                    "Check whether the value of `CustomerPurchaseCode` is `YAG-YGO`. If yes, keep the original data.",
-                    "Insert a new column to the right of `POItemNo`, name it `PO+POLINE`, and set its value to `CONCATENATE(PONo, POItemNo)`.",
-                    "Filter the values in the `PO+POLINE` column, keeping only the data where `PO+POLINE` is greater than `107774190400640`.",
-                    "Insert a new column to the right of `BalanceQTY`, name it `QTY`, and set its value to `BalanceQTY / 1000`.",
-                    "Insert a new column to the left of `PartNo`, name it `SalesOrderType`. If the first two characters of `PartNo` contain (`AT`, `RT`, values starting with `P`, `RL`, `RC0100`, `RC0075`, `RP`, `CC0100`, `500V↑`, `AC`, `CQ`, `CS`, `CC_105↑` (1 μF and above), or `RC_P`), then set the sales type to `ZOR1`. If the first two characters of `CustomerPartNO` contain (`AC`, `AA`, `RC0201↑`, `AF`, `YC`, `TC`, `RE`, `SR`, `AS`, `AH`, `RV`, `CC` general products), then set the sales type to `ZCO`.",
-                    "Delete rows where the order status `POStatus` is `Block` or `To be cancel`.",
-                    "Extract the following fields from the data table and output to Excel: `CustomerPurchaseCode`, `PONo`, `PODate`, `POItemNo`, `PO+POLINE`, `CustomerPartNO`, `QTY`, `RequestDate`, `NetPrice`, `PartNo`, `SalesOrderType`."
+                    "检查客户采购代码CustomerPurchaseCode值是否为YAG-YGO,是的话保留原数据。",
+                    "在POItemNo右侧新添一列，列明为PO+POLINE，数值为CONCATENATE（PONO，POItemNo）。",
+                    "对PO+POLINE列里的数值进行筛选，保留PO+POLINE中比107774190400640大的数据。",
+                    "在BalanceQTY右侧新添一列，列明为QTY，数值为BalanceQTY / 1000。",
+                    "在PartNo左侧新添一列，列明为SalesOrderType。如果PartNo的前两个字符包含（AT，RT，P开头的值，RL，RC0100，RC0075，RP，CC0100，500V↑，AC，CQ，CS，CC_105↑（1μF及以上），或RC_P），则销售类型设为ZOR1。如果CustomerPartNO的前两个字符包含（AC，AA，RC0201↑，AF，YC，TC，RE，SR，AS，AH，RV，CC一般产品），则销售类型设为ZCO。",
+                    "删除订单状态POStatus为Block或To be cancel的行。",
+                    "从数据表中提取以下字段并输出到Excel：CustomerPurchaseCode，PONo，PODate，POItemNo，PO+POLINE，CustomerPartNO，QTY，RequestDate，NetPrice，PartNo，SalesOrderType。"
                 ],
                 "C002": [
-                    "Delete line items with blank values in the Delivery Date column",
-                    "Delete data where PO Date is less than or equal to 20241129",
-                    "Add two new columns to the right of the Plant column, named 'Sold To' and 'Ship To'. The values for Sold To and Ship To are determined based on the Plant value: If Plant is 2310, then Sold To is 132274 and Ship To is 132279; If Plant is 2370, then Sold To is 132274 and Ship To is 660076; If Plant is 2350, then Sold To is 132274 and Ship To is 660082; If Plant is 2381, additional differentiation is required by checking Part No - if Part No contains letter 'A', then both Sold To and Ship To are 660081, if Part No does not contain letter 'A', then Sold To is 132274 and Ship To is 660075; If Plant is 2380, additional differentiation is required by checking Part No - if Part No contains letters 'AAA', then both Sold To and Ship To are 660084, if Part No does not contain letter 'A', then Sold To is 132274 and Ship To is 660077.",
-                    "Create a new column to the right of Delivery Date, named 'CRD'. The CRD value is a date that equals Delivery Date minus 20 days.",
-                    "Create a new column to the right of Order Qty, named 'Quantity'. The value equals Order Qty divided by 1000.",
-                    "Add a new column to the left of Manuf. P/N, named 'SalesOrderType'. For Part No values with the first two characters starting with (AT, RT, P prefix, RL, RC0100, RC0075, RP, CC0100, 500V↑, AC, CQ, CS, CC_105↑(1 uF and above)) & RC_P, the sales type is ZOR1. For CustomerPartNO values with the first two characters starting with (AC, AA, RC0201↑, AF, YC, TC, RE, SR, AS, AH, RV, CC general products), the sales type is ZCO.",
-                    "Extract the following fields from the data table for Excel output: Vendor NO, PO Number, Item No, Part No, Delivery Date, PO Date, Quantity, Manuf. P/N, Plant, Ship To, SalesOrderType."
+                    "删除Delivery Date列中空白的项目",
+                    "删除PO Date列中空白的项目",
+                    "在Plant列右侧新添两列，列明为'Sold To'和'Ship To'。Sold To和Ship To的值根据Plant的值来确定：如果Plant为2310，则Sold To为132274，Ship To为132279；如果Plant为2370，则Sold To为132274，Ship To为660076；如果Plant为2350，则Sold To为132274，Ship To为660082；如果Plant为2381，则需要通过检查Part No进行额外区分——如果Part No包含字母'A'，则Sold To和Ship To均为660081，如果Part No不包含字母'A'，则Sold To为132274，Ship To为660075；如果Plant为2380，则需要通过检查Part No进行额外区分——如果Part No包含字母'AAA'，则Sold To和Ship To均为660084，如果Part No不包含字母'A'，则Sold To为132274，Ship To为660077。",
+                    "在Delivery Date右侧新添一列，列明为'CRD'。CRD的值为Delivery Date减去20天。",
+                    "在Order Qty右侧新添一列，列明为'Quantity'。其值为Order Qty除以1000。",
+                    "在Manuf. P/N左侧新添一列，列明为'SalesOrderType'。对于Part No值的前两个字符以（AT，RT，P开头的值，RL，RC0100，RC0075，RP，CC0100，500V↑，AC，CQ，CS，CC_105↑（1μF及以上））和RC_P开头的值，销售类型设为ZOR1。对于CustomerPartNO值的前两个字符以（AC，AA，RC0201↑，AF，YC，TC，RE，SR，AS，AH，RV，CC一般产品）开头的值，销售类型设为ZCO。",
+                    "从数据表中提取以下字段并输出到Excel：Vendor NO，PO Number，Item No，Part No，Delivery Date，PO Date，Quantity，Manuf. P/N，Plant，Ship To，SalesOrderType。"
                 ],
                 "C003": [
                     "Check that Order Qty is greater than 0",

@@ -15,8 +15,8 @@
             <l:VerticalLayout width="100%" class="sapUiSmallMarginTop">
                 <!-- Welcome Section -->
                 <VBox alignItems="Center" class="sapUiSmallMarginBottom">
-                    <Title text="Welcome to SO Automation Suite" level="H2" class="sapUiTinyMarginBottom"/>
-                    <Text text="Complete end-to-end solution for sales order processing"/>
+                    <Title text="欢迎使用销售订单自动化代理" level="H2" class="sapUiTinyMarginBottom"/>
+                    <Text text="端到端销售订单创建解决方案"/>
                 </VBox>
 
                 <!-- Process Flow Cards - 2x2 Grid Layout (Compact) -->
@@ -24,69 +24,69 @@
                     <!-- First Row -->
                     <HBox justifyContent="Center" class="sapUiSmallMarginBottom">
                         <!-- Data Acquisition -->
-                        <VBox alignItems="Center" width="280px" class="sapUiMediumMargin">
-                            <core:Icon src="sap-icon://database" size="3rem" color="#0854a0" 
+                        <VBox alignItems="Center" width="360px" class="sapUiMediumMargin">
+                            <core:Icon src="sap-icon://database" size="4rem" color="#0854a0" 
                                       class="sapUiSmallMarginBottom"/>
-                            <Title text="1. Data Acquisition" level="H4" 
+                            <Title text="1. 数据获取" level="H3" 
                                    class="sapUiTinyMarginBottom" textAlign="Center"/>
-                            <Text text="Extract data from web pages or PDF documents using OCR and AI" 
+                            <Text text="使用OCR和自动化技术从网页或PDF文档中提取数据" 
                                   textAlign="Center" class="sapUiTinyMarginBottom"/>
-                            <Button text="Start Me..." type="Emphasized" 
-                                    press="onNavigateToDataAcquisition"/>
+                            <Button text="开始" type="Emphasized" 
+                                    press="onNavigateToDataAcquisition" width="120px"/>
                         </VBox>
 
                         <!-- SO Automation -->
-                        <VBox alignItems="Center" width="280px" class="sapUiMediumMargin">
-                            <core:Icon src="sap-icon://flight" size="3rem" color="#0854a0" 
+                        <VBox alignItems="Center" width="360px" class="sapUiMediumMargin">
+                            <core:Icon src="sap-icon://flight" size="4rem" color="#0854a0" 
                                       class="sapUiSmallMarginBottom"/>
-                            <Title text="2. SO Automation" level="H4" 
+                            <Title text="2. 销售订单自动化" level="H3" 
                                    class="sapUiTinyMarginBottom" textAlign="Center"/>
-                            <Text text="Upload Excel data and process sales orders with AI-powered automation" 
+                            <Text text="上传Excel数据并使用AI驱动的自动化处理销售订单" 
                                   textAlign="Center" class="sapUiTinyMarginBottom"/>
-                            <Button text="Start Me..." type="Default" 
-                                    press="onNavigateToSOAutomation"/>
+                            <Button text="开始" type="Default" 
+                                    press="onNavigateToSOAutomation" width="120px"/>
                         </VBox>
                     </HBox>
 
                     <!-- Second Row -->
                     <HBox justifyContent="Center" class="sapUiSmallMarginTop">
                         <!-- SO Upload -->
-                        <VBox alignItems="Center" width="280px" class="sapUiMediumMargin">
-                            <core:Icon src="sap-icon://upload-to-cloud" size="3rem" color="#0854a0" 
+                        <VBox alignItems="Center" width="360px" class="sapUiMediumMargin">
+                            <core:Icon src="sap-icon://upload-to-cloud" size="4rem" color="#0854a0" 
                                       class="sapUiSmallMarginBottom"/>
-                            <Title text="3. SO Upload" level="H4" 
+                            <Title text="3. 销售订单上传" level="H3" 
                                    class="sapUiTinyMarginBottom" textAlign="Center"/>
-                            <Text text="Validate and upload sales orders to ERP system with real-time status tracking" 
+                            <Text text="校验并上传销售订单至SAP系统，实时状态跟踪" 
                                   textAlign="Center" class="sapUiTinyMarginBottom"/>
-                            <Button text="Start Me..." type="Default" 
-                                    press="onNavigateToSOUpload"/>
+                            <Button text="开始" type="Default" 
+                                    press="onNavigateToSOUpload" width="120px"/>
                         </VBox>
 
                         <!-- Review & Report -->
-                        <VBox alignItems="Center" width="280px" class="sapUiMediumMargin">
-                            <core:Icon src="sap-icon://business-objects-experience" size="3rem" color="#0854a0" 
+                        <VBox alignItems="Center" width="360px" class="sapUiMediumMargin">
+                            <core:Icon src="sap-icon://business-objects-experience" size="4rem" color="#0854a0" 
                                       class="sapUiSmallMarginBottom"/>
-                            <Title text="4. Review &amp; Report" level="H4" 
+                            <Title text="4. 订单回顾与报告" level="H3" 
                                    class="sapUiTinyMarginBottom" textAlign="Center"/>
-                            <Text text="AI-powered analysis and insights with comprehensive reporting capabilities" 
+                            <Text text="AI智能分析洞察及综合报告功能" 
                                   textAlign="Center" class="sapUiTinyMarginBottom"/>
-                            <Button text="Start Me..." type="Default" 
-                                    press="onNavigateToReviewReport"/>
+                            <Button text="开始" type="Default" 
+                                    press="onNavigateToReviewReport" width="120px"/>
                         </VBox>
                     </HBox>
                 </VBox>
 
                 <!-- Process Flow Indicator -->
                 <VBox alignItems="Center" class="sapUiMediumMarginTop">
-                    <Text text="Process Flow:" class="sapUiTinyMarginBottom" />
+                    <Text text="流程步骤：" class="sapUiTinyMarginBottom" />
                     <HBox alignItems="Center">
-                        <Text text="1. Data Acquisition" class="sapUiTinyMarginEnd"/>
-                        <core:Icon src="sap-icon://navigation-right-arrow" size="0.8rem" color="#0854a0" class="sapUiTinyMarginEnd"/>
-                        <Text text="2. SO Automation" class="sapUiTinyMarginEnd"/>
-                        <core:Icon src="sap-icon://navigation-right-arrow" size="0.8rem" color="#0854a0" class="sapUiTinyMarginEnd"/>
-                        <Text text="3. SO Upload" class="sapUiTinyMarginEnd"/>
-                        <core:Icon src="sap-icon://navigation-right-arrow" size="0.8rem" color="#0854a0" class="sapUiTinyMarginEnd"/>
-                        <Text text="4. Review &amp; Report"/>
+                        <core:Icon src="sap-icon://database" size="2rem" color="#0854a0" class="sapUiTinyMarginEnd"/>
+                        <core:Icon src="sap-icon://navigation-right-arrow" size="1rem" color="#0854a0" class="sapUiTinyMarginEnd"/>
+                        <core:Icon src="sap-icon://flight" size="2rem" color="#0854a0" class="sapUiTinyMarginEnd"/>
+                        <core:Icon src="sap-icon://navigation-right-arrow" size="1rem" color="#0854a0" class="sapUiTinyMarginEnd"/>
+                        <core:Icon src="sap-icon://upload-to-cloud" size="2rem" color="#0854a0" class="sapUiTinyMarginEnd"/>
+                        <core:Icon src="sap-icon://navigation-right-arrow" size="1rem" color="#0854a0" class="sapUiTinyMarginEnd"/>
+                        <core:Icon src="sap-icon://business-objects-experience" size="2rem" color="#0854a0"/>
                     </HBox>
                 </VBox>
             </l:VerticalLayout>

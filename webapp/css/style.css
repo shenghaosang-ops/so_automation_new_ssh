@@ -1,5 +1,61 @@
 /* Enter your custom styles here */
 
+/* 中文黑体字体设置 - 应用到所有UI5组件 */
+.sapUiBody,
+.sapMText,
+.sapMLabel,
+.sapMButton,
+.sapMInput,
+.sapMInputBase,
+.sapMColumnHeader,
+.sapMListTblCell,
+.sapMMessageStrip,
+.sapMObjectStatus,
+.sapUiTableCell,
+.sapMTileContent,
+.sapMNumericContent,
+.sapMToolbar {
+    font-family: "Microsoft YaHei UI", "Microsoft YaHei", "SimHei", "黑体", sans-serif !important;
+}
+
+/* 标题样式 - 加粗放大 */
+.sapMTitle,
+.sapMPanel .sapMPanelHdr,
+.sapMGenericTile .sapMGTHdrTxt,
+.sapMPage .sapMPageHeader .sapMBarMiddle .sapMTitle {
+    font-family: "Microsoft YaHei UI", "Microsoft YaHei", "SimHei", "黑体", sans-serif !important;
+    font-weight: bold !important;
+}
+
+/* H2级标题 - 更大更粗 */
+.sapMTitle.sapMTitleStyleH2 {
+    font-size: 1.5rem !important;
+    font-weight: bold !important;
+}
+
+/* H3级标题 */
+.sapMTitle.sapMTitleStyleH3 {
+    font-size: 1.25rem !important;
+    font-weight: bold !important;
+}
+
+/* H4级标题 */
+.sapMTitle.sapMTitleStyleH4 {
+    font-size: 1.125rem !important;
+    font-weight: bold !important;
+}
+
+/* 页面标题 - 特别强调 */
+.sapMPage .sapMPageHeader .sapMBarMiddle .sapMTitle {
+    font-size: 1.375rem !important;
+    font-weight: bold !important;
+}
+
+/* 面板标题 - 加粗 */
+.sapMPanel .sapMPanelHdr .sapMTitle {
+    font-weight: bold !important;
+}
+
 /* SAP UI5 标准布局：限制内容宽度，左右留白 */
 .sapUiBody .sapMShellAppWidthLimited .sapMShellCentralBox {
     max-width: 1280px;
@@ -29,4 +85,12 @@
 .previewPanel .sapMPanelContent {
     border-bottom: none;
     padding: 1rem;
+}
+
+/* 邮件修改后的灰色背景 */
+.emailModifiedBackground {
+    background-color: #f5f5f5;
+    padding: 0.5rem;
+    border-radius: 4px;
+    border: 1px solid #d9d9d9;
 }

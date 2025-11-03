@@ -10,7 +10,7 @@
 
     <Page
         id="reviewReportPage"
-        title="Review &amp; Report - AI Insights"
+        title="订单回顾与报告 - AI Insights"
         showNavButton="true"
         navButtonPress="onNavBack"
         backgroundDesign="Transparent">
@@ -20,15 +20,15 @@
             <Panel
                 expandable="true"
                 expanded="true"
-                headerText="AI-Powered Analysis"
+                headerText="AI智能分析"
                 width="auto"
                 class="sapUiNoContentPadding">
                 <headerToolbar>
                     <Toolbar style="Clear">
-                        <Title text="AI Analysis &amp; Insights"/>
+                        <Title text="AI分析与洞察"/>
                         <ToolbarSpacer/>
                         <Button
-                            text="Analyze Data"
+                            text="分析数据"
                             icon="sap-icon://lab"
                             type="Emphasized"
                             press="onAnalyzeData"/>
@@ -41,11 +41,11 @@
                         <VBox visible="{= ${report>/aiAnalyzing} === true}" class="sapUiSmallMarginBottom">
                             <HBox alignItems="Center" class="sapUiTinyMarginBottom">
                                 <BusyIndicator size="1rem" class="sapUiTinyMarginEnd"/>
-                                <Text text="🤖 AI is analyzing your sales order data..." class="sapUiSmallMarginBegin"/>
+                                <Text text="🤖 AI正在分析您的销售订单数据..." class="sapUiSmallMarginBegin"/>
                             </HBox>
                             <ProgressIndicator
                                 percentValue="{report>/aiProgress}"
-                                displayValue="Analyzing..."
+                                displayValue="分析中..."
                                 showValue="true"
                                 state="Information"/>
                         </VBox>
@@ -57,8 +57,8 @@
                                 <l:content>
                                     <!-- Success Rate Card -->
                                     <GenericTile
-                                        header="Success Rate"
-                                        subheader="Overall Performance"
+                                        header="成功率"
+                                        subheader="整体表现"
                                         frameType="TwoByOne">
                                         <tileContent>
                                             <TileContent>
@@ -76,8 +76,8 @@
 
                                     <!-- Total Orders Card -->
                                     <GenericTile
-                                        header="Total Orders"
-                                        subheader="Processed in this batch"
+                                        header="订单总数"
+                                        subheader="本批次处理"
                                         frameType="TwoByOne">
                                         <tileContent>
                                             <TileContent>
@@ -93,8 +93,8 @@
 
                                     <!-- Failed Orders Card -->
                                     <GenericTile
-                                        header="Failed Orders"
-                                        subheader="Click to view details"
+                                        header="失败订单"
+                                        subheader="点击查看详情"
                                         frameType="TwoByOne"
                                         press="onShowFailedOrders">
                                         <tileContent>
@@ -114,14 +114,14 @@
 
                             <!-- AI Insights - Hidden by default, shown on Failed Orders click -->
                             <VBox visible="false" class="sapUiSmallMarginTop">
-                                <Title text="� AI Insights &amp; Recommendations" level="H4" class="sapUiSmallMarginBottom"/>
+                                <Title text="💡 AI洞察与建议" level="H4" class="sapUiSmallMarginBottom"/>
                             </VBox>
                         </VBox>
 
                         <!-- No Data Message -->
                         <MessageStrip
                             visible="{= ${report>/aiAnalysisComplete} !== true &amp;&amp; ${report>/aiAnalyzing} !== true}"
-                            text="Click 'Analyze Data' to get AI-powered insights on your sales order creation results"
+                            text="点击'分析数据'获取销售订单创建结果的AI智能洞察"
                             type="Information"
                             showIcon="true"/>
                     </VBox>
@@ -133,16 +133,16 @@
                 id="failedOrdersSection"
                 expandable="true"
                 expanded="{report>/showFailedDetails}"
-                headerText="Failed Orders Analysis"
+                headerText="失败订单分析"
                 width="auto"
                 visible="{= ${report>/failedCount} > 0}"
                 class="sapUiNoContentPadding">
                 <headerToolbar>
                     <Toolbar style="Clear">
-                        <Title text="Failed Orders Analysis"/>
+                        <Title text="失败订单分析"/>
                         <ToolbarSpacer/>
                         <Button
-                            text="Export to Excel"
+                            text="导出到Excel"
                             icon="sap-icon://excel-attachment"
                             press="onExportFailedOrders"
                             type="Transparent"/>
@@ -153,11 +153,11 @@
                     <VBox class="sapUiSmallMargin">
                         <VBox class="sapUiSmallMarginBottom">
                             <MessageStrip
-                                text="{= 'Total Failed Orders: ' + ${report>/failedCount} + ' out of ' + ${report>/totalCount} + ' (ERP Upload Failed: ' + ${report>/erpFailedCount} + ', Automation Validation Failed: ' + ${report>/validationFailedCount} + ')'}"
+                                text="{= '失败订单总数：' + ${report>/failedCount} + ' / ' + ${report>/totalCount} + '（ERP上传失败：' + ${report>/erpFailedCount} + '，Validation失败：' + ${report>/validationFailedCount} + '）'}"
                                 type="Error"
                                 showIcon="true"/>
                             <MessageStrip
-                                text="ℹ️ ERP Upload Failed: Orders that passed validation but failed during ERP upload. Automation Validation Failed: Orders that failed business rule checks and were not uploaded."
+                                text="ℹ️ ERP Upload Failed: Orders that passed validation but failed during ERP upload. Validation Failed: Orders that did not pass business rules check and were not uploaded."
                                 type="Information"
                                 showIcon="false"
                                 class="sapUiTinyMarginTop"/>
@@ -170,14 +170,14 @@
                             growingThreshold="20"
                             sticky="ColumnHeaders">
                             <columns>
-                                <Column width="60px"><Text text="Row #"/></Column>
-                                <Column width="130px"><Text text="Failure Type"/></Column>
-                                <Column width="120px"><Text text="PO Number"/></Column>
-                                <Column width="140px"><Text text="Customer"/></Column>
-                                <Column width="120px"><Text text="Part Number"/></Column>
-                                <Column width="70px"><Text text="Qty"/></Column>
-                                <Column minWidth="200px"><Text text="Error Reason"/></Column>
-                                <Column minWidth="250px"><Text text="AI Recommendation"/></Column>
+                                <Column width="60px"><Text text="行号"/></Column>
+                                <Column width="130px"><Text text="失败类型"/></Column>
+                                <Column width="120px"><Text text="采购订单号"/></Column>
+                                <Column width="140px"><Text text="客户"/></Column>
+                                <Column width="120px"><Text text="物料编号"/></Column>
+                                <Column width="70px"><Text text="数量"/></Column>
+                                <Column minWidth="200px"><Text text="错误原因"/></Column>
+                                <Column minWidth="250px"><Text text="AI建议"/></Column>
                             </columns>
                             <items>
                                 <ColumnListItem>
@@ -197,10 +197,15 @@
                                             </HBox>
                                         </VBox>
                                         <VBox>
-                                            <HBox alignItems="Center">
+                                            <HBox alignItems="Center" class="sapUiTinyMarginBottom">
                                                 <core:Icon src="sap-icon://lightbulb" color="#0854a0" size="1rem" class="sapUiTinyMarginEnd"/>
                                                 <Text text="{report>recommendation}" class="sapUiSmallMarginEnd"/>
                                             </HBox>
+                                            <Link
+                                                text="返回workzone进行修改"
+                                                href="http://localhost:8080/test/flp.html?sap-ui-xx-viewCache=false#Shell-home"
+                                                target="_blank"
+                                                emphasized="true"/>
                                         </VBox>
                                     </cells>
                                 </ColumnListItem>
@@ -215,11 +220,11 @@
             <Toolbar>
                 <ToolbarSpacer/>
                 <Button
-                    text="Back to Home"
+                    text="返回主页"
                     icon="sap-icon://home"
                     press="onNavigateToHome"/>
                 <Button
-                    text="Complete Workflow"
+                    text="完成工作流"
                     type="Success"
                     icon="sap-icon://accept"
                     press="onCompleteWorkflow"/>

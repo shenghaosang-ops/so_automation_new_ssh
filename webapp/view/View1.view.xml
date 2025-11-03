@@ -22,7 +22,7 @@
 
     <Page
         id="page"
-        title="SO Automation Demo"
+        title="销售订单自动化演示"
         showNavButton="true"
         navButtonPress="onNavBack"
         backgroundDesign="Transparent">
@@ -40,12 +40,12 @@
             <Panel
                 expandable="true"
                 expanded="true"
-                headerText="Upload CSV/Excel File"
+                headerText="上传CSV/Excel文件"
                 width="auto"
                 class="sapUiNoContentPadding">
                 <headerToolbar>
                     <Toolbar style="Clear">
-                        <Title text="Upload CSV/Excel File"/>
+                        <Title text="上传CSV/Excel文件"/>
                         <ToolbarSpacer/>
                         <core:Icon src="sap-icon://upload" class="sapUiTinyMarginEnd"/>
                     </Toolbar>
@@ -55,24 +55,24 @@
                         <HBox alignItems="Center" class="sapUiSmallMargin">
                             <u:FileUploader
                                 id="fileUploader"
-                                buttonText="Choose CSV/Excel File"
+                                buttonText="选择CSV/Excel文件"
                                 fileType="csv,xlsx"
                                 change="onFileSelect"
                                 style="Emphasized"
                                 useMultipart="false"
                                 sendXHR="true"
-                                tooltip="Upload CSV or Excel file"/>
+                                tooltip="上传CSV或Excel文件"/>
                             <Button
                                 id="extractButton"
-                                text="Extract Data"
+                                text="提取数据"
                                 press="onExtractPress"
                                 type="Emphasized"
                                 icon="sap-icon://table-view"
                                 class="sapUiTinyMarginBegin"
-                                tooltip="Extract data from CSV or Excel file"/>
+                                tooltip="从CSV或Excel文件提取数据"/>
                             <MessageStrip
                                 id="fileNameStrip"
-                                text="No file selected. Supported formats: CSV (.csv), Excel (.xlsx)"
+                                text="未选择文件。支持格式：CSV (.csv), Excel (.xlsx)"
                                 type="Information"
                                 showIcon="true"
                                 class="sapUiTinyMarginBegin"/>
@@ -82,13 +82,13 @@
                             id="previewPanel"
                             expandable="true"
                             expanded="false"
-                            headerText="Excel Data Preview"
+                            headerText="Excel数据预览"
                             class="sapUiTinyMarginTop previewPanel">
                             <headerToolbar>
                                 <Toolbar>
-                                    <Title text="Excel Data Preview (First 5 Columns)"/>
+                                    <Title text="Excel数据预览（前5列）"/>
                                     <ToolbarSpacer/>
-                                    <Text text="{viewData>/rowCount} rows loaded" class="sapUiTinyMarginEnd"/>
+                                    <Text text="{viewData>/rowCount} 行已加载" class="sapUiTinyMarginEnd"/>
                                 </Toolbar>
                             </headerToolbar>
                             <content>
@@ -134,12 +134,12 @@
             <Panel
                 expandable="true"
                 expanded="true"
-                headerText="Process Configuration"
+                headerText="规则配置"
                 width="auto"
                 class="sapUiNoContentPadding">
                 <headerToolbar>
                     <Toolbar style="Clear">
-                        <Title text="Process Configuration"/>
+                        <Title text="规则配置"/>
                         <ToolbarSpacer/>
                         <core:Icon src="sap-icon://settings" class="sapUiTinyMarginEnd"/>
                     </Toolbar>
@@ -149,14 +149,14 @@
                         <!-- Left Section: Customer and Batch Size -->
                         <VBox width="300px" class="sapUiTinyMarginEnd">
                             <!-- Customer Selection -->
-                            <Label text="Customer" required="true" class="sapUiTinyMarginBottom"/>
+                            <Label text="客户" required="true" class="sapUiTinyMarginBottom"/>
                             <!-- <Select
                                 id="customerSelect"
                                 change="onCustomerChange"
                                 class="sapUiSmallMarginBottom"
                                 width="100%">
-                                <core:Item key="customerA" text="Customer A"/>
-                                <core:Item key="customerB" text="Customer B"/>
+                                <core:Item key="customerA" text="客户A"/>
+                                <core:Item key="customerB" text="客户B"/>
                             </Select> -->
                             <Select
                                 id="customerSelect"
@@ -167,19 +167,19 @@
                                 <core:Item key="{customerRules>key}" text="{customerRules>name}"/>
                             </Select>
                             <!-- Batch Size Selection -->
-                            <Label text="Batch Size" required="true" class="sapUiTinyMarginBottom"/>
+                            <Label text="批次大小" required="true" class="sapUiTinyMarginBottom"/>
                             <Select
                                 id="batchSizeSelect"
                                 class="sapUiSmallMarginBottom"
                                 width="100%">
-                                <core:Item key="1" text="1 record per batch"/>
-                                <core:Item key="5" text="5 records per batch"/>
-                                <core:Item key="10" text="10 records per batch"/>
+                                <core:Item key="1" text="每批次1条记录"/>
+                                <core:Item key="5" text="每批次5条记录"/>
+                                <core:Item key="10" text="每批次10条记录"/>
                             </Select>
                             <!-- Action Button -->
                             <Button
                                 id="btnAutomation"
-                                text="Start AI Automation"
+                                text="启动AI Mapping"
                                 type="Emphasized"
                                 width="100%"
                                 icon="sap-icon://activate"
@@ -188,17 +188,17 @@
                         <!-- Right Section: Rule Preview -->
                         <VBox width="100%" class="sapUiTinyMarginBegin">
                             <HBox justifyContent="SpaceBetween" class="sapUiTinyMarginBottom">
-                                <Label text="Rule Configuration" required="true"/>
+                                <Label text="规则配置" required="true"/>
                                 <HBox>
                                     <Button
                                         id="btnEditRule"
-                                        text="Edit Rule"
+                                        text="编辑规则"
                                         icon="sap-icon://edit"
                                         press="onEditRule"
                                         class="sapUiTinyMarginEnd"/>
                                     <Button
                                         id="btnCancelEditRule"
-                                        text="Cancel"
+                                        text="取消"
                                         icon="sap-icon://cancel"
                                         visible="false"
                                         press="onCancelEditRule"/>
@@ -233,12 +233,12 @@
             <Panel
                 expandable="true"
                 expanded="true"
-                headerText="Processing Results"
+                headerText="处理结果"
                 width="auto"
                 class="sapUiNoContentPadding">
                 <headerToolbar>
                     <Toolbar style="Clear">
-                        <Title text="Processing Results"/>
+                        <Title text="处理结果"/>
                         <!-- 添加进度条和处理状态 -->
                         <ToolbarSpacer width="2rem"/>
                         <ProgressIndicator
@@ -280,54 +280,54 @@
                             growingScrollToLoad="true">
                             <columns>
                                 <!-- 固定列 -->
-                                <Column width="60px" hAlign="Begin"><Text text="Row #" /></Column>
-                                <Column width="60px" hAlign="Begin"><Text text="Status" /></Column>
-                                <Column width="100px" hAlign="Begin"><Text text="Results" /></Column>
+                                <Column width="60px" hAlign="Begin"><Text text="行号" /></Column>
+                                <Column width="60px" hAlign="Begin"><Text text="状态" /></Column>
+                                <Column width="100px" hAlign="Begin"><Text text="结果" /></Column>
                                 <!-- 根据客户显示动态列 -->
                                 <Column visible="{= ${customerRules>/selectedCustomer} === 'C001' || ${customerRules>/selectedCustomer} === 'C002'}" hAlign="Begin">
-                                    <Text text="Customer Code" />
+                                    <Text text="客户代码" />
                                 </Column>
                                 <Column visible="{= ${customerRules>/selectedCustomer} === 'C001' || ${customerRules>/selectedCustomer} === 'C002'}" hAlign="Begin">
-                                    <Text text="PO Number" />
+                                    <Text text="采购订单号" />
                                 </Column>
                                 <Column visible="{= ${customerRules>/selectedCustomer} === 'C001' || ${customerRules>/selectedCustomer} === 'C002'}" hAlign="Begin">
-                                    <Text text="PO Date" />
+                                    <Text text="采购订单日期" />
                                 </Column>
                                 <Column visible="{= ${customerRules>/selectedCustomer} === 'C001' || ${customerRules>/selectedCustomer} === 'C002'}" hAlign="Begin">
-                                    <Text text="Item No" />
+                                    <Text text="物料编号" />
                                 </Column>
                                 <!-- 客户 A 特有列 -->
                                 <Column visible="{= ${customerRules>/selectedCustomer} === 'C001'}" hAlign="Begin">
-                                    <Text text="PO Line" />
+                                    <Text text="采购订单行项目" />
                                 </Column>
                                 <Column hAlign="Begin">
-                                    <Text text="Customer Part No" />
+                                    <Text text="客户物料编号" />
                                 </Column>
                                 <Column hAlign="Begin">
-                                    <Text text="Quantity" />
+                                    <Text text="数量" />
                                 </Column>
                                 <Column hAlign="Begin">
-                                    <Text text="Request Date" />
+                                    <Text text="需求日期" />
                                 </Column>
                                 <!-- 客户 A 特有列 -->
                                 <Column visible="{= ${customerRules>/selectedCustomer} === 'C001'}" hAlign="Begin">
-                                    <Text text="Net Price" />
+                                    <Text text="净价" />
                                 </Column>
                                 <Column hAlign="Begin">
-                                    <Text text="Part No" />
+                                    <Text text="物料编号" />
                                 </Column>
                                 <Column hAlign="Begin">
-                                    <Text text="Sales Order Type" />
+                                    <Text text="销售订单类型" />
                                 </Column>
                                 <!-- 客户 B 特有列 -->
                                 <Column visible="{= ${customerRules>/selectedCustomer} === 'C002'}" hAlign="Begin">
-                                    <Text text="Plant" />
+                                    <Text text="工厂" />
                                 </Column>
                                 <Column visible="{= ${customerRules>/selectedCustomer} === 'C002'}" hAlign="Begin">
-                                    <Text text="Ship To" />
+                                    <Text text="收货方" />
                                 </Column>
                                 <Column hAlign="Begin">
-                                    <Text text="Reason" />
+                                    <Text text="错误原因" />
                                 </Column>
                             </columns>
                             <items>
@@ -370,7 +370,7 @@
             <Toolbar>
                 <ToolbarSpacer/>
                 <Button
-                    text="Next: SO Upload"
+                    text="下一步：销售订单上传"
                     type="Emphasized"
                     icon="sap-icon://navigation-right-arrow"
                     iconDensityAware="false"

@@ -15,12 +15,52 @@ sap.ui.define([], function() {
             this._controller = oController;
         },
 
+        // Material number mapping cache (customer part no -> SAP material no)
+        _materialNumberCache: {},
+        _lastSAPNumber: 10000000, // Starting SAP number (8 digits, starts with 1)
+
+        /**
+         * Convert part number to SAP material number format (8 digits starting with 1)
+         * Same customer part number will always get the same SAP material number
+         * @param {String} sPartNo - Original part number
+         * @returns {String} SAP material number
+         */
+        _convertToSAPMaterialNumber: function(sPartNo) {
+            if (!sPartNo) return "";
+            
+            var sKey = String(sPartNo).trim().toUpperCase();
+            
+            // Check if we already have a mapping for this part number
+            if (this._materialNumberCache[sKey]) {
+                return this._materialNumberCache[sKey];
+            }
+            
+            // Generate new SAP material number
+            // Format: 1xxxxxxx (8 digits, starts with 1, range 10000000-19999999)
+            var sSAPNumber = String(this._lastSAPNumber);
+            
+            // Increment for next material
+            this._lastSAPNumber++;
+            
+            // Make sure we don't exceed 19999999
+            if (this._lastSAPNumber > 19999999) {
+                this._lastSAPNumber = 10000000; // Reset to start
+            }
+            
+            // Cache the mapping
+            this._materialNumberCache[sKey] = sSAPNumber;
+            
+            return sSAPNumber;
+        },
+
         /**
          * Validate SO data before upload
          * @param {Array} aData - Array of SO records
          * @returns {Promise} Promise with validated data
          */
         validateData: function(aData) {
+            var that = this; // Save reference to service object
+            
             return new Promise(function(resolve, reject) {
                 setTimeout(function() {
                     try {
@@ -52,11 +92,17 @@ sap.ui.define([], function() {
                                 // aErrors.push("Customer Code is recommended");
                             }
 
+                            // Convert part number (物料编号) to SAP material number format
+                            // Keep itemNo (行项目) unchanged
+                            var sSAPMaterialNumber = that._convertToSAPMaterialNumber(oItem.partNo);
+
                             var sMessage = bValid ? "All validations passed" : aErrors.join("; ");
 
                             return Object.assign({}, oItem, {
                                 valid: bValid,
-                                validationMessage: sMessage
+                                validationMessage: sMessage,
+                                partNo: sSAPMaterialNumber  // Only replace partNo (物料编号) with SAP format
+                                // itemNo (行项目) remains unchanged
                             });
                         });
 

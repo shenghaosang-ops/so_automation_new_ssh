@@ -7,7 +7,7 @@
 
     <Page
         id="soUploadPage"
-        title="SO Upload to ERP"
+        title="销售订单上传至ERP"
         showNavButton="true"
         navButtonPress="onNavBack"
         backgroundDesign="Transparent">
@@ -17,35 +17,35 @@
             <Panel
                 expandable="true"
                 expanded="true"
-                headerText="Upload Summary"
+                headerText="上传摘要"
                 width="auto"
                 class="sapUiNoContentPadding">
                 <headerToolbar>
                     <Toolbar style="Clear">
-                        <Title text="SO Data Summary"/>
+                        <Title text="销售订单数据摘要"/>
                         <ToolbarSpacer/>
-                        <core:Icon src="sap-icon://infoget rich" class="sapUiTinyMarginEnd"/>
+                        <core:Icon src="sap-icon://information" class="sapUiTinyMarginEnd"/>
                     </Toolbar>
                 </headerToolbar>
                 <content>
                     <l:HorizontalLayout class="sapUiSmallMargin">
                         <l:VerticalLayout width="200px" class="sapUiSmallMarginEnd">
                             <ObjectStatus
-                                title="Total Records"
+                                title="记录总数"
                                 text="{soUpload>/totalRecords}"
                                 state="Information"
                                 icon="sap-icon://documents"/>
                         </l:VerticalLayout>
                         <l:VerticalLayout width="200px" class="sapUiSmallMarginEnd">
                             <ObjectStatus
-                                title="Valid Records"
+                                title="Valid记录"
                                 text="{soUpload>/validRecords}"
                                 state="Success"
                                 icon="sap-icon://status-positive"/>
                         </l:VerticalLayout>
                         <l:VerticalLayout width="200px">
                             <ObjectStatus
-                                title="Invalid Records"
+                                title="Invalid记录"
                                 text="{soUpload>/invalidRecords}"
                                 state="Warning"
                                 icon="sap-icon://status-error"/>
@@ -58,16 +58,16 @@
             <Panel
                 expandable="true"
                 expanded="true"
-                headerText="SO Data for Upload"
+                headerText="待上传销售订单数据"
                 width="auto"
                 class="sapUiNoContentPadding">
                 <headerToolbar>
                     <Toolbar style="Clear">
-                        <Title text="Review SO Data"/>
+                        <Title text="审核销售订单数据"/>
                         <ToolbarSpacer/>
                         <SearchField 
                             width="15rem" 
-                            placeholder="Search..." 
+                            placeholder="搜索..." 
                             search="onSearchData"/>
                         <core:Icon src="sap-icon://table-view" class="sapUiTinyMarginEnd"/>
                     </Toolbar>
@@ -82,33 +82,25 @@
                             growingThreshold="50"
                             mode="MultiSelect">
                             <columns>
-                                <Column width="60px"><Text text="Row #"/></Column>
-                                <Column width="80px"><Text text="Status"/></Column>
-                                <Column><Text text="Customer Code"/></Column>
-                                <Column><Text text="PO Number"/></Column>
-                                <Column><Text text="PO Date"/></Column>
-                                <Column><Text text="Item No"/></Column>
-                                <Column><Text text="Part No"/></Column>
-                                <Column><Text text="Quantity"/></Column>
-                                <Column><Text text="Request Date"/></Column>
-                                <Column><Text text="Sales Order Type"/></Column>
-                                <Column width="200px"><Text text="Validation Message"/></Column>
+                                <Column width="60px"><Text text="行号"/></Column>
+                                <Column width="80px"><Text text="状态"/></Column>
+                                <Column><Text text="客户代码"/></Column>
+                                <Column><Text text="采购订单号"/></Column>
+                                <Column><Text text="采购订单日期"/></Column>
+                                <Column><Text text="行项目"/></Column>
+                                <Column><Text text="物料编号"/></Column>
+                                <Column><Text text="数量"/></Column>
+                                <Column><Text text="需求日期"/></Column>
+                                <Column><Text text="销售订单类型"/></Column>
                             </columns>
                             <items>
                                 <ColumnListItem>
                                     <cells>
                                         <Text text="{soUpload>rowIndex}"/>
-                                        <HBox alignItems="Center">
-                                            <core:Icon 
-                                                src="sap-icon://business-objects-experience" 
-                                                color="#0854a0" 
-                                                size="1rem"
-                                                class="sapUiTinyMarginEnd"/>
-                                            <ObjectStatus
-                                                text="{= ${soUpload>valid} ? 'Valid' : 'Invalid'}"
-                                                state="{= ${soUpload>valid} ? 'Success' : 'Warning'}"
-                                                icon="{= ${soUpload>valid} ? 'sap-icon://accept' : 'sap-icon://alert'}"/>
-                                        </HBox>
+                                        <ObjectStatus
+                                            text="{= ${soUpload>valid} ? 'Valid' : 'Invalid'}"
+                                            state="{= ${soUpload>valid} ? 'Success' : 'Warning'}"
+                                            icon="{= ${soUpload>valid} ? 'sap-icon://accept' : 'sap-icon://alert'}"/>
                                         <Text text="{soUpload>customerCode}"/>
                                         <Text text="{soUpload>poNumber}"/>
                                         <Text text="{soUpload>poDate}"/>
@@ -117,7 +109,6 @@
                                         <Text text="{soUpload>quantity}"/>
                                         <Text text="{soUpload>requestDate}"/>
                                         <Text text="{soUpload>salesOrderType}"/>
-                                        <Text text="{soUpload>validationMessage}"/>
                                     </cells>
                                 </ColumnListItem>
                             </items>
@@ -130,12 +121,12 @@
             <Panel
                 expandable="true"
                 expanded="true"
-                headerText="Upload Actions"
+                headerText="上传操作"
                 width="auto"
                 class="sapUiNoContentPadding">
                 <headerToolbar>
                     <Toolbar style="Clear">
-                        <Title text="Validate and Upload"/>
+                        <Title text="校验与上传"/>
                         <ToolbarSpacer/>
                         <core:Icon src="sap-icon://action" class="sapUiTinyMarginEnd"/>
                     </Toolbar>
@@ -144,18 +135,18 @@
                     <VBox class="sapUiSmallMargin">
                         <HBox justifyContent="SpaceBetween" class="sapUiSmallMarginBottom">
                             <VBox width="60%">
-                                <Label text="ERP System Configuration" class="sapUiTinyMarginBottom"/>
+                                <Label text="ERP系统配置" class="sapUiTinyMarginBottom"/>
                                 <HBox alignItems="Center" class="sapUiSmallMarginBottom">
-                                    <Label text="System:" width="100px"/>
+                                    <Label text="系统：" width="100px"/>
                                     <Input 
                                         value="{soUpload>/erpSystem}" 
                                         placeholder="SAP S/4HANA"
                                         width="300px"/>
                                 </HBox>
                                 <HBox alignItems="Center" class="sapUiSmallMarginBottom">
-                                    <Label text="Connection:" width="100px"/>
+                                    <Label text="连接状态：" width="100px"/>
                                     <ObjectStatus
-                                        text="{soUpload>/connectionStatus}"
+                                        text="{= ${soUpload>/connectionStatus} === 'Connected' ? 'Connected' : 'Disconnected'}"
                                         state="{= ${soUpload>/connectionStatus} === 'Connected' ? 'Success' : 'Error'}"
                                         icon="{= ${soUpload>/connectionStatus} === 'Connected' ? 'sap-icon://connected' : 'sap-icon://disconnected'}"/>
                                 </HBox>
@@ -169,7 +160,7 @@
                                     width="100%"
                                     class="sapUiTinyMarginBottom"/>
                                 <Button
-                                    text="Execute Upload to ERP"
+                                    text="执行上传至ERP"
                                     type="Emphasized"
                                     icon="sap-icon://upload-to-cloud"
                                     press="onExecuteUpload"
@@ -182,14 +173,14 @@
                         <VBox 
                             visible="{= ${soUpload>/uploadInProgress} === true}"
                             class="sapUiSmallMarginTop">
-                            <Label text="Upload Progress" class="sapUiTinyMarginBottom"/>
+                            <Label text="上传进度" class="sapUiTinyMarginBottom"/>
                             <ProgressIndicator
                                 percentValue="{soUpload>/uploadProgress}"
                                 displayValue="{soUpload>/uploadProgress}%"
                                 showValue="true"
                                 state="{= ${soUpload>/uploadProgress} === 100 ? 'Success' : 'Information'}"/>
                             <Text 
-                                text="{soUpload>/uploadedCount} of {soUpload>/totalRecords} records uploaded"
+                                text="已上传 {soUpload>/uploadedCount} / {soUpload>/totalRecords} 条记录"
                                 class="sapUiTinyMarginTop"/>
                         </VBox>
                     </VBox>
@@ -201,16 +192,16 @@
                 id="uploadResultsPanel"
                 expandable="true"
                 expanded="true"
-                headerText="Upload Results"
+                headerText="上传结果"
                 visible="{= ${soUpload>/uploadResults} !== undefined &amp;&amp; ${soUpload>/uploadResults/length} > 0}"
                 width="auto"
                 class="sapUiNoContentPadding">
                 <headerToolbar>
                     <Toolbar style="Clear">
-                        <Title text="Upload Status"/>
+                        <Title text="上传状态"/>
                         <ToolbarSpacer/>
                         <Button
-                            text="Export Results"
+                            text="导出结果"
                             icon="sap-icon://excel-attachment"
                             press="onExportResults"/>
                         <core:Icon src="sap-icon://message-success" class="sapUiTinyMarginEnd"/>
@@ -230,12 +221,12 @@
                             growing="true"
                             growingThreshold="20">
                             <columns>
-                                <Column width="60px"><Text text="Row #"/></Column>
-                                <Column width="110px"><Text text="PO Number"/></Column>
-                                <Column width="110px"><Text text="SO Number"/></Column>
-                                <Column width="110px"><Text text="Created Date"/></Column>
-                                <Column width="120px"><Text text="Upload Status"/></Column>
-                                <Column><Text text="Message"/></Column>
+                                <Column width="60px"><Text text="行号"/></Column>
+                                <Column width="110px"><Text text="采购订单号"/></Column>
+                                <Column width="110px"><Text text="销售订单号"/></Column>
+                                <Column width="110px"><Text text="创建日期"/></Column>
+                                <Column width="120px"><Text text="上传状态"/></Column>
+                                <Column><Text text="消息"/></Column>
                             </columns>
                             <items>
                                 <ColumnListItem>
@@ -245,7 +236,7 @@
                                         <Text text="{soUpload>soNumber}"/>
                                         <Text text="{soUpload>createdDate}"/>
                                         <ObjectStatus
-                                            text="{soUpload>status}"
+                                            text="{= ${soUpload>status} === 'Success' ? '成功' : '失败'}"
                                             state="{= ${soUpload>status} === 'Success' ? 'Success' : 'Error'}"
                                             icon="{= ${soUpload>status} === 'Success' ? 'sap-icon://message-success' : 'sap-icon://message-error'}"/>
                                         <Text text="{soUpload>message}"/>
@@ -261,13 +252,13 @@
             <Panel
                 expandable="true"
                 expanded="true"
-                headerText="Email Notification"
+                headerText="邮件通知"
                 visible="{= ${soUpload>/uploadResults} !== undefined &amp;&amp; ${soUpload>/uploadResults/length} &gt; 0}"
                 width="auto"
                 class="sapUiNoContentPadding">
                 <headerToolbar>
                     <Toolbar style="Clear">
-                        <Title text="Configure Email Settings"/>
+                        <Title text="邮件配置"/>
                         <ToolbarSpacer/>
                         <core:Icon src="sap-icon://email" class="sapUiTinyMarginEnd"/>
                     </Toolbar>
@@ -276,7 +267,7 @@
                     <VBox class="sapUiSmallMargin">
                         <!-- Email Configuration Form -->
                         <VBox class="sapUiSmallMarginBottom">
-                            <Label text="To (Recipients)" required="true" class="sapUiTinyMarginBottom"/>
+                            <Label text="收件人" required="true" class="sapUiTinyMarginBottom"/>
                             <Input
                                 value="{soUpload>/email/recipients}"
                                 placeholder="recipents@sap.com"
@@ -285,7 +276,7 @@
                         </VBox>
 
                         <VBox class="sapUiSmallMarginBottom">
-                            <Label text="CC (Carbon Copy)" class="sapUiTinyMarginBottom"/>
+                            <Label text="抄送" class="sapUiTinyMarginBottom"/>
                             <Input
                                 value="{soUpload>/email/cc}"
                                 placeholder="cc@example.com"
@@ -293,21 +284,40 @@
                         </VBox>
 
                         <VBox class="sapUiSmallMarginBottom">
-                            <Label text="Subject" required="true" class="sapUiTinyMarginBottom"/>
+                            <Label text="主题" required="true" class="sapUiTinyMarginBottom"/>
                             <Input
                                 value="{soUpload>/email/subject}"
-                                placeholder="SO Upload Results - [Date]"
+                                placeholder="销售订单上传结果 - [日期]"
                                 width="100%"/>
                         </VBox>
 
                         <!-- Smart Email Content Preview -->
                         <VBox class="sapUiSmallMarginBottom">
-                            <Label text="Email Preview (Auto-generated)" class="sapUiTinyMarginBottom"/>
+                            <HBox justifyContent="SpaceBetween" alignItems="Center" class="sapUiTinyMarginBottom">
+                                <Label text="邮件预览（自动生成）"/>
+                                <HBox>
+                                    <Button
+                                        text="编辑内容"
+                                        type="Transparent"
+                                        icon="sap-icon://edit"
+                                        press="onEditEmailContent"
+                                        visible="{= !${soUpload>/email/editMode}}"
+                                        tooltip="点击编辑AI生成的邮件内容"
+                                        class="sapUiTinyMarginEnd"/>
+                                    <Button
+                                        text="保存"
+                                        type="Emphasized"
+                                        icon="sap-icon://save"
+                                        press="onSaveEmailContent"
+                                        visible="{soUpload>/email/editMode}"
+                                        tooltip="保存修改后的邮件内容"/>
+                                </HBox>
+                            </HBox>
                             
                             <!-- All Success Scenario -->
                             <MessageStrip
                                 visible="{= ${soUpload>/successCount} === ${soUpload>/totalUploadCount} &amp;&amp; ${soUpload>/totalUploadCount} &gt; 0}"
-                                text="✅ All records uploaded successfully!"
+                                text="✅ 所有记录上传成功！"
                                 type="Success"
                                 showIcon="true"
                                 class="sapUiSmallMarginBottom"/>
@@ -315,7 +325,7 @@
                             <!-- Partial Success Scenario -->
                             <MessageStrip
                                 visible="{= ${soUpload>/failedCount} &gt; 0 &amp;&amp; ${soUpload>/failedCount} &lt; ${soUpload>/totalUploadCount}}"
-                                text="⚠️ Partial success - Some records failed to upload"
+                                text="⚠️ 部分成功 - 部分记录上传失败"
                                 type="Warning"
                                 showIcon="true"
                                 class="sapUiSmallMarginBottom"/>
@@ -323,25 +333,43 @@
                             <!-- Complete Failure Scenario -->
                             <MessageStrip
                                 visible="{= ${soUpload>/failedCount} === ${soUpload>/totalUploadCount} &amp;&amp; ${soUpload>/totalUploadCount} &gt; 0}"
-                                text="❌ All records failed to upload"
+                                text="❌ 所有记录上传失败"
                                 type="Error"
                                 showIcon="true"
                                 class="sapUiSmallMarginBottom"/>
 
-                            <!-- Email Content -->
-                            <TextArea
-                                value="{soUpload>/email/content}"
-                                rows="10"
-                                width="100%"
-                                editable="false"
-                                class="sapUiSmallMarginBottom"/>
+                            <!-- Email Content with Modified Indicator -->
+                            <VBox class="{= ${soUpload>/email/isModified} ? 'emailModifiedBackground' : ''}">
+                                <TextArea
+                                    value="{soUpload>/email/content}"
+                                    rows="10"
+                                    width="100%"
+                                    editable="{soUpload>/email/editMode}"
+                                    class="sapUiSmallMarginBottom"/>
+                            </VBox>
+                            
+                            <!-- Modified Indicator -->
+                            <MessageStrip
+                                visible="{soUpload>/email/isModified}"
+                                text="✏️ 邮件内容已修改"
+                                type="Information"
+                                showIcon="true"
+                                class="sapUiTinyMarginTop sapUiTinyMarginBottom"/>
+                            
+                            <!-- Edit Mode Info -->
+                            <MessageStrip
+                                visible="{soUpload>/email/editMode}"
+                                text="💡 您现在可以编辑邮件内容。点击'保存'按钮完成编辑。"
+                                type="Information"
+                                showIcon="true"
+                                class="sapUiTinyMarginTop"/>
                         </VBox>
 
                         <!-- Send Email Button -->
                         <VBox class="sapUiSmallMarginTop">
                             <HBox justifyContent="End">
                                 <Button
-                                    text="Send Email"
+                                    text="发送邮件"
                                     type="Emphasized"
                                     icon="sap-icon://email"
                                     press="onSendEmail"
@@ -354,11 +382,11 @@
                                 class="sapUiSmallMarginTop">
                                 <HBox alignItems="Center" class="sapUiTinyMarginBottom">
                                     <BusyIndicator size="1rem" class="sapUiTinyMarginEnd"/>
-                                    <Text text="Sending email..."/>
+                                    <Text text="正在发送邮件..."/>
                                 </HBox>
                                 <ProgressIndicator
                                     percentValue="{soUpload>/email/sendProgress}"
-                                    displayValue="Sending..."
+                                    displayValue="发送中..."
                                     showValue="true"
                                     state="Information"/>
                             </VBox>
@@ -366,7 +394,7 @@
                             <!-- Email Send Result -->
                             <MessageStrip
                                 visible="{= ${soUpload>/email/sent} === true}"
-                                text="✅ Email sent successfully to {soUpload>/email/recipients}"
+                                text="✅ 邮件已成功发送至 {soUpload>/email/recipients}"
                                 type="Success"
                                 showIcon="true"
                                 class="sapUiSmallMarginTop"/>
@@ -380,7 +408,7 @@
             <Toolbar>
                 <ToolbarSpacer/>
                 <Button
-                    text="Next: Review &amp; Report"
+                    text="下一步：订单回顾与报告"
                     type="Emphasized"
                     icon="sap-icon://navigation-right-arrow"
                     iconDensityAware="false"
