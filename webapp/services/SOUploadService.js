@@ -167,7 +167,7 @@ sap.ui.define([], function() {
                             soNumber: sSAPSONumber,
                             createdDate: bSuccess ? sCreatedDate : "",
                             customerCode: oItem.customerCode,
-                            customerName: oItem.customerName,
+                            customerName: oItem.customerName || oItem.customerCode || "", // Use customerCode if customerName is empty
                             partNumber: oItem.partNo,
                             partNo: oItem.partNo,
                             quantity: oItem.quantity,

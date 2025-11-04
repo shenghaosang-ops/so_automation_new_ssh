@@ -140,13 +140,6 @@
                 <headerToolbar>
                     <Toolbar style="Clear">
                         <Title text="失败订单分析"/>
-                        <ToolbarSpacer/>
-                        <Button
-                            text="导出到Excel"
-                            icon="sap-icon://excel-attachment"
-                            press="onExportFailedOrders"
-                            type="Transparent"/>
-                        <core:Icon src="sap-icon://warning" color="#E78C07" class="sapUiTinyMarginBegin"/>
                     </Toolbar>
                 </headerToolbar>
                 <content>
@@ -203,8 +196,7 @@
                                             </HBox>
                                             <Link
                                                 text="返回workzone进行修改"
-                                                href="http://localhost:8080/test/flp.html?sap-ui-xx-viewCache=false#Shell-home"
-                                                target="_blank"
+                                                press="onNavigateToHome"
                                                 emphasized="true"/>
                                         </VBox>
                                     </cells>

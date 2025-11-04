@@ -7,7 +7,7 @@
 
     <Page
         id="soUploadPage"
-        title="销售订单上传至ERP"
+        title="销售订单上传"
         showNavButton="true"
         navButtonPress="onNavBack"
         backgroundDesign="Transparent">

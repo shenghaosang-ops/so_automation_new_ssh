@@ -425,8 +425,21 @@ sap.ui.define([
         },
 
         onNavigateToHome: function () {
-            var oRouter = this.getOwnerComponent().getRouter();
-            oRouter.navTo("Home");
+            // Try to navigate to Launchpad/Workzone Shell home
+            var oCrossAppNavigator = sap.ushell && sap.ushell.Container && sap.ushell.Container.getService("CrossApplicationNavigation");
+            
+            if (oCrossAppNavigator) {
+                // In Fiori Launchpad/Workzone environment - navigate to Shell home
+                oCrossAppNavigator.toExternal({
+                    target: {
+                        shellHash: "#Shell-home"
+                    }
+                });
+            } else {
+                // Standalone mode - navigate to app home
+                var oRouter = this.getOwnerComponent().getRouter();
+                oRouter.navTo("Home");
+            }
         },
 
         onCompleteWorkflow: function () {

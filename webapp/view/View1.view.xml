@@ -22,7 +22,7 @@
 
     <Page
         id="page"
-        title="销售订单自动化演示"
+        title="销售订单自动化字段处理"
         showNavButton="true"
         navButtonPress="onNavBack"
         backgroundDesign="Transparent">

@@ -84,13 +84,14 @@ downloadExcelFile: function(sUrl) {
             // Simulate successful download
             resolve({
                 success: true,
-                filePath: "C:\\Downloads\\CustomerOrders_" + new Date().getTime() + ".xlsx"
+                message: "文件成功下载",
+                filePath: "C:\\Download\\CustomerA_Orders.xlsx"
             });
 
             // Uncomment to simulate error
             /*reject({
                 success: false,
-                message: "Network error occurred"
+                message: "网络错误"
             });*/
         }, 2000); // Simulate network delay
     });

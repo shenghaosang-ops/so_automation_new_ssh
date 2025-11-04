@@ -238,13 +238,13 @@ sap.ui.define([
             
             // Set confirmation flag
             oModel.setProperty("/documentAIDataConfirmed", true);
-            oModel.setProperty("/documentAIStatus", "Data successfully downloaded from Document AI application.");
+            oModel.setProperty("/documentAIStatus", "数据已成功从Document AI应用程序下载");
             oModel.setProperty("/documentAIStatusType", "Success");
             
             // Set extracted data flag to enable Next button
             oModel.setProperty("/extractedData", "Document AI data confirmed");
             
-            MessageToast.show("Document AI data confirmed successfully");
+            MessageToast.show("Document AI数据确认成功");
         },
 
         /**
