@@ -195,8 +195,9 @@
                                                 <Text text="{report>recommendation}" class="sapUiSmallMarginEnd"/>
                                             </HBox>
                                             <Link
-                                                text="返回workzone进行修改"
-                                                press="onNavigateToHome"
+                                                text="返回S/4 HANA Fiori进行修改"
+                                                href="https://training.csdgc.c.ap-cn-1.cloud.sap:44300/sap/bc/ui2/flp?sap-client=626&amp;sap-language=ZH"
+                                                target="_blank"
                                                 emphasized="true"/>
                                         </VBox>
                                     </cells>
@@ -212,9 +213,9 @@
             <Toolbar>
                 <ToolbarSpacer/>
                 <Button
-                    text="返回主页"
+                    text="返回S/4 HANA"
                     icon="sap-icon://home"
-                    press="onNavigateToHome"/>
+                    press="onNavigateToS4"/>
                 <Button
                     text="完成工作流"
                     type="Success"

@@ -22,6 +22,7 @@ sap.ui.define([
                 extractionTemplate: "",
                 extractedData: "",
                 documentFile: null,
+                isDownloading: false,
                 downloadSuccess: false,
                 downloadStatus: "",
                 documentAIStatus: "",
@@ -138,34 +139,35 @@ sap.ui.define([
             var sUrl = oModel.getProperty("/websiteUrl");
             
             if (!sUrl) {
-                oModel.setProperty("/downloadStatus", "Please select a customer first");
-                oModel.setProperty("/downloadSuccess", false);
+                MessageToast.show("请先选择客户");
                 return;
             }
 
-            // Show loading status
+            // Show BPA processing status
             oModel.setProperty("/isDownloading", true);
-            oModel.setProperty("/downloadStatus", "Downloading file...");
+            oModel.setProperty("/downloadSuccess", false);
 
-            DataAcquisitionService.downloadExcelFile(sUrl)
-                .then(function(oResult) {
-                    if (oResult.success) {
-                        oModel.setProperty("/downloadStatus", "File downloaded successfully to: " + oResult.filePath);
-                        oModel.setProperty("/downloadSuccess", true);
-                        // Enable the Next button by setting some extracted data
-                        oModel.setProperty("/extractedData", "Download completed");
-                    } else {
-                        oModel.setProperty("/downloadStatus", "Failed to download file");
+            // Simulate BPA processing with 10 second delay
+            setTimeout(function() {
+                DataAcquisitionService.downloadExcelFile(sUrl)
+                    .then(function(oResult) {
+                        if (oResult.success) {
+                            oModel.setProperty("/downloadSuccess", true);
+                            oModel.setProperty("/extractedData", "Download completed");
+                            MessageToast.show("Excel文件下载成功");
+                        } else {
+                            MessageToast.show("下载失败");
+                            oModel.setProperty("/downloadSuccess", false);
+                        }
+                    })
+                    .catch(function(oError) {
+                        MessageToast.show("下载出错: " + oError.message);
                         oModel.setProperty("/downloadSuccess", false);
-                    }
-                })
-                .catch(function(oError) {
-                    oModel.setProperty("/downloadStatus", "Error downloading file: " + oError.message);
-                    oModel.setProperty("/downloadSuccess", false);
-                })
-                .finally(function() {
-                    oModel.setProperty("/isDownloading", false);
-                });
+                    })
+                    .finally(function() {
+                        oModel.setProperty("/isDownloading", false);
+                    });
+            }, 10000); // 10 seconds delay
         },
         /**
          * Extract data from document (PDF, DOC, TXT)

@@ -258,7 +258,7 @@
                 class="sapUiNoContentPadding">
                 <headerToolbar>
                     <Toolbar style="Clear">
-                        <Title text="邮件配置"/>
+                        <Title text="邮件自动化配置"/>
                         <ToolbarSpacer/>
                         <core:Icon src="sap-icon://email" class="sapUiTinyMarginEnd"/>
                     </Toolbar>

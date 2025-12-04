@@ -1,6 +1,6 @@
 <!--
 /******************************************************************
- * SO Automation Application - Main View
+ * 销售订单自动化应用 - 主视图
  * 
  * This view implements a three-section interface for SO processing:
  * 1. File Upload: Handles Excel file selection and validation

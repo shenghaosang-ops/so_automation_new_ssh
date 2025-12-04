@@ -4,8 +4,9 @@ sap.ui.define([
     "sap/ui/model/json/JSONModel",
     "sap/m/MessageToast",
     "sap/m/MessageBox",
-    "../services/SOUploadService"
-], function(Controller, History, JSONModel, MessageToast, MessageBox, SOUploadService) {
+    "../services/SOUploadService",
+    "../services/EmailService"
+], function(Controller, History, JSONModel, MessageToast, MessageBox, SOUploadService, EmailService) {
     "use strict";
 
     return Controller.extend("yegeoaiso.controller.SOUpload", {
@@ -415,16 +416,17 @@ sap.ui.define([
         },
 
         /**
-         * Send email notification
+         * Send email notification via BPA SMTP
          */
         onSendEmail: function() {
             var oModel = this.getView().getModel("soUpload");
             var sRecipients = oModel.getProperty("/email/recipients");
+            var sCc = oModel.getProperty("/email/cc");
             var sSubject = oModel.getProperty("/email/subject");
             var sContent = oModel.getProperty("/email/content");
 
             if (!sRecipients || !sSubject) {
-                MessageBox.warning("Please fill in recipients and subject");
+                MessageBox.warning("请填写收件人和主题");
                 return;
             }
 
@@ -433,19 +435,50 @@ sap.ui.define([
             oModel.setProperty("/email/sendProgress", 0);
             oModel.setProperty("/email/sent", false);
 
-            // Simulate email sending with progress
+            // Simulate email sending progress
             var iProgress = 0;
             var oInterval = setInterval(function() {
                 iProgress += 20;
                 oModel.setProperty("/email/sendProgress", iProgress);
+            }, 400);
 
-                if (iProgress >= 100) {
-                    clearInterval(oInterval);
-                    oModel.setProperty("/email/sending", false);
-                    oModel.setProperty("/email/sent", true);
-                    MessageToast.show("Email sent successfully!");
-                }
-            }, 300);
+            // Send email via BPA SMTP using EmailService
+            EmailService.sendEmail({
+                recipients: sRecipients,
+                cc: sCc,
+                subject: sSubject,
+                content: sContent
+            }).then(function(oResult) {
+                // Clear progress interval
+                clearInterval(oInterval);
+                oModel.setProperty("/email/sendProgress", 100);
+                
+                // Set success state
+                oModel.setProperty("/email/sending", false);
+                oModel.setProperty("/email/sent", true);
+                
+                // Show success message with BPA details
+                MessageToast.show(
+                    "邮件已成功发送！\n" +
+                    "通过: " + oResult.smtpServer + "\n" +
+                    "收件人: " + oResult.recipientCount + "人"
+                );
+                
+                console.log("BPA邮件发送成功:", oResult);
+            }).catch(function(oError) {
+                // Clear progress interval
+                clearInterval(oInterval);
+                
+                // Reset sending state
+                oModel.setProperty("/email/sending", false);
+                oModel.setProperty("/email/sent", false);
+                oModel.setProperty("/email/sendProgress", 0);
+                
+                // Show error message
+                MessageBox.error("邮件发送失败: " + (oError.message || "未知错误"));
+                
+                console.error("BPA邮件发送失败:", oError);
+            });
         },
 
         /**

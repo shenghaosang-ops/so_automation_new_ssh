@@ -128,23 +128,31 @@
                             type="Emphasized"
                             icon="sap-icon://download"
                             press="onDownloadExcel"
-                            enabled="{= !${dataAcquisition>/downloadSuccess}}"
+                            enabled="{= !${dataAcquisition>/downloadSuccess} &amp;&amp; !${dataAcquisition>/isDownloading}}"
                             width="200px"
                             class="sapUiSmallMarginBottom"/>
 
+                        <!-- BPA Processing Message -->
                         <MessageStrip
-                            id="downloadStatus"
-                            visible="{= ${dataAcquisition>/downloadStatus} !== ''}"
-                            text="{dataAcquisition>/downloadStatus}"
-                            type="{= ${dataAcquisition>/isDownloading} ? 'Information' : 
-                                ${dataAcquisition>/downloadSuccess} ? 'Success' : 'Error'}"
-                            showIcon="true">
+                            id="bpaProcessingStatus"
+                            visible="{dataAcquisition>/isDownloading}"
+                            text="正在调用BPA进行处理..."
+                            type="Information"
+                            showIcon="true"
+                            class="sapUiSmallMarginBottom">
                             <customData>
-                                <core:CustomData 
-                                    key="showLoadingIndicator" 
-                                    value="{dataAcquisition>/isDownloading}"/>
+                                <core:CustomData key="showBusyIndicator" value="true"/>
                             </customData>
                         </MessageStrip>
+
+                        <!-- Download Success Message -->
+                        <MessageStrip
+                            id="downloadSuccessStatus"
+                            visible="{= ${dataAcquisition>/downloadSuccess} === true}"
+                            text="Excel已经从网页下载完成"
+                            type="Success"
+                            showIcon="true"
+                            class="sapUiSmallMarginBottom"/>
                     </VBox>
                 </content>
                 <!-- <content>

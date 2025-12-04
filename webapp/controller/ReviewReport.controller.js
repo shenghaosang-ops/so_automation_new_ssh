@@ -442,10 +442,15 @@ sap.ui.define([
             }
         },
 
+        onNavigateToS4: function () {
+            // Open S/4 HANA Fiori Launchpad in new window
+            window.open("https://training.csdgc.c.ap-cn-1.cloud.sap:44300/sap/bc/ui2/flp?sap-client=626&sap-language=ZH", "_blank");
+        },
+
         onCompleteWorkflow: function () {
             MessageBox.success("Workflow completed successfully! All data has been processed and analyzed.", {
                 onClose: function () {
-                    this.onNavigateToHome();
+                    this.onNavigateToS4();
                 }.bind(this)
             });
         },

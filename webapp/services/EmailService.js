@@ -1,12 +1,39 @@
 /**
  * Email Service
- * Handles email notification sending
+ * Handles email notification sending via SAP Build Process Automation (BPA) SMTP
+ * Integrated with BPA destination configuration
  */
 sap.ui.define([], function() {
     "use strict";
 
     var EmailService = {
         _controller: null,
+
+        /**
+         * BPA SMTP Email Configuration
+         * Based on SAP Process Automation destination: sap_process_automation_mail
+         */
+        bpaEmailConfig: {
+            destinationName: "sap_process_automation_mail",
+            host: "smtp.qq.com",
+            port: 587,
+            secure: false, // false for STARTTLS
+            auth: {
+                user: "867749660@qq.com",
+                // Password should be securely stored in BPA destination
+            },
+            from: "867749660@qq.com",
+            starttls: {
+                enable: true,
+                required: true
+            },
+            ssl: {
+                checkServerIdentity: false,
+                trust: "*",
+                enable: false
+            },
+            transportProtocol: "smtp"
+        },
 
         /**
          * Initialize service
@@ -16,8 +43,12 @@ sap.ui.define([], function() {
         },
 
         /**
-         * Send email with SO upload results
+         * Send email with SO upload results via BPA SMTP (Backend API)
          * @param {Object} oEmailData - Email configuration and data
+         * @param {String} oEmailData.recipients - Email recipients (comma or semicolon separated)
+         * @param {String} oEmailData.cc - CC recipients (optional)
+         * @param {String} oEmailData.subject - Email subject
+         * @param {String} oEmailData.content - Email content
          * @returns {Promise} Promise with send result
          */
         sendEmail: function(oEmailData) {
@@ -25,49 +56,91 @@ sap.ui.define([], function() {
                 // Validate email data
                 if (!oEmailData.recipients || oEmailData.recipients.trim() === "") {
                     reject({
-                        message: "Recipients are required"
+                        message: "收件人不能为空"
                     });
                     return;
                 }
 
-                // Simulate email sending via backend API
-                setTimeout(function() {
-                    try {
-                        // Parse recipients
-                        var aRecipients = oEmailData.recipients.split(";").map(function(s) {
-                            return s.trim();
-                        }).filter(function(s) {
-                            return s !== "";
-                        });
+                if (!oEmailData.subject || oEmailData.subject.trim() === "") {
+                    reject({
+                        message: "邮件主题不能为空"
+                    });
+                    return;
+                }
 
-                        // Validate email format (basic)
-                        var bValidEmails = aRecipients.every(function(sEmail) {
-                            return sEmail.includes("@") && sEmail.includes(".");
-                        });
+                // Parse recipients (support both comma and semicolon)
+                var aRecipients = oEmailData.recipients
+                    .split(/[;,]/)
+                    .map(function(s) { return s.trim(); })
+                    .filter(function(s) { return s !== ""; });
 
-                        if (!bValidEmails) {
-                            reject({
-                                message: "Invalid email address format"
-                            });
-                            return;
-                        }
+                // Parse CC recipients if provided
+                var aCCRecipients = [];
+                if (oEmailData.cc) {
+                    aCCRecipients = oEmailData.cc
+                        .split(/[;,]/)
+                        .map(function(s) { return s.trim(); })
+                        .filter(function(s) { return s !== ""; });
+                }
 
-                        // Simulate successful send
-                        var oResult = {
-                            status: "sent",
-                            recipientCount: aRecipients.length,
-                            sentAt: new Date().toISOString(),
-                            messageId: "MSG-" + Date.now(),
-                            attachments: oEmailData.attachExcel ? 1 : 0
-                        };
+                // Prepare payload for backend API
+                var oPayload = {
+                    to: aRecipients,
+                    cc: aCCRecipients.length > 0 ? aCCRecipients : undefined,
+                    subject: oEmailData.subject,
+                    text: oEmailData.content,
+                    html: oEmailData.content.replace(/\n/g, '<br>')
+                };
 
-                        resolve(oResult);
-                    } catch (error) {
-                        reject({
-                            message: "Failed to send email: " + error.message
+                // Log request (for debugging)
+                console.log("发送邮件请求到后端API:", {
+                    to: oPayload.to,
+                    cc: oPayload.cc,
+                    subject: oPayload.subject,
+                    apiUrl: 'http://localhost:3000/api/email/send'
+                });
+
+                // Call backend API
+                fetch('http://localhost:3000/api/email/send', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(oPayload)
+                })
+                .then(function(response) {
+                    if (!response.ok) {
+                        return response.json().then(function(error) {
+                            throw new Error(error.error || '邮件发送失败');
                         });
                     }
-                }, 2000); // Simulate sending delay
+                    return response.json();
+                })
+                .then(function(result) {
+                    if (result.success) {
+                        console.log("邮件发送成功:", result.data);
+                        resolve({
+                            success: true,
+                            message: result.message,
+                            messageId: result.data.messageId,
+                            recipientCount: result.data.recipientCount,
+                            ccCount: result.data.ccCount,
+                            sentAt: result.data.sentAt,
+                            smtpServer: result.data.smtpServer,
+                            from: EmailService.bpaEmailConfig.from
+                        });
+                    } else {
+                        reject({
+                            message: result.error || "邮件发送失败"
+                        });
+                    }
+                })
+                .catch(function(error) {
+                    console.error("邮件发送失败:", error);
+                    reject({
+                        message: error.message || "无法连接到邮件服务器"
+                    });
+                });
             });
         },
 

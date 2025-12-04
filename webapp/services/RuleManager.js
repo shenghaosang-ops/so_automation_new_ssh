@@ -22,7 +22,7 @@ sap.ui.define([], function() {
                 ],
                 rules: {
                 "C001": [
-                    "检查客户采购代码CustomerPurchaseCode值是否为YAG-YGO,是的话保留原数据。",
+                    "检查客户采购代码CustomerPurchaseCode值是否为SAP,是的话保留原数据。",
                     "在POItemNo右侧新添一列，列明为PO+POLINE，数值为CONCATENATE（PONO，POItemNo）。",
                     "对PO+POLINE列里的数值进行筛选，保留PO+POLINE中比107774190400640大的数据。",
                     "在BalanceQTY右侧新添一列，列明为QTY，数值为BalanceQTY / 1000。",
@@ -33,7 +33,7 @@ sap.ui.define([], function() {
                 "C002": [
                     "删除Delivery Date列中空白的项目",
                     "删除PO Date列中空白的项目",
-                    "在Plant列右侧新添两列，列明为'Sold To'和'Ship To'。Sold To和Ship To的值根据Plant的值来确定：如果Plant为2310，则Sold To为132274，Ship To为132279；如果Plant为2370，则Sold To为132274，Ship To为660076；如果Plant为2350，则Sold To为132274，Ship To为660082；如果Plant为2381，则需要通过检查Part No进行额外区分——如果Part No包含字母'A'，则Sold To和Ship To均为660081，如果Part No不包含字母'A'，则Sold To为132274，Ship To为660075；如果Plant为2380，则需要通过检查Part No进行额外区分——如果Part No包含字母'AAA'，则Sold To和Ship To均为660084，如果Part No不包含字母'A'，则Sold To为132274，Ship To为660077。",
+                    "在Plant列右侧新添两列，列明为'Sold To'和'Ship To'。Sold To和Ship To的值根据Plant的值来确定：如果Plant为1010，则Sold To为132274，Ship To为132279；如果Plant为1020，则Sold To为132274，Ship To为660076；如果Plant为1030，则Sold To为132274，Ship To为660082；如果Plant为1040，则需要通过检查Part No进行额外区分——如果Part No包含字母'A'，则Sold To和Ship To均为660081，如果Part No不包含字母'A'，则Sold To为132274，Ship To为660075；如果Plant为1050，则需要通过检查Part No进行额外区分——如果Part No包含字母'AAA'，则Sold To和Ship To均为660084，如果Part No不包含字母'A'，则Sold To为132274，Ship To为660077。",
                     "在Delivery Date右侧新添一列，列明为'CRD'。CRD的值为Delivery Date减去20天。",
                     "在Order Qty右侧新添一列，列明为'Quantity'。其值为Order Qty除以1000。",
                     "在Manuf. P/N左侧新添一列，列明为'SalesOrderType'。对于Part No值的前两个字符以（AT，RT，P开头的值，RL，RC0100，RC0075，RP，CC0100，500V↑，AC，CQ，CS，CC_105↑（1μF及以上））和RC_P开头的值，销售类型设为ZOR1。对于CustomerPartNO值的前两个字符以（AC，AA，RC0201↑，AF，YC，TC，RE，SR，AS，AH，RV，CC一般产品）开头的值，销售类型设为ZCO。",

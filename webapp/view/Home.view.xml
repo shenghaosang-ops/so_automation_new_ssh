@@ -7,7 +7,7 @@
 
     <Page
         id="homePage"
-        title="SO Automation Agent"
+        title="销售订单自动化代理"
         showNavButton="false"
         backgroundDesign="Transparent">
 
