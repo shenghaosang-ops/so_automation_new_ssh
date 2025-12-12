@@ -289,7 +289,8 @@
                             <Input
                                 value="{soUpload>/email/cc}"
                                 placeholder="cc@example.com"
-                                width="100%"/>
+                                width="100%"
+                                editable="false"/>
                         </VBox>
 
                         <VBox class="sapUiSmallMarginBottom">
@@ -297,12 +298,30 @@
                             <Input
                                 value="{soUpload>/email/subject}"
                                 placeholder="SO Upload Results - [Date]"
-                                width="100%"/>
+                                width="100%"
+                                editable="{soUpload>/email/editing}"/>
                         </VBox>
 
                         <!-- Smart Email Content Preview -->
                         <VBox class="sapUiSmallMarginBottom">
-                            <Label text="Email Preview (Auto-generated)" class="sapUiTinyMarginBottom"/>
+                            <HBox justifyContent="SpaceBetween" alignItems="Center" class="sapUiTinyMarginBottom">
+                                <Label text="Email Preview (Auto-generated)"/>
+                                <HBox>
+                                    <Button
+                                        text="Edit"
+                                        icon="sap-icon://edit"
+                                        type="Transparent"
+                                        visible="{= !${soUpload>/email/editing}}"
+                                        press="onEditEmail"
+                                        class="sapUiTinyMarginEnd"/>
+                                    <Button
+                                        text="Save"
+                                        icon="sap-icon://save"
+                                        type="Emphasized"
+                                        visible="{soUpload>/email/editing}"
+                                        press="onSaveEmail"/>
+                                </HBox>
+                            </HBox>
                             
                             <!-- All Success Scenario -->
                             <MessageStrip
@@ -333,7 +352,7 @@
                                 value="{soUpload>/email/content}"
                                 rows="10"
                                 width="100%"
-                                editable="false"
+                                editable="{soUpload>/email/editing}"
                                 class="sapUiSmallMarginBottom"/>
                         </VBox>
 

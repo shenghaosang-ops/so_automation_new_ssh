@@ -22,7 +22,7 @@ sap.ui.define([], function() {
                 ],
                 rules: {
                 "C001": [
-                    "Check whether the value of `CustomerPurchaseCode` is `YAG-YGO`. If yes, keep the original data.",
+                    "Check whether the value of `CustomerPurchaseCode` is `SAP`. If yes, keep the original data.",
                     "Insert a new column to the right of `POItemNo`, name it `PO+POLINE`, and set its value to `CONCATENATE(PONo, POItemNo)`.",
                     "Filter the values in the `PO+POLINE` column, keeping only the data where `PO+POLINE` is greater than `107774190400640`.",
                     "Insert a new column to the right of `BalanceQTY`, name it `QTY`, and set its value to `BalanceQTY / 1000`.",

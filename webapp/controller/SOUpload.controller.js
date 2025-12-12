@@ -35,7 +35,10 @@ sap.ui.define([
                     content: "",
                     sending: false,
                     sendProgress: 0,
-                    sent: false
+                    sent: false,
+                    editing: false,
+                    originalSubject: "",
+                    originalContent: ""
                 }
             });
             this.getView().setModel(oUploadModel, "soUpload");
@@ -388,6 +391,29 @@ sap.ui.define([
         /**
          * Send email notification
          */
+        /**
+         * Enable email editing mode
+         */
+        onEditEmail: function() {
+            var oModel = this.getView().getModel("soUpload");
+            // Save original values for potential cancel
+            oModel.setProperty("/email/originalSubject", oModel.getProperty("/email/subject"));
+            oModel.setProperty("/email/originalContent", oModel.getProperty("/email/content"));
+            // Enable editing
+            oModel.setProperty("/email/editing", true);
+            MessageToast.show("Email editing enabled");
+        },
+
+        /**
+         * Save email changes
+         */
+        onSaveEmail: function() {
+            var oModel = this.getView().getModel("soUpload");
+            // Disable editing
+            oModel.setProperty("/email/editing", false);
+            MessageToast.show("Email changes saved");
+        },
+
         onSendEmail: function() {
             var oModel = this.getView().getModel("soUpload");
             var sRecipients = oModel.getProperty("/email/recipients");
