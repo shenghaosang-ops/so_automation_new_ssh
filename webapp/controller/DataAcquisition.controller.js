@@ -46,7 +46,7 @@ sap.ui.define([
             
             // Auto-fill URL based on customer selection
             if (sSelectedKey === "customerA") {
-                oModel.setProperty("/websiteUrl", "https://www.filemail.com/d/tzivrghywfzivdn");
+                oModel.setProperty("/websiteUrl", "https://uplodea.com/en/Lx9PwBORQhKRAQ5/file#google_vignette");
                 MessageToast.show("Customer A selected - URL auto-filled");
             } else if (sSelectedKey === "customerB") {
                 oModel.setProperty("/websiteUrl", "");
@@ -150,18 +150,26 @@ sap.ui.define([
             DataAcquisitionService.downloadExcelFile(sUrl)
                 .then(function(oResult) {
                     if (oResult.success) {
-                        oModel.setProperty("/downloadStatus", "File downloaded successfully to: " + oResult.filePath);
+                        var sStatusMessage = "BPA process triggered successfully!\n" +
+                            "Job ID: " + oResult.jobUid;
+                        
+                        oModel.setProperty("/downloadStatus", sStatusMessage);
                         oModel.setProperty("/downloadSuccess", true);
+                        oModel.setProperty("/bpaJobUid", oResult.jobUid);
                         // Enable the Next button by setting some extracted data
                         oModel.setProperty("/extractedData", "Download completed");
+                        
+                        MessageToast.show("BPA process started with Job ID: " + oResult.jobUid);
                     } else {
-                        oModel.setProperty("/downloadStatus", "Failed to download file");
+                        oModel.setProperty("/downloadStatus", "Failed to trigger BPA process");
                         oModel.setProperty("/downloadSuccess", false);
                     }
                 })
                 .catch(function(oError) {
-                    oModel.setProperty("/downloadStatus", "Error downloading file: " + oError.message);
+                    var sErrorMsg = oError.message || "Unknown error occurred";
+                    oModel.setProperty("/downloadStatus", "Error triggering BPA process: " + sErrorMsg);
                     oModel.setProperty("/downloadSuccess", false);
+                    MessageBox.error("Failed to trigger BPA process: " + sErrorMsg);
                 })
                 .finally(function() {
                     oModel.setProperty("/isDownloading", false);

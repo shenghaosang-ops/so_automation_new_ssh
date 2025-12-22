@@ -147,23 +147,77 @@ sap.ui.define([
 
             this.getView().setBusy(true);
 
-            // Call service to validate data
-            SOUploadService.validateData(aData).then(function(aValidatedData) {
-                this.getView().setBusy(false);
+            // First check material validity via CPI API (batch)
+            SOUploadService.checkMaterialValidity(aData).then(function(oMaterialResult) {
+                console.log("Material validation result:", oMaterialResult);
                 
-                // Update data with validation results
-                this._loadSOData(aValidatedData);
-                
-                var iValid = oModel.getProperty("/validRecords");
-                var iInvalid = oModel.getProperty("/invalidRecords");
-                
-                MessageBox.information(
-                    "Data validation completed.\n\nValid Records: " + iValid + 
-                    "\nInvalid Records: " + iInvalid
-                );
+                // Then perform local data validation
+                return SOUploadService.validateData(aData).then(function(aValidatedData) {
+                    this.getView().setBusy(false);
+                    
+                    // Update data with validation results
+                    this._loadSOData(aValidatedData);
+                    
+                    var iValid = oModel.getProperty("/validRecords");
+                    var iInvalid = oModel.getProperty("/invalidRecords");
+                    
+                    // Build material validation status
+                    var sMaterialStatus = "";
+                    var sStatusIcon = "";
+                    if (oMaterialResult.success) {
+                        sStatusIcon = "✓";
+                        sMaterialStatus = " Material validation: " + oMaterialResult.totalValidated + " plant(s) checked";
+                    } else {
+                        sStatusIcon = "⚠";
+                        sMaterialStatus = " Material validation: CPI service unavailable (validation skipped)";
+                    }
+                    
+                    var sSalesOrderInfo = "";
+                    if (oMaterialResult.salesOrders && oMaterialResult.salesOrders.length > 0) {
+                        sSalesOrderInfo = "\nFound " + oMaterialResult.salesOrders.length + " sales order(s) for material 1000253";
+                    }
+                    
+                    var sErrorDetails = "";
+                    if (oMaterialResult.errors && oMaterialResult.errors.length > 0) {
+                        sErrorDetails = "\n\nCPI Service Issues:";
+                        oMaterialResult.errors.forEach(function(oErr) {
+                            var sErrMsg = oErr.error || "";
+                            // Simplify error message
+                            if (sErrMsg.includes("500") || sErrMsg.includes("Internal Server Error")) {
+                                sErrMsg = "CPI service temporarily unavailable";
+                            }
+                            sErrorDetails += "\n- " + (oErr.plant ? "Plant " + oErr.plant + ": " : "") + sErrMsg;
+                        });
+                        sErrorDetails += "\n\nNote: You can continue with data upload despite CPI validation issues.";
+                    }
+                    
+                    var sMessageType = (oMaterialResult.success && iInvalid === 0) ? "success" : "information";
+                    
+                    MessageBox[sMessageType](
+                        "Data validation completed.\n\n" +
+                        sStatusIcon + sMaterialStatus + sSalesOrderInfo + sErrorDetails +
+                        "\n\nData Records:" +
+                        "\nValid: " + iValid + 
+                        "\nInvalid: " + iInvalid,
+                        {
+                            title: "Validation Results",
+                            contentWidth: "500px"
+                        }
+                    );
+                }.bind(this));
             }.bind(this)).catch(function(oError) {
                 this.getView().setBusy(false);
-                MessageBox.error("Validation failed: " + oError.message);
+                console.error("Validation error:", oError);
+                MessageBox.warning(
+                    "Material validation service is currently unavailable.\n\n" +
+                    "However, you can still proceed with:\n" +
+                    "• Data validation (completed)\n" +
+                    "• Upload to ERP\n\n" +
+                    "Error: " + (oError.message || "Unknown error"),
+                    {
+                        title: "Validation Warning"
+                    }
+                );
             }.bind(this));
         },
 

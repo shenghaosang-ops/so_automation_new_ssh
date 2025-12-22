@@ -71,30 +71,45 @@ sap.ui.define([], function() {
             });
         },
 
-        // BPA API can integrate in here
-/**
- * Download Excel file from URL
- * @param {string} sUrl - URL of the Excel file
- * @returns {Promise} Promise with download result
- */
-downloadExcelFile: function(sUrl) {
-    return new Promise(function(resolve, reject) {
-        // Mock API call for downloading Excel file
-        setTimeout(function() {
-            // Simulate successful download
-            resolve({
-                success: true,
-                filePath: "C:\\Downloads\\CustomerOrders_" + new Date().getTime() + ".xlsx"
-            });
+        /**
+         * Download Excel file from URL using BPA API
+         * @param {string} sUrl - URL of the Excel file
+         * @returns {Promise} Promise with download result
+         */
+        downloadExcelFile: function(sUrl) {
+            return new Promise(async function(resolve, reject) {
+                try {
+                    // Import ApiService dynamically
+                    var ApiService = sap.ui.require("yegeoaiso/services/ApiService");
+                    
+                    if (!ApiService) {
+                        // Load ApiService if not already loaded
+                        ApiService = await new Promise(function(res, rej) {
+                            sap.ui.require(["yegeoaiso/services/ApiService"], function(Service) {
+                                res(Service);
+                            }, rej);
+                        });
+                    }
 
-            // Uncomment to simulate error
-            /*reject({
-                success: false,
-                message: "Network error occurred"
-            });*/
-        }, 2000); // Simulate network delay
-    });
-},
+                    // Call BPA trigger API
+                    var oResult = await ApiService.callBPATriggerAPI(sUrl);
+                    
+                    // Log the result for debugging
+                    console.log("BPA Result:", oResult);
+                    
+                    resolve({
+                        success: true,
+                        message: oResult.message || "BPA process triggered",
+                        jobUid: oResult.jobUid || "N/A"
+                    });
+                } catch (error) {
+                    reject({
+                        success: false,
+                        message: error.message || "Failed to trigger BPA process"
+                    });
+                }
+            });
+        },
         /**
          * Extract data from document (PDF, DOC, TXT)
          * @param {Object} oConfig - Configuration object with file

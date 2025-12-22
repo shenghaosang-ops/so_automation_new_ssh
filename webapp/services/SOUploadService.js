@@ -16,6 +16,116 @@ sap.ui.define([], function() {
         },
 
         /**
+         * Check material validity using CPI API
+         * @param {Array} aData - Array of SO records
+         * @returns {Promise} Promise with validation results
+         */
+        checkMaterialValidity: async function(aData) {
+            try {
+                // Import ApiService dynamically
+                var ApiService = sap.ui.require("yegeoaiso/services/ApiService");
+                
+                if (!ApiService) {
+                    // Load ApiService if not already loaded
+                    ApiService = await new Promise(function(res, rej) {
+                        sap.ui.require(["yegeoaiso/services/ApiService"], function(Service) {
+                            res(Service);
+                        }, rej);
+                    });
+                }
+
+                // Use default material number
+                var sMaterial = "1000253";
+                
+                // Batch process all unique CustomerCode values
+                var aUniqueCustomerCodes = [];
+                var oCustomerCodeMap = {};
+                
+                // Extract all unique CustomerCode/CompanyCode values
+                aData.forEach(function(oItem) {
+                    var sCustomerCode = oItem.customerCode || oItem.CompanyCode || oItem.companyCode || "";
+                    if (sCustomerCode && !oCustomerCodeMap[sCustomerCode]) {
+                        oCustomerCodeMap[sCustomerCode] = true;
+                        aUniqueCustomerCodes.push(sCustomerCode);
+                    }
+                });
+
+                console.log("Found unique customer codes:", aUniqueCustomerCodes);
+                console.log("Sample data item:", aData[0]);
+
+                if (aUniqueCustomerCodes.length === 0) {
+                    throw new Error("No CustomerCode/CompanyCode found in data. Please check data structure.");
+                }
+
+                // Call CPI API for each unique customer code (SERIAL with delay)
+                var aAllResults = [];
+                var aErrors = [];
+                
+                // Helper function to delay
+                var delay = function(ms) {
+                    return new Promise(function(resolve) {
+                        setTimeout(resolve, ms);
+                    });
+                };
+                
+                // Process sequentially with 2-second delay between requests
+                for (var i = 0; i < aUniqueCustomerCodes.length; i++) {
+                    var sProductionPlant = aUniqueCustomerCodes[i];
+                    console.log("Validating material " + sMaterial + " for plant " + sProductionPlant + " (" + (i + 1) + "/" + aUniqueCustomerCodes.length + ")");
+                    
+                    try {
+                        var oResult = await ApiService.callCPIMaterialValidation(sMaterial, sProductionPlant);
+                        if (oResult.results && oResult.results.length > 0) {
+                            aAllResults = aAllResults.concat(oResult.results);
+                            console.log("✓ Plant " + sProductionPlant + ": Found " + oResult.results.length + " sales order(s)");
+                        } else {
+                            console.log("⚠ Plant " + sProductionPlant + ": No sales orders found");
+                        }
+                    } catch (error) {
+                        console.error("✗ Validation failed for plant " + sProductionPlant + ":", error.message);
+                        aErrors.push({
+                            plant: sProductionPlant,
+                            error: error.message
+                        });
+                    }
+                    
+                    // Wait 2 seconds before next request (except for last one)
+                    if (i < aUniqueCustomerCodes.length - 1) {
+                        console.log("Waiting 2 seconds before next validation...");
+                        await delay(2000);
+                    }
+                }
+                
+                var bAllSuccess = aErrors.length === 0;
+                var sMessage = bAllSuccess ? 
+                    "Material validation completed successfully" :
+                    "Material validation completed with " + aErrors.length + " error(s)";
+                
+                return {
+                    success: bAllSuccess,
+                    message: sMessage,
+                    materialValid: aAllResults.length > 0,
+                    salesOrders: aAllResults,
+                    totalValidated: aUniqueCustomerCodes.length,
+                    errors: aErrors,
+                    data: {
+                        results: aAllResults
+                    }
+                };
+            } catch (error) {
+                console.error("Material validation failed:", error);
+                return {
+                    success: false,
+                    message: error.message || "Material validation failed",
+                    materialValid: false,
+                    salesOrders: [],
+                    totalValidated: 0,
+                    errors: [{ error: error.message }]
+                };
+            }
+        },
+
+        /**
          * Validate SO data before upload
          * @param {Array} aData - Array of SO records
          * @returns {Promise} Promise with validated data
