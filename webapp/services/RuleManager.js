@@ -22,13 +22,13 @@ sap.ui.define([], function() {
                 ],
                 rules: {
                 "C001": [
-                    "Check whether the value of `CustomerPurchaseCode` is `SAP`. If yes, keep the original data.",
+                    "Check whether the value of `CustomerPurchaseCode` is `1010`. If yes, keep the original data.",
                     "Insert a new column to the right of `POItemNo`, name it `PO+POLINE`, and set its value to `CONCATENATE(PONo, POItemNo)`.",
                     "Filter the values in the `PO+POLINE` column, keeping only the data where `PO+POLINE` is greater than `107774190400640`.",
                     "Insert a new column to the right of `BalanceQTY`, name it `QTY`, and set its value to `BalanceQTY / 1000`.",
                     "Insert a new column to the left of `PartNo`, name it `SalesOrderType`. If the first two characters of `PartNo` contain (`AT`, `RT`, values starting with `P`, `RL`, `RC0100`, `RC0075`, `RP`, `CC0100`, `500V↑`, `AC`, `CQ`, `CS`, `CC_105↑` (1 μF and above), or `RC_P`), then set the sales type to `ZOR1`. If the first two characters of `CustomerPartNO` contain (`AC`, `AA`, `RC0201↑`, `AF`, `YC`, `TC`, `RE`, `SR`, `AS`, `AH`, `RV`, `CC` general products), then set the sales type to `ZCO`.",
                     "Delete rows where the order status `POStatus` is `Block` or `To be cancel`.",
-                    "Extract the following fields from the data table and output to Excel: `CustomerPurchaseCode`, `PONo`, `PODate`, `POItemNo`, `PO+POLINE`, `CustomerPartNO`, `QTY`, `RequestDate`, `NetPrice`, `PartNo`, `SalesOrderType`."
+                    "Extract the following fields from the data table and output to Excel: `CustomerPurchaseCode`, `PONo`, `PODate`, `POItemNo`, `PO+POLINE`,`CompanyCode`, `CustomerPartNO`, `QTY`, `RequestDate`, `NetPrice`, `PartNo`, `SalesOrderType`."
                 ],
                 "C002": [
                     "Delete line items with blank values in the Delivery Date column",
@@ -37,7 +37,7 @@ sap.ui.define([], function() {
                     "Create a new column to the right of Delivery Date, named 'CRD'. The CRD value is a date that equals Delivery Date minus 20 days.",
                     "Create a new column to the right of Order Qty, named 'Quantity'. The value equals Order Qty divided by 1000.",
                     "Add a new column to the left of Manuf. P/N, named 'SalesOrderType'. For Part No values with the first two characters starting with (AT, RT, P prefix, RL, RC0100, RC0075, RP, CC0100, 500V↑, AC, CQ, CS, CC_105↑(1 uF and above)) & RC_P, the sales type is ZOR1. For CustomerPartNO values with the first two characters starting with (AC, AA, RC0201↑, AF, YC, TC, RE, SR, AS, AH, RV, CC general products), the sales type is ZCO.",
-                    "Extract the following fields from the data table for Excel output: Vendor NO, PO Number, Item No, Part No, Delivery Date, PO Date, Quantity, Manuf. P/N, Plant, Ship To, SalesOrderType."
+                    "Extract the following fields from the data table for Excel output: Vendor NO, PO Number, Item No, CompanyCode,Part No, Delivery Date, PO Date, Quantity, Manuf. P/N, Plant, Ship To, SalesOrderType."
                 ],
                 "C003": [
                     "Check that Order Qty is greater than 0",

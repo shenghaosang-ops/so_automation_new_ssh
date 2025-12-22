@@ -138,6 +138,48 @@ sap.ui.define([], function() {
                 console.error("CPI material validation API call failed:", error);
                 throw error;
             }
+        },
+
+        /**
+         * Call CPI API to create sales order
+         * @param {Object} oSalesOrderData Sales order data
+         * @returns {Promise<Object>} API response object
+         */
+        callCPICreateSalesOrder: async function(oSalesOrderData) {
+            console.log("Calling CPI create sales order API with data:", oSalesOrderData);
+            try {
+                var response = await fetch('https://yageo-poc-backend-grateful-aardvark-kn.cfapps.eu12.hana.ondemand.com/v1/cpi/salesorder', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(oSalesOrderData)
+                });
+
+                if (!response.ok) {
+                    var sErrorText = await response.text();
+                    throw new Error("CPI create SO API failed: " + response.status + " " + response.statusText + ". " + sErrorText);
+                }
+
+                var responseData = await response.json();
+                
+                console.log("CPI Create SO Response:", JSON.stringify(responseData, null, 2));
+                
+                if (responseData.status !== "success") {
+                    throw new Error("CPI SO creation failed: " + (responseData.message || "Unknown error"));
+                }
+
+                return {
+                    success: true,
+                    message: responseData.message,
+                    salesOrder: responseData.data && responseData.data.SalesOrder,
+                    data: responseData.data
+                };
+            } catch (error) {
+                console.error("CPI create SO API call failed:", error);
+                throw error;
+            }
         }
     };
 

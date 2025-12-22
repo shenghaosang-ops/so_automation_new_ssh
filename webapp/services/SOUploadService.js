@@ -43,7 +43,7 @@ sap.ui.define([], function() {
                 
                 // Extract all unique CustomerCode/CompanyCode values
                 aData.forEach(function(oItem) {
-                    var sCustomerCode = oItem.customerCode || oItem.CompanyCode || oItem.companyCode || "";
+                    var sCustomerCode = String(oItem.customerCode || oItem.CompanyCode || oItem.companyCode || "");
                     if (sCustomerCode && !oCustomerCodeMap[sCustomerCode]) {
                         oCustomerCodeMap[sCustomerCode] = true;
                         aUniqueCustomerCodes.push(sCustomerCode);
@@ -57,44 +57,43 @@ sap.ui.define([], function() {
                     throw new Error("No CustomerCode/CompanyCode found in data. Please check data structure.");
                 }
 
-                // Call CPI API for each unique customer code (SERIAL with delay)
+                // Call CPI API for each unique customer code (PARALLEL)
                 var aAllResults = [];
                 var aErrors = [];
                 
-                // Helper function to delay
-                var delay = function(ms) {
-                    return new Promise(function(resolve) {
-                        setTimeout(resolve, ms);
-                    });
-                };
+                console.log("Starting parallel validation for " + aUniqueCustomerCodes.length + " plant(s)...");
                 
-                // Process sequentially with 2-second delay between requests
-                for (var i = 0; i < aUniqueCustomerCodes.length; i++) {
-                    var sProductionPlant = aUniqueCustomerCodes[i];
-                    console.log("Validating material " + sMaterial + " for plant " + sProductionPlant + " (" + (i + 1) + "/" + aUniqueCustomerCodes.length + ")");
-                    
-                    try {
-                        var oResult = await ApiService.callCPIMaterialValidation(sMaterial, sProductionPlant);
-                        if (oResult.results && oResult.results.length > 0) {
-                            aAllResults = aAllResults.concat(oResult.results);
-                            console.log("✓ Plant " + sProductionPlant + ": Found " + oResult.results.length + " sales order(s)");
-                        } else {
-                            console.log("⚠ Plant " + sProductionPlant + ": No sales orders found");
-                        }
-                    } catch (error) {
-                        console.error("✗ Validation failed for plant " + sProductionPlant + ":", error.message);
-                        aErrors.push({
-                            plant: sProductionPlant,
-                            error: error.message
+                // Process all requests in parallel
+                var aPromises = aUniqueCustomerCodes.map(function(sProductionPlant) {
+                    return ApiService.callCPIMaterialValidation(sMaterial, sProductionPlant)
+                        .then(function(oResult) {
+                            if (oResult.results && oResult.results.length > 0) {
+                                console.log("✓ Plant " + sProductionPlant + ": Found " + oResult.results.length + " sales order(s)");
+                                return oResult.results;
+                            } else {
+                                console.log("⚠ Plant " + sProductionPlant + ": No sales orders found");
+                                return [];
+                            }
+                        })
+                        .catch(function(error) {
+                            console.error("✗ Validation failed for plant " + sProductionPlant + ":", error.message);
+                            aErrors.push({
+                                plant: sProductionPlant,
+                                error: error.message
+                            });
+                            return [];
                         });
+                });
+                
+                // Wait for all requests to complete
+                var aResults = await Promise.all(aPromises);
+                
+                // Flatten results
+                aResults.forEach(function(results) {
+                    if (results && results.length > 0) {
+                        aAllResults = aAllResults.concat(results);
                     }
-                    
-                    // Wait 2 seconds before next request (except for last one)
-                    if (i < aUniqueCustomerCodes.length - 1) {
-                        console.log("Waiting 2 seconds before next validation...");
-                        await delay(2000);
-                    }
-                }
+                });
                 
                 var bAllSuccess = aErrors.length === 0;
                 var sMessage = bAllSuccess ? 
@@ -135,6 +134,11 @@ sap.ui.define([], function() {
                 setTimeout(function() {
                     try {
                         var aValidatedData = aData.map(function(oItem) {
+                            // If already marked as invalid from processing, keep it invalid
+                            if (oItem.valid === false) {
+                                return oItem; // Don't change invalid items
+                            }
+                            
                             var bValid = true;
                             var aErrors = [];
 
@@ -181,84 +185,127 @@ sap.ui.define([], function() {
         },
 
         /**
-         * Upload SO data to ERP system
+         * Upload SO data to ERP system using CPI API
          * @param {Array} aData - Array of valid SO records
          * @param {Function} fnProgress - Progress callback function
          * @returns {Promise} Promise with upload results
          */
-        uploadToERP: function(aData, fnProgress) {
-            return new Promise(function(resolve, reject) {
+        uploadToERP: async function(aData, fnProgress) {
+            try {
+                // Import ApiService dynamically
+                var ApiService = sap.ui.require("yegeoaiso/services/ApiService");
+                
+                if (!ApiService) {
+                    ApiService = await new Promise(function(res, rej) {
+                        sap.ui.require(["yegeoaiso/services/ApiService"], function(Service) {
+                            res(Service);
+                        }, rej);
+                    });
+                }
+
                 var aResults = [];
                 var iTotal = aData.length;
                 var iProcessed = 0;
                 
-                // Generate base SO number (starting point)
-                // Format: 4000xxxxxx where xxxxxx increments
-                var iBaseSONumber = 4000000000 + Math.floor(Math.random() * 100000); // Random starting point
-                var iCurrentSONumber = iBaseSONumber;
+                // Get today's date in SAP format (DD.MM.YYYY)
+                var oToday = new Date();
+                var sDay = ("0" + oToday.getDate()).slice(-2);
+                var sMonth = ("0" + (oToday.getMonth() + 1)).slice(-2);
+                var sYear = oToday.getFullYear();
+                var sCreatedDate = sDay + "." + sMonth + "." + sYear;
 
-                // Simulate batch upload
-                var processNext = function() {
-                    if (iProcessed >= iTotal) {
-                        resolve(aResults);
-                        return;
-                    }
-
-                    var oItem = aData[iProcessed];
+                // Process each item sequentially
+                for (var i = 0; i < aData.length; i++) {
+                    var oItem = aData[i];
                     
-                    // Simulate ERP API call
-                    setTimeout(function() {
-                        // Simulate success/failure (90% success rate)
-                        var bSuccess = Math.random() > 0.1;
+                    try {
+                        // Build CPI request payload with fixed values
+                        // Ensure SalesOrganization is a string
+                        var sSalesOrg = String(oItem.customerCode || oItem.companyCode || "1010");
                         
-                        // Generate SAP-style SO number: sequential 10-digit number starting with 4
-                        var sSAPSONumber = "N/A";
-                        if (bSuccess) {
-                            sSAPSONumber = iCurrentSONumber.toString();
-                            iCurrentSONumber++; // Increment for next SO
-                        }
+                        var oRequestData = {
+                            A_SalesOrder: {
+                                SalesOrderType: "OR",
+                                SalesOrganization: sSalesOrg,
+                                DistributionChannel: "10",
+                                OrganizationDivision: "00",
+                                SalesGroup: "101",
+                                SalesOffice: "1010",
+                                SalesDistrict: "NORTH",
+                                SoldToParty: "1000042",
+                                ExternalDocumentID: "",
+                                PurchaseOrderByCustomer: "customer order number",
+                                to_Item: {
+                                    SalesOrderItemCategory: "TAN",
+                                    Material: "10000112",
+                                    RequestedQuantity: "1",
+                                    RequestedQuantityUnit: "EA",
+                                    ProductionPlant: "1010",
+                                    ShippingPoint: "1010"
+                                }
+                            }
+                        };
+
+                        console.log("Creating SO for item " + (i + 1) + "/" + iTotal + " (SalesOrg: " + sSalesOrg + ")");
+
+                        // Call CPI API
+                        var oResult = await ApiService.callCPICreateSalesOrder(oRequestData);
                         
-                        // Get today's date in SAP format (DD.MM.YYYY)
-                        var oToday = new Date();
-                        var sDay = ("0" + oToday.getDate()).slice(-2);
-                        var sMonth = ("0" + (oToday.getMonth() + 1)).slice(-2);
-                        var sYear = oToday.getFullYear();
-                        var sCreatedDate = sDay + "." + sMonth + "." + sYear;
-                        
-                        var oResult = {
+                        // Success result
+                        aResults.push({
                             rowIndex: oItem.rowIndex,
                             poNumber: oItem.poNumber,
-                            soNumber: sSAPSONumber,
-                            createdDate: bSuccess ? sCreatedDate : "",
+                            soNumber: oResult.salesOrder || "N/A",
+                            createdDate: sCreatedDate,
                             customerCode: oItem.customerCode,
                             customerName: oItem.customerName,
                             partNumber: oItem.partNo,
                             partNo: oItem.partNo,
                             quantity: oItem.quantity,
                             requestDate: oItem.requestDate,
-                            status: bSuccess ? "Success" : "Failed",
-                            errorMessage: bSuccess ? "" : "System error or duplicate PO",
-                            message: bSuccess ? 
-                                "SO created successfully in ERP system" : 
-                                "Failed: System error or duplicate PO"
-                        };
+                            status: "Success",
+                            errorMessage: "",
+                            message: "SO created successfully in ERP system"
+                        });
+                        
+                        console.log("✓ SO created successfully: " + oResult.salesOrder);
+                        
+                    } catch (error) {
+                        // Error result
+                        console.error("✗ Failed to create SO for item " + (i + 1) + ":", error.message);
+                        
+                        aResults.push({
+                            rowIndex: oItem.rowIndex,
+                            poNumber: oItem.poNumber,
+                            soNumber: "N/A",
+                            createdDate: "",
+                            customerCode: oItem.customerCode,
+                            customerName: oItem.customerName,
+                            partNumber: oItem.partNo,
+                            partNo: oItem.partNo,
+                            quantity: oItem.quantity,
+                            requestDate: oItem.requestDate,
+                            status: "Failed",
+                            errorMessage: error.message || "System error",
+                            message: "Failed: " + (error.message || "System error")
+                        });
+                    }
+                    
+                    iProcessed++;
+                    
+                    // Update progress
+                    var iProgress = Math.round((iProcessed / iTotal) * 100);
+                    if (fnProgress) {
+                        fnProgress(iProgress, iProcessed);
+                    }
+                }
 
-                        aResults.push(oResult);
-                        iProcessed++;
-
-                        // Update progress
-                        var iProgress = Math.round((iProcessed / iTotal) * 100);
-                        if (fnProgress) {
-                            fnProgress(iProgress, iProcessed);
-                        }
-
-                        // Process next item
-                        processNext();
-                    }, 500); // Simulate API call delay
-                };
-
-                processNext();
-            });
+                return aResults;
+                
+            } catch (error) {
+                console.error("Upload to ERP failed:", error);
+                throw error;
+            }
         },
 
         /**
